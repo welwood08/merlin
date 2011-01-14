@@ -28,7 +28,7 @@ from Core.db import true, false, session
 from Core.maps import Updates, Cluster, Galaxy, Planet, epenis, galpenis
 from Core.maps import galaxy_temp, planet_temp, planet_new_id_search, planet_old_id_search
 
-prefixes = ['ally_']
+prefixes = ['scans_']
 
 if len(sys.argv) > 1:
     Config.set("URL", "dumps", sys.argv[1])
