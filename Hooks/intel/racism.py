@@ -28,7 +28,7 @@ from Core.loadable import loadable, route
 class racism(loadable):
     """Shows averages for each race matching a given alliance in intel or for a galaxy."""
     usage = " <alliance> | <x:y>"
-    access = 3 # Member
+    access = 2 # Public
     
     @route(r"(\S+)", access="racism")
     def intel_alliance(self, message, user, params):
@@ -53,7 +53,11 @@ class racism(loadable):
         
         self.execute(message, alliance.name, result)
     
+<<<<<<< HEAD
     @route(loadable.coord, access="racism")
+=======
+    @route(loadable.coord, access = "galmate")
+>>>>>>> 8fabbbf... settings for #scans
     def galaxy(self, message, user, params):
         galaxy = Galaxy.load(*params.group(1,3))
         if galaxy is None:

@@ -28,17 +28,18 @@ from Core.paconf import PA
 from Core.db import session
 from Core.maps import Updates, Planet, Galaxy, Request, Intel
 from Core.chanusertracker import CUT
-from Core.loadable import loadable, route, require_user, robohci
+from Core.loadable import loadable, route, require_user, user_in, robohci
 
 class request(loadable):
     """Request a scan"""
     alias = "req"
     usage = " <x.y.z> <scantype(s)> [dists] | <id> blocks <amps> | cancel <id> | list | links"
-    access = 3 # Member
+    access = 2 # Public
     subcommands = ["req_cancel", "req_update", "req_list", "req_gal", "req_noquota", "req_highquota"]
-    subaccess = [3, 3, 3, 3, 1, 3]
+    subaccess = [3, 3, 3, 3, 2, 2]
     
     @route(loadable.coord+"\s+(["+"".join(PA.options("scans"))+r"]+)\w*(?:\s+(\d+))?", access="request")
+    @user_in("public")
     @require_user
     def execute(self, message, user, params):
         tick = Updates.current_tick()

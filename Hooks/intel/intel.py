@@ -30,7 +30,7 @@ class intel(loadable):
     """View or set intel for a planet. Valid options: """
     __doc__ += ", ".join(options)
     usage = " <x.y[.z]> [option=value]+"
-    access = 3 # Member
+    access = 2 # Pulic
     subcommands = ["intel_set"]
     subaccess = [3]
     

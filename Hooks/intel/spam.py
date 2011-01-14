@@ -27,7 +27,7 @@ from Core.loadable import loadable, route
 class spam(loadable):
     """Spam alliance coords"""
     usage = " <alliance>"
-    access = 3 # Member
+    access = 2 # Public
     
     @route(r"(\S+)", access="spam")
     def execute(self, message, user, params):

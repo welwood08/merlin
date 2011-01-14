@@ -105,8 +105,8 @@ if (not round) or fromlegacy:
     session.commit()
 
     print "Setting up default access levels"
-    addaccess("arthur_intel", 3)
-    addaccess("arthur_scans", 3)
+    addaccess("arthur_intel", 2)
+    addaccess("arthur_scans", 2)
     addaccess("arthur_attacks", 3)
 
     for callback in Callbacks.callbacks['PRIVMSG']:

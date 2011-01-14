@@ -28,7 +28,6 @@ from Arthur.context import menu, render
 from Arthur.loadable import loadable, load
 bot = Config.get("Connection","nick")
 
-@menu(bot, "Members")
 @load
 class members(loadable):
     access = "member"
@@ -63,7 +62,6 @@ class members(loadable):
         
         return render("members.tpl", request, accesslist=members)
 
-@menu(bot, "Galmates")
 @load
 class galmates(loadable):
     access = "member"
@@ -88,7 +86,6 @@ class galmates(loadable):
         
         return render("galmates.tpl", request, members=Q.all())
 
-@menu(bot, "Channels")
 @load
 class channels(loadable):
     access = "member"

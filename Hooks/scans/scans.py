@@ -29,7 +29,7 @@ from Core.loadable import loadable, route, robohci
 
 class scans(loadable):
     usage = " <x:y:z>"
-    access = 3 # Member
+    access = 2 # Public
     
     @route(loadable.planet_coord, access = "scans")
     def execute(self, message, user, params):

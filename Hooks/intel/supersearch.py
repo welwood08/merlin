@@ -28,7 +28,7 @@ from Core.loadable import loadable, route
 class supersearch(loadable):
     """Advanced planet/intel search: alliance, nick, reportchan, amps, dists, size, value, race, comment"""
     usage = "[option=value]+ [comment=key words]"
-    access = 3 # Member
+    access = 2 # Public
     
     @route("(.+)", access="supersearch")
     def search(self, message, user, params):

@@ -27,7 +27,7 @@ from Core.loadable import loadable, route
 class search(loadable):
     """Search for a planet by alliance or nick."""
     usage = " <alliance|nick>"
-    access = 3 # Member
+    access = 2 # Public
     
     @route(r"(\S+)", access="search")
     def execute(self, message, user, params):
