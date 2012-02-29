@@ -10,8 +10,8 @@ Installation Requirements
 Requirements: 
 
 + Git 
-+ Python 2.6
-+ PostgreSQL 8.4 
++ Python 2*
++ PostgreSQL 8*
 + psycopg2 2.2.1
 + SQLAlchemy 0.6.3
 
@@ -84,7 +84,7 @@ with client encoding LATIN1
 Preparing merlin
 ----------------------------
 
-Inspect and modify merlin.cfg in a text editor as required. You should only need to change the Connection, Admin, Alliance, Channel and DB settings. If you're using the SMS features you'll need to add your details in the clickatell and googlevoice section and check the sms setting in Misc.
+Inspect and modify merlin.cfg in an editor as required. You should only need to change the Connection, Admin, Alliance, Channel and DB settings. If you're using the SMS features you'll need to add your details in the clickatell and googlevoice section and check the sms setting in Misc.
 
 >Note Graphing can be completely disabled in the config, look for - graphing  : and append "cached", "enabled", or "disabled" depending on which you want!
        
@@ -94,7 +94,7 @@ Run createdb.py. This will create all the neccessary tables for you, as well as 
 
 Inspect and modify /Hooks/\_\_init\_\_.py as needed. This controls which groups of commands will be enabled. The SMS package is disabled by default, if you have a clickatell account to use you will want to remove the # character. Many alliances will want to disable the prop/cookie package, use a # character at the beginning of the line.
        
-You may also want to change the access levels for some of the commands,you should do that now. 
+You may also want to change the access levels for some of the commands, you should do that now. 
    
 Merlin Access Settings
 ----------------------------
