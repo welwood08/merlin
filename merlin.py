@@ -22,8 +22,8 @@
 import sys
 sys.stderr = sys.stdout
 
-if not 2.6 <= float(sys.version[:3]) < 2.7:
-    sys.exit("Python 2.6.x Required")
+if not 2.7 <= float(sys.version[:3]) < 3.0:
+    sys.exit("Python 2.7.x Required")
 
 if __name__ == "__main__":
     # Start the bot here, if we're the main module.
