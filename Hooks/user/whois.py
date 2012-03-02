@@ -35,7 +35,7 @@ class whois(loadable):
 
         # do stuff here
         if search.lower() == Config.get("Connection","nick").lower():
-            message.reply("I am %s. Hear me roar." % (Config.get("Connection","nick"),))
+            message.reply("I am %s. YOU ARE A GHEY!" % (Config.get("Connection","nick"),))
             return
 
         whore = User.load(name=search, exact=False, access="member") or User.load(name=search)
