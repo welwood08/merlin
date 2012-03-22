@@ -21,9 +21,9 @@
  
 # SQLAlchemy DB interface
 
-import psycopg2
-if not 2.1 <= float(psycopg2.__version__[2:6]):
-    sys.exit("psycopg2 2.2.1+ Required")
+#import psycopg2
+#if not 2.1 <= float(psycopg2.__version__[2:6]):
+#    sys.exit("psycopg2 2.2.1+ Required")
 import sys
 import sqlalchemy
 if not 6.3 <= float(sqlalchemy.__version__[2:5]) < 7.0:
@@ -37,8 +37,8 @@ from Core.config import Config
 from Core.string import encoding
 
 engine = create_engine(Config.get("DB", "URL"), convert_unicode=True, encoding=encoding)#, echo='debug')
-if engine.name != "postgresql" or "PostgreSQL 8.4" not in engine.connect().execute(text("SELECT version();")).scalar():
-    sys.exit("PostgreSQL 8.4+ Required.")
+#if engine.name != "postgresql" or "PostgreSQL 8.4" not in engine.connect().execute(text("SELECT version();")).scalar():
+#    sys.exit("PostgreSQL 8.4+ Required.")
 
 if encoding != engine.connect().execute(text("SHOW client_encoding;")).scalar().lower():
     sys.exit("Database client encoding needs to be %s." %(encoding,))
