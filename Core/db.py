@@ -40,8 +40,8 @@ engine = create_engine(Config.get("DB", "URL"), convert_unicode=True, encoding=e
 #if engine.name != "postgresql" or "PostgreSQL 8.4" not in engine.connect().execute(text("SELECT version();")).scalar():
 #    sys.exit("PostgreSQL 8.4+ Required.")
 
-if encoding != engine.connect().execute(text("SHOW client_encoding;")).scalar().lower():
-    sys.exit("Database client encoding needs to be %s." %(encoding,))
+#if encoding != engine.connect().execute(text("SHOW client_encoding;")).scalar().lower():
+#    sys.exit("Database client encoding needs to be %s." %(encoding,))
 
 # Some constants
 true = bindparam("true",True)
