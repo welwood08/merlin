@@ -274,12 +274,20 @@ while True:
                                   rrankdiff = COALESCE(t.size_rank - c.size_rank, 0),
                                   idle = CASE WHEN ((t.value-c.value) BETWEEN (c.vdiff-1) AND (c.vdiff+1) AND (c.xp-t.xp=0)) THEN 1 + COALESCE(c.idle, 0) ELSE 0 END
                                 FROM (SELECT *,
-                                  rank() OVER (ORDER BY totalroundroids DESC) AS totalroundroids_rank,
-                                  rank() OVER (ORDER BY totallostroids DESC) AS totallostroids_rank,
-                                  rank() OVER (ORDER BY size DESC) AS size_rank,
-                                  rank() OVER (ORDER BY score DESC) AS score_rank,
-                                  rank() OVER (ORDER BY value DESC) AS value_rank,
-                                  rank() OVER (ORDER BY xp DESC) AS xp_rank
+                                  (SELECT COUNT(*) + 1 FROM c WHERE totalroundroids > c.totalroundroids) as totalroundroids_rank,
+                                  (SELECT COUNT(*) + 1 FROM c WHERE totallostroids > c.totallostroids) as totallostroids_rank,
+                                  (SELECT COUNT(*) + 1 FROM c WHERE size > c.size) as size_rank,
+                                  (SELECT COUNT(*) + 1 FROM c WHERE score > c.score) as score_rank,
+                                  (SELECT COUNT(*) + 1 FROM c WHERE value > c.value) as value_rank,
+                                  (SELECT COUNT(*) + 1 FROM c WHERE xp > c.xp) as xp_rank,
+                                  """+
+                                #  rank() OVER (ORDER BY totalroundroids DESC) AS totalroundroids_rank,
+                                #  rank() OVER (ORDER BY totallostroids DESC) AS totallostroids_rank,
+                                #  rank() OVER (ORDER BY size DESC) AS size_rank,
+                                #  rank() OVER (ORDER BY score DESC) AS score_rank,
+                                #  rank() OVER (ORDER BY value DESC) AS value_rank,
+                                #  rank() OVER (ORDER BY xp DESC) AS xp_rank
+                                """
                                 FROM (SELECT t.*,
                                   COALESCE(c.totalroundroids + (GREATEST(t.size - c.size, 0)), t.size) AS totalroundroids,
                                   COALESCE(c.totallostroids + (GREATEST(c.size - t.size, 0)), 0) AS totallostroids
