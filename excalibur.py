@@ -322,6 +322,12 @@ while True:
 #                                   WHERE t.x = g.x AND t.y = g.y
 #                             ;"""))
 
+
+        session.execute(text("""UPDATE galaxy_temp AS t, galaxy as g SET
+                                  t.id = g.id
+                                  WHERE t.x = g.x AND t.y = g.y
+                            ;"""))
+
         # Make sure all the galaxies are active,
         #  some might have been deactivated previously
         session.execute(text("UPDATE galaxy SET active = :true;", bindparams=[true]))
@@ -478,6 +484,12 @@ while True:
 #                                 FROM (SELECT id, rulername, planetname FROM planet WHERE active = :true) AS p
 #                                   WHERE t.rulername = p.rulername AND t.planetname = p.planetname
 #                             ;""", bindparams=[true]))
+
+
+        session.execute(text("""UPDATE planet_temp AS t, planet as p SET
+                                  t.id = p.id
+                                  WHERE t.rulername = p.rulername AND t.planetname = p.planetname
+                            ;""", bindparams=[true]))
 
         t2=time.time()-t1
         excaliburlog("Copy planet ids to temp in %.3f seconds" % (t2,))
@@ -801,6 +813,12 @@ while True:
 #                                   WHERE t.name = a.name
 #                             ;"""))
 
+
+        session.execute(text("""UPDATE alliance_temp AS t, alliance AS a SET
+                                  t.id = a.id
+                                  WHERE t.name = a.name
+                            ;"""))
+
         # Make sure all the alliances are active,
         #  some might have been deactivated previously
         session.execute(text("UPDATE alliance SET active = :true;", bindparams=[true]))
@@ -953,11 +971,11 @@ while True:
                                   planets   = (SELECT count(*) FROM planet   WHERE planet.active   = :true),
                                   alliances = (SELECT count(*) FROM alliance WHERE alliance.active = :true),
                                   c200     = (SELECT count(*) FROM planet WHERE planet.active = :true AND x = 200),
-                                  ter      = (SELECT count(*) FROM planet WHERE planet.active = :true AND race ILIKE 'ter%'),
-                                  cat      = (SELECT count(*) FROM planet WHERE planet.active = :true AND race ILIKE 'cat%'),
-                                  xan      = (SELECT count(*) FROM planet WHERE planet.active = :true AND race ILIKE 'xan%'),
-                                  zik      = (SELECT count(*) FROM planet WHERE planet.active = :true AND race ILIKE 'zik%'),
-                                  etd      = (SELECT count(*) FROM planet WHERE planet.active = :true AND race ILIKE 'etd%')
+                                  ter      = (SELECT count(*) FROM planet WHERE planet.active = :true AND race LIKE 'ter%'),
+                                  cat      = (SELECT count(*) FROM planet WHERE planet.active = :true AND race LIKE 'cat%'),
+                                  xan      = (SELECT count(*) FROM planet WHERE planet.active = :true AND race LIKE 'xan%'),
+                                  zik      = (SELECT count(*) FROM planet WHERE planet.active = :true AND race LIKE 'zik%'),
+                                  etd      = (SELECT count(*) FROM planet WHERE planet.active = :true AND race LIKE 'etd%')
                                 WHERE updates.id = :tick
                             ;""", bindparams=[tick, true]))
 
