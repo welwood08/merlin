@@ -304,7 +304,34 @@ while True:
 #                                 AND c.active = :true
 #                             ;""", bindparams=[tick, true]))
 
-        session.execute(text("""UPDATE cluster AS c, cluster_temp AS t SET
+        session.execute(text("""UPDATE cluster AS c,
+                                 (SELECT *,
+                                   (SELECT COUNT(*) + 1 FROM c WHERE totalroundroids > c.totalroundroids) as totalroundroids_rank,
+                                   (SELECT COUNT(*) + 1 FROM c WHERE totallostroids > c.totallostroids) as totallostroids_rank,
+                                   (SELECT COUNT(*) + 1 FROM c WHERE size > c.size) as size_rank,
+                                   (SELECT COUNT(*) + 1 FROM c WHERE score > c.score) as score_rank,
+                                   (SELECT COUNT(*) + 1 FROM c WHERE value > c.value) as value_rank,
+                                   (SELECT COUNT(*) + 1 FROM c WHERE xp > c.xp) as xp_rank,
+                                   """+
+                                #  rank() OVER (ORDER BY totalroundroids DESC) AS totalroundroids_rank,
+                                #  rank() OVER (ORDER BY totallostroids DESC) AS totallostroids_rank,
+                                #  rank() OVER (ORDER BY size DESC) AS size_rank,
+                                #  rank() OVER (ORDER BY score DESC) AS score_rank,
+                                #  rank() OVER (ORDER BY value DESC) AS value_rank,
+                                #  rank() OVER (ORDER BY xp DESC) AS xp_rank
+                                 """
+                                 FROM (SELECT t.*,
+                                   COALESCE(c.totalroundroids + (GREATEST(t.size - c.size, 0)), t.size) AS totalroundroids,
+                                   COALESCE(c.totallostroids + (GREATEST(c.size - t.size, 0)), 0) AS totallostroids
+                                 FROM cluster AS c, (SELECT x,
+                                   count(*) as count,
+                                   sum(size) as size,
+                                   sum(value) as value,
+                                   sum(score) as score,
+                                   sum(xp) as xp
+                                 FROM planet_temp
+                                   GROUP BY x) AS t
+                                   WHERE c.x = t.x) AS t) AS t SET
                                   c.age = COALESCE(c.age, 0) + 1,
                                   c.size = t.size, c.score = t.score, c.value = t.value, c.xp = t.xp,
                                   c.ratio = CASE WHEN (t.value != 0) THEN 10000.0 * t.size / t.value ELSE 0 END,
