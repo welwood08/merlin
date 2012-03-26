@@ -390,13 +390,6 @@ while True:
 
                                  INSERT INTO temp_2 VALUES (SELECT x, y, count(*) AS count, SUM(score) AS real_score 
                                                               FROM planet_temp GROUP BY x, y);
-
-
-                                   (SELECT a.x, a.y, a.count, a.real_score,
-                                     (SELECT COUNT(*) + 1 FROM a WHERE real_score > a.real_score) as real_score_rank
-                                     FROM temp2 AS a
-                                   ) AS p
-                                   WHERE g.id = t.id AND g.x = p.x AND g.y = p.y AND g.active = :true;
                              """, bindparams=[true]))
 
         session.execute(text("""UPDATE galaxy AS g, 
@@ -685,95 +678,47 @@ while True:
 
         # Update everything from the temp table and generate ranks
         # Deactivated items are untouched but NULLed earlier
-#         session.execute(text("""UPDATE planet AS p SET
-#                                   age = COALESCE(p.age, 0) + 1,
-#                                   x = t.x, y = t.y, z = t.z,
-#                                   planetname = t.planetname, rulername = t.rulername, race = t.race,
-#                                   size = t.size, score = t.score, value = t.value, xp = t.xp,
-#                                   ratio = CASE WHEN (t.value != 0) THEN 10000.0 * t.size / t.value ELSE 0 END,
+        session.execute(text("""CREATE TABLE temp_1 (
+                                  id INT, 
+                                  x INT, 
+                                  y INT, 
+                                  name VARCHAR(255), 
+                                  size INT, 
+                                  score INT, 
+                                  value INT, 
+                                  xp INT, 
+                                  totalroundroids INT, 
+                                  totallostroids INT
+                                );
+
+                                CREATE TABLE temp_2 (
+                                  x INT, 
+                                  y INT, 
+                                  count INT, 
+                                  real_score INT, 
+                                );
+
+                                 INSERT INTO temp_1 VALUES (SELECT t.*,
+                                   COALESCE(g.totalroundroids + (GREATEST(t.size - g.size, 0)), t.size) AS totalroundroids,
+                                   COALESCE(g.totallostroids + (GREATEST(g.size - t.size, 0)), 0) AS totallostroids
+                                 FROM galaxy AS g, galaxy_temp AS t
+                                   WHERE g.id = t.id AND g.active = :true);
+
+                                 INSERT INTO temp_2 VALUES (SELECT x, y, count(*) AS count, SUM(score) AS real_score 
+                                                              FROM planet_temp GROUP BY x, y);
+                             """, bindparams=[true]))
+
+                                FROM (SELECT *,
+                             """ + ((
+                                  (SELECT COUNT(*) + 1 FROM temp_1 WHERE totalroundroids > temp_1.totalroundroids AND %s) as %s_totalroundroids_rank,
+                                  (SELECT COUNT(*) + 1 FROM temp_1 WHERE totallostroids > temp_1.totallostroids AND %s) as %s_totallostroids_rank,
+                                  (SELECT COUNT(*) + 1 FROM temp_1 WHERE size > temp_1.size AND %s) as %s_size_rank,
+                                  (SELECT COUNT(*) + 1 FROM temp_1 WHERE score > temp_1.score AND %s) as %s_score_rank,
+                                  (SELECT COUNT(*) + 1 FROM temp_1 WHERE value > temp_1.value AND %s) as %s_value_rank,
+                                  (SELECT COUNT(*) + 1 FROM temp_1 WHERE xp > temp_1.xp AND %s) as %s_xp_rank,
+                             """ * 3) % (("x=temp1.x","cluster",)*6 + ("x=temp1.x AND y=temp1.y","galaxy",)*6 + ("race=temp1.race","race",)*6)) +
 #                              """ + ((
-#                              """
-#                                   size_growth = t.size - COALESCE(p.size - p.size_growth, 0),
-#                                   score_growth = t.score - COALESCE(p.score - p.score_growth, 0),
-#                                   value_growth = t.value - COALESCE(p.value - p.value_growth, 0),
-#                                   xp_growth = t.xp - COALESCE(p.xp - p.xp_growth, 0),
-#                                   size_growth_pc = CASE WHEN (p.size - p.size_growth != 0) THEN COALESCE((t.size - (p.size - p.size_growth)) * 100.0 / (p.size - p.size_growth), 0) ELSE 0 END,
-#                                   score_growth_pc = CASE WHEN (p.score - p.score_growth != 0) THEN COALESCE((t.score - (p.score - p.score_growth)) * 100.0 / (p.score - p.score_growth), 0) ELSE 0 END,
-#                                   value_growth_pc = CASE WHEN (p.value - p.value_growth != 0) THEN COALESCE((t.value - (p.value - p.value_growth)) * 100.0 / (p.value - p.value_growth), 0) ELSE 0 END,
-#                                   xp_growth_pc = CASE WHEN (p.xp - p.xp_growth != 0) THEN COALESCE((t.xp - (p.xp - p.xp_growth)) * 100.0 / (p.xp - p.xp_growth), 0) ELSE 0 END,
-#                              """ + ((
-#                              """
-#                                   %ssize_rank_change = t.%ssize_rank - COALESCE(p.%ssize_rank - p.%ssize_rank_change, 0),
-#                                   %sscore_rank_change = t.%sscore_rank - COALESCE(p.%sscore_rank - p.%sscore_rank_change, 0),
-#                                   %svalue_rank_change = t.%svalue_rank - COALESCE(p.%svalue_rank - p.%svalue_rank_change, 0),
-#                                   %sxp_rank_change = t.%sxp_rank - COALESCE(p.%sxp_rank - p.%sxp_rank_change, 0),
-#                                   %stotalroundroids_rank_change = t.%stotalroundroids_rank - COALESCE(p.%stotalroundroids_rank - p.%stotalroundroids_rank_change, 0),
-#                                   %stotallostroids_rank_change = t.%stotallostroids_rank - COALESCE(p.%stotallostroids_rank - p.%stotallostroids_rank_change, 0),
-#                              """ * 4) % (("",)*24 + ("cluster_",)*24 + ("galaxy_",)*24 + ("race_",)*24)) +
-#                              """
-#                                   totalroundroids_growth = t.totalroundroids - COALESCE(p.totalroundroids - p.totalroundroids_growth, 0),
-#                                   totalroundroids_growth_pc = CASE WHEN (p.totalroundroids - p.totalroundroids_growth != 0) THEN COALESCE((t.totalroundroids - (p.totalroundroids - p.totalroundroids_growth)) * 100.0 / (p.totalroundroids - p.totalroundroids_growth), 0) ELSE 0 END,
-#                                   totallostroids_growth = t.totallostroids - COALESCE(p.totallostroids - p.totallostroids_growth, 0),
-#                                   totallostroids_growth_pc = CASE WHEN (p.totallostroids - p.totallostroids_growth != 0) THEN COALESCE((t.totallostroids - (p.totallostroids - p.totallostroids_growth)) * 100.0 / (p.totallostroids - p.totallostroids_growth), 0) ELSE 0 END,
-#                              """ ) if not midnight
-#                                  else (
-#                              """
-#                                   size_growth = t.size - COALESCE(p.size, 0),
-#                                   score_growth = t.score - COALESCE(p.score, 0),
-#                                   value_growth = t.value - COALESCE(p.value, 0),
-#                                   xp_growth = t.xp - COALESCE(p.xp, 0),
-#                                   size_growth_pc = CASE WHEN (p.size != 0) THEN COALESCE((t.size - p.size) * 100.0 / p.size, 0) ELSE 0 END,
-#                                   score_growth_pc = CASE WHEN (p.score != 0) THEN COALESCE((t.score - p.score) * 100.0 / p.score, 0) ELSE 0 END,
-#                                   value_growth_pc = CASE WHEN (p.value != 0) THEN COALESCE((t.value - p.value) * 100.0 / p.value, 0) ELSE 0 END,
-#                                   xp_growth_pc = CASE WHEN (p.xp != 0) THEN COALESCE((t.xp - p.xp) * 100.0 / p.xp, 0) ELSE 0 END,
-#                              """ + ((
-#                              """
-#                                   %ssize_rank_change = t.%ssize_rank - COALESCE(p.%ssize_rank, 0),
-#                                   %sscore_rank_change = t.%sscore_rank - COALESCE(p.%sscore_rank, 0),
-#                                   %svalue_rank_change = t.%svalue_rank - COALESCE(p.%svalue_rank, 0),
-#                                   %sxp_rank_change = t.%sxp_rank - COALESCE(p.%sxp_rank, 0),
-#                                   %stotalroundroids_rank_change = t.%stotalroundroids_rank - COALESCE(p.%stotalroundroids_rank, 0),
-#                                   %stotallostroids_rank_change = t.%stotallostroids_rank - COALESCE(p.%stotallostroids_rank, 0),
-#                              """ * 4) % (("",)*18 + ("cluster_",)*18 + ("galaxy_",)*18 + ("race_",)*18)) +
-#                              """
-#                                   totalroundroids_growth = t.totalroundroids - COALESCE(p.totalroundroids, 0),
-#                                   totalroundroids_growth_pc = CASE WHEN (p.totalroundroids != 0) THEN COALESCE((t.totalroundroids - p.totalroundroids) * 100.0 / p.totalroundroids, 0) ELSE 0 END,
-#                                   totallostroids_growth = t.totallostroids - COALESCE(p.totallostroids, 0),
-#                                   totallostroids_growth_pc = CASE WHEN (p.totallostroids != 0) THEN COALESCE((t.totallostroids - p.totallostroids) * 100.0 / p.totallostroids, 0) ELSE 0 END,
-#                              """ )) +
-#                              """
-#                                   totalroundroids = t.totalroundroids, totallostroids = t.totallostroids,
-#                              """ + ((
-#                              """
-#                                   %ssize_rank = t.%ssize_rank, %sscore_rank = t.%sscore_rank, %svalue_rank = t.%svalue_rank, %sxp_rank = t.%sxp_rank,
-#                                   %stotalroundroids_rank = t.%stotalroundroids_rank, %stotallostroids_rank = t.%stotallostroids_rank,
-#                              """ * 4) % (("",)*12 + ("cluster_",)*12 + ("galaxy_",)*12 + ("race_",)*12)) +
-#                              """
-#                                   ticksroiding = COALESCE(p.ticksroiding, 0) + CASE WHEN (t.size > p.size AND (t.size - p.size) != (t.xp - p.xp)) THEN 1 ELSE 0 END,
-#                                   ticksroided = COALESCE(p.ticksroided, 0) + CASE WHEN (t.size < p.size) THEN 1 ELSE 0 END,
-#                                   tickroids = COALESCE(p.tickroids, 0) + t.size,
-#                                   avroids = COALESCE((p.tickroids + t.size) / (p.age + 1.0), t.size),
-#                                   roidxp = CASE WHEN (t.size != 0) THEN t.xp * 1.0 / t.size ELSE 0 END,
-#                              """ + ((
-#                              """
-#                                   %s_highest_rank = CASE WHEN (t.%s_rank <= COALESCE(p.%s_highest_rank, t.%s_rank)) THEN t.%s_rank ELSE p.%s_highest_rank END,
-#                                   %s_highest_rank_tick = CASE WHEN (t.%s_rank <= COALESCE(p.%s_highest_rank, t.%s_rank)) THEN :tick ELSE p.%s_highest_rank_tick END,
-#                                   %s_lowest_rank = CASE WHEN (t.%s_rank >= COALESCE(p.%s_lowest_rank, t.%s_rank)) THEN t.%s_rank ELSE p.%s_lowest_rank END,
-#                                   %s_lowest_rank_tick = CASE WHEN (t.%s_rank >= COALESCE(p.%s_lowest_rank, t.%s_rank)) THEN :tick ELSE p.%s_lowest_rank_tick END,
-#                              """ * 4) % (("size",)*22 + ("score",)*22 + ("value",)*22 + ("xp",)*22)) +
-#                              """
-#                                   vdiff = COALESCE(t.value - p.value, 0),
-#                                   sdiff = COALESCE(t.score - p.score, 0),
-#                                   xdiff = COALESCE(t.xp - p.xp, 0),
-#                                   rdiff = COALESCE(t.size - p.size, 0),
-#                                   vrankdiff = COALESCE(t.value_rank - p.value_rank, 0),
-#                                   srankdiff = COALESCE(t.score_rank - p.score_rank, 0),
-#                                   xrankdiff = COALESCE(t.xp_rank - p.xp_rank, 0),
-#                                   rrankdiff = COALESCE(t.size_rank - p.size_rank, 0),
-#                                   idle = CASE WHEN ((t.value-p.value) BETWEEN (p.vdiff-1) AND (p.vdiff+1) AND (p.xp-t.xp=0)) THEN 1 + COALESCE(p.idle, 0) ELSE 0 END
-#                                 FROM (SELECT *,
-#                              """ + ((
-#                              """
+#                                   (SELECT COUNT(*) + 1 FROM temp_1 WHERE totallostroids > temp_1.totallostroids AND x=temp1.x) as totallostroids_rank,
 #                                   rank() OVER (PARTITION BY %s ORDER BY totalroundroids DESC) AS %s_totalroundroids_rank,
 #                                   rank() OVER (PARTITION BY %s ORDER BY totallostroids DESC) AS %s_totallostroids_rank,
 #                                   rank() OVER (PARTITION BY %s ORDER BY size DESC) AS %s_size_rank,
@@ -788,14 +733,131 @@ while True:
 #                                   rank() OVER (ORDER BY score DESC) AS score_rank,
 #                                   rank() OVER (ORDER BY value DESC) AS value_rank,
 #                                   rank() OVER (ORDER BY xp DESC) AS xp_rank
-#                                 FROM (SELECT t.*,
-#                                   COALESCE(p.totalroundroids + (GREATEST(t.size - p.size, 0)), t.size) AS totalroundroids,
-#                                   COALESCE(p.totallostroids + (GREATEST(p.size - t.size, 0)), 0) AS totallostroids
-#                                 FROM planet AS p, planet_temp AS t
-#                                   WHERE p.id = t.id AND p.active = :true) AS t) AS t
-#                                   WHERE p.id = t.id
-#                                 AND p.active = :true
-#                             ;""", bindparams=[tick, true]))
+                             """
+                                  (SELECT COUNT(*) + 1 FROM temp_1 WHERE totalroundroids > temp_1.totalroundroids) as totalroundroids_rank,
+                                  (SELECT COUNT(*) + 1 FROM temp_1 WHERE totallostroids > temp_1.totallostroids) as totallostroids_rank,
+                                  (SELECT COUNT(*) + 1 FROM temp_1 WHERE size > temp_1.size) as size_rank,
+                                  (SELECT COUNT(*) + 1 FROM temp_1 WHERE score > temp_1.score) as score_rank,
+                                  (SELECT COUNT(*) + 1 FROM temp_1 WHERE value > temp_1.value) as value_rank,
+                                  (SELECT COUNT(*) + 1 FROM temp_1 WHERE xp > temp_1.xp) as xp_rank,
+                                FROM (SELECT t.*,
+                                  COALESCE(p.totalroundroids + (GREATEST(t.size - p.size, 0)), t.size) AS totalroundroids,
+                                  COALESCE(p.totallostroids + (GREATEST(p.size - t.size, 0)), 0) AS totallostroids
+                                FROM planet AS p, planet_temp AS t
+                                  WHERE p.id = t.id AND p.active = :true) AS t) AS t
+                                  WHERE p.id = t.id
+                                AND p.active = :true
+        session.execute(text("""UPDATE planet AS p SET
+                                  age = COALESCE(p.age, 0) + 1,
+                                  x = t.x, y = t.y, z = t.z,
+                                  planetname = t.planetname, rulername = t.rulername, race = t.race,
+                                  size = t.size, score = t.score, value = t.value, xp = t.xp,
+                                  ratio = CASE WHEN (t.value != 0) THEN 10000.0 * t.size / t.value ELSE 0 END,
+                             """ + ((
+                             """
+                                  size_growth = t.size - COALESCE(p.size - p.size_growth, 0),
+                                  score_growth = t.score - COALESCE(p.score - p.score_growth, 0),
+                                  value_growth = t.value - COALESCE(p.value - p.value_growth, 0),
+                                  xp_growth = t.xp - COALESCE(p.xp - p.xp_growth, 0),
+                                  size_growth_pc = CASE WHEN (p.size - p.size_growth != 0) THEN COALESCE((t.size - (p.size - p.size_growth)) * 100.0 / (p.size - p.size_growth), 0) ELSE 0 END,
+                                  score_growth_pc = CASE WHEN (p.score - p.score_growth != 0) THEN COALESCE((t.score - (p.score - p.score_growth)) * 100.0 / (p.score - p.score_growth), 0) ELSE 0 END,
+                                  value_growth_pc = CASE WHEN (p.value - p.value_growth != 0) THEN COALESCE((t.value - (p.value - p.value_growth)) * 100.0 / (p.value - p.value_growth), 0) ELSE 0 END,
+                                  xp_growth_pc = CASE WHEN (p.xp - p.xp_growth != 0) THEN COALESCE((t.xp - (p.xp - p.xp_growth)) * 100.0 / (p.xp - p.xp_growth), 0) ELSE 0 END,
+                             """ + ((
+                             """
+                                  %ssize_rank_change = t.%ssize_rank - COALESCE(p.%ssize_rank - p.%ssize_rank_change, 0),
+                                  %sscore_rank_change = t.%sscore_rank - COALESCE(p.%sscore_rank - p.%sscore_rank_change, 0),
+                                  %svalue_rank_change = t.%svalue_rank - COALESCE(p.%svalue_rank - p.%svalue_rank_change, 0),
+                                  %sxp_rank_change = t.%sxp_rank - COALESCE(p.%sxp_rank - p.%sxp_rank_change, 0),
+                                  %stotalroundroids_rank_change = t.%stotalroundroids_rank - COALESCE(p.%stotalroundroids_rank - p.%stotalroundroids_rank_change, 0),
+                                  %stotallostroids_rank_change = t.%stotallostroids_rank - COALESCE(p.%stotallostroids_rank - p.%stotallostroids_rank_change, 0),
+                             """ * 4) % (("",)*24 + ("cluster_",)*24 + ("galaxy_",)*24 + ("race_",)*24)) +
+                             """
+                                  totalroundroids_growth = t.totalroundroids - COALESCE(p.totalroundroids - p.totalroundroids_growth, 0),
+                                  totalroundroids_growth_pc = CASE WHEN (p.totalroundroids - p.totalroundroids_growth != 0) THEN COALESCE((t.totalroundroids - (p.totalroundroids - p.totalroundroids_growth)) * 100.0 / (p.totalroundroids - p.totalroundroids_growth), 0) ELSE 0 END,
+                                  totallostroids_growth = t.totallostroids - COALESCE(p.totallostroids - p.totallostroids_growth, 0),
+                                  totallostroids_growth_pc = CASE WHEN (p.totallostroids - p.totallostroids_growth != 0) THEN COALESCE((t.totallostroids - (p.totallostroids - p.totallostroids_growth)) * 100.0 / (p.totallostroids - p.totallostroids_growth), 0) ELSE 0 END,
+                             """ ) if not midnight
+                                 else (
+                             """
+                                  size_growth = t.size - COALESCE(p.size, 0),
+                                  score_growth = t.score - COALESCE(p.score, 0),
+                                  value_growth = t.value - COALESCE(p.value, 0),
+                                  xp_growth = t.xp - COALESCE(p.xp, 0),
+                                  size_growth_pc = CASE WHEN (p.size != 0) THEN COALESCE((t.size - p.size) * 100.0 / p.size, 0) ELSE 0 END,
+                                  score_growth_pc = CASE WHEN (p.score != 0) THEN COALESCE((t.score - p.score) * 100.0 / p.score, 0) ELSE 0 END,
+                                  value_growth_pc = CASE WHEN (p.value != 0) THEN COALESCE((t.value - p.value) * 100.0 / p.value, 0) ELSE 0 END,
+                                  xp_growth_pc = CASE WHEN (p.xp != 0) THEN COALESCE((t.xp - p.xp) * 100.0 / p.xp, 0) ELSE 0 END,
+                             """ + ((
+                             """
+                                  %ssize_rank_change = t.%ssize_rank - COALESCE(p.%ssize_rank, 0),
+                                  %sscore_rank_change = t.%sscore_rank - COALESCE(p.%sscore_rank, 0),
+                                  %svalue_rank_change = t.%svalue_rank - COALESCE(p.%svalue_rank, 0),
+                                  %sxp_rank_change = t.%sxp_rank - COALESCE(p.%sxp_rank, 0),
+                                  %stotalroundroids_rank_change = t.%stotalroundroids_rank - COALESCE(p.%stotalroundroids_rank, 0),
+                                  %stotallostroids_rank_change = t.%stotallostroids_rank - COALESCE(p.%stotallostroids_rank, 0),
+                             """ * 4) % (("",)*18 + ("cluster_",)*18 + ("galaxy_",)*18 + ("race_",)*18)) +
+                             """
+                                  totalroundroids_growth = t.totalroundroids - COALESCE(p.totalroundroids, 0),
+                                  totalroundroids_growth_pc = CASE WHEN (p.totalroundroids != 0) THEN COALESCE((t.totalroundroids - p.totalroundroids) * 100.0 / p.totalroundroids, 0) ELSE 0 END,
+                                  totallostroids_growth = t.totallostroids - COALESCE(p.totallostroids, 0),
+                                  totallostroids_growth_pc = CASE WHEN (p.totallostroids != 0) THEN COALESCE((t.totallostroids - p.totallostroids) * 100.0 / p.totallostroids, 0) ELSE 0 END,
+                             """ )) +
+                             """
+                                  totalroundroids = t.totalroundroids, totallostroids = t.totallostroids,
+                             """ + ((
+                             """
+                                  %ssize_rank = t.%ssize_rank, %sscore_rank = t.%sscore_rank, %svalue_rank = t.%svalue_rank, %sxp_rank = t.%sxp_rank,
+                                  %stotalroundroids_rank = t.%stotalroundroids_rank, %stotallostroids_rank = t.%stotallostroids_rank,
+                             """ * 4) % (("",)*12 + ("cluster_",)*12 + ("galaxy_",)*12 + ("race_",)*12)) +
+                             """
+                                  ticksroiding = COALESCE(p.ticksroiding, 0) + CASE WHEN (t.size > p.size AND (t.size - p.size) != (t.xp - p.xp)) THEN 1 ELSE 0 END,
+                                  ticksroided = COALESCE(p.ticksroided, 0) + CASE WHEN (t.size < p.size) THEN 1 ELSE 0 END,
+                                  tickroids = COALESCE(p.tickroids, 0) + t.size,
+                                  avroids = COALESCE((p.tickroids + t.size) / (p.age + 1.0), t.size),
+                                  roidxp = CASE WHEN (t.size != 0) THEN t.xp * 1.0 / t.size ELSE 0 END,
+                             """ + ((
+                             """
+                                  %s_highest_rank = CASE WHEN (t.%s_rank <= COALESCE(p.%s_highest_rank, t.%s_rank)) THEN t.%s_rank ELSE p.%s_highest_rank END,
+                                  %s_highest_rank_tick = CASE WHEN (t.%s_rank <= COALESCE(p.%s_highest_rank, t.%s_rank)) THEN :tick ELSE p.%s_highest_rank_tick END,
+                                  %s_lowest_rank = CASE WHEN (t.%s_rank >= COALESCE(p.%s_lowest_rank, t.%s_rank)) THEN t.%s_rank ELSE p.%s_lowest_rank END,
+                                  %s_lowest_rank_tick = CASE WHEN (t.%s_rank >= COALESCE(p.%s_lowest_rank, t.%s_rank)) THEN :tick ELSE p.%s_lowest_rank_tick END,
+                             """ * 4) % (("size",)*22 + ("score",)*22 + ("value",)*22 + ("xp",)*22)) +
+                             """
+                                  vdiff = COALESCE(t.value - p.value, 0),
+                                  sdiff = COALESCE(t.score - p.score, 0),
+                                  xdiff = COALESCE(t.xp - p.xp, 0),
+                                  rdiff = COALESCE(t.size - p.size, 0),
+                                  vrankdiff = COALESCE(t.value_rank - p.value_rank, 0),
+                                  srankdiff = COALESCE(t.score_rank - p.score_rank, 0),
+                                  xrankdiff = COALESCE(t.xp_rank - p.xp_rank, 0),
+                                  rrankdiff = COALESCE(t.size_rank - p.size_rank, 0),
+                                  idle = CASE WHEN ((t.value-p.value) BETWEEN (p.vdiff-1) AND (p.vdiff+1) AND (p.xp-t.xp=0)) THEN 1 + COALESCE(p.idle, 0) ELSE 0 END
+#                                FROM (SELECT *,
+                             """ + ((
+                             """
+                                  rank() OVER (PARTITION BY %s ORDER BY totalroundroids DESC) AS %s_totalroundroids_rank,
+                                  rank() OVER (PARTITION BY %s ORDER BY totallostroids DESC) AS %s_totallostroids_rank,
+                                  rank() OVER (PARTITION BY %s ORDER BY size DESC) AS %s_size_rank,
+                                  rank() OVER (PARTITION BY %s ORDER BY score DESC) AS %s_score_rank,
+                                  rank() OVER (PARTITION BY %s ORDER BY value DESC) AS %s_value_rank,
+                                  rank() OVER (PARTITION BY %s ORDER BY xp DESC) AS %s_xp_rank,
+                             """ * 3) % (("x","cluster",)*6 + ("x, y","galaxy",)*6 + ("race","race",)*6)) +
+                             """
+                                  rank() OVER (ORDER BY totalroundroids DESC) AS totalroundroids_rank,
+                                  rank() OVER (ORDER BY totallostroids DESC) AS totallostroids_rank,
+                                  rank() OVER (ORDER BY size DESC) AS size_rank,
+                                  rank() OVER (ORDER BY score DESC) AS score_rank,
+                                  rank() OVER (ORDER BY value DESC) AS value_rank,
+                                  rank() OVER (ORDER BY xp DESC) AS xp_rank
+                                FROM (SELECT t.*,
+                                  COALESCE(p.totalroundroids + (GREATEST(t.size - p.size, 0)), t.size) AS totalroundroids,
+                                  COALESCE(p.totallostroids + (GREATEST(p.size - t.size, 0)), 0) AS totallostroids
+                                FROM planet AS p, planet_temp AS t
+                                  WHERE p.id = t.id AND p.active = :true) AS t) AS t
+                                  WHERE p.id = t.id
+                                AND p.active = :true
+                            ;""", bindparams=[tick, true]))
 
         t2=time.time()-t1
         excaliburlog("Update planets from temp and generate ranks in %.3f seconds" % (t2,))
