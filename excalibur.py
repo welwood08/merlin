@@ -306,13 +306,15 @@ while True:
 
         session.execute(text("""UPDATE cluster AS c,
                                  (SELECT *,
-                                   (SELECT COUNT(*) + 1 FROM c WHERE totalroundroids > c.totalroundroids) as totalroundroids_rank,
-                                   (SELECT COUNT(*) + 1 FROM c WHERE totallostroids > c.totallostroids) as totallostroids_rank,
-                                   (SELECT COUNT(*) + 1 FROM c WHERE size > c.size) as size_rank,
-                                   (SELECT COUNT(*) + 1 FROM c WHERE score > c.score) as score_rank,
-                                   (SELECT COUNT(*) + 1 FROM c WHERE value > c.value) as value_rank,
-                                   (SELECT COUNT(*) + 1 FROM c WHERE xp > c.xp) as xp_rank,
+                                   (SELECT COUNT(*) + 1 FROM t WHERE totalroundroids > t.totalroundroids) as totalroundroids_rank,
+                                   (SELECT COUNT(*) + 1 FROM t WHERE totallostroids > t.totallostroids) as totallostroids_rank,
+                                   (SELECT COUNT(*) + 1 FROM t WHERE size > t.size) as size_rank,
+                                   (SELECT COUNT(*) + 1 FROM t WHERE score > t.score) as score_rank,
+                                   (SELECT COUNT(*) + 1 FROM t WHERE value > t.value) as value_rank,
+                                   (SELECT COUNT(*) + 1 FROM t WHERE xp > t.xp) as xp_rank,
                                    """+
+                                #    (SET @rownum := 0; SELECT @rownum := @rownum + 1 AS rank FROM (SELECT totalroundroids))
+                                #     """+
                                 #  rank() OVER (ORDER BY totalroundroids DESC) AS totalroundroids_rank,
                                 #  rank() OVER (ORDER BY totallostroids DESC) AS totallostroids_rank,
                                 #  rank() OVER (ORDER BY size DESC) AS size_rank,
@@ -435,7 +437,7 @@ while True:
                                #  FROM planet_temp
                                #    GROUP BY x) AS t
                                #    WHERE c.x = t.x) AS t) AS t
-                               +"""
+                               """
                                 WHERE c.x = t.x
                                 AND c.active = :true
                             ;""", bindparams=[tick, true]))
