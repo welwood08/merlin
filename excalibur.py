@@ -149,17 +149,6 @@ while True:
                                                 "value": int(p[8] or 0),
                                                 "xp": int(p[9] or 0),
                                                } for p in [decode(line).strip().split("\t") for line in planets]]) if planets else None
-#         mpsi=0
-#         for line in planets:
-#           print line
-#           for p in decode(line).strip().split("\t"):
-#             print p(0)
-#           i+=1
-#           if i > 3:
-#             break
-#         quit()
-
-
         # Galaxies
         session.execute(galaxy_temp.insert(), [{
                                                 "x": int(g[0]),
@@ -220,7 +209,7 @@ while True:
                                   totalroundroids INT, 
                                   totallostroids INT
                              );
-                                 INSERT INTO temp_1 VALUES (SELECT t.*,
+                                 INSERT INTO temp_1 SELECT t.*,
                                    COALESCE(c.totalroundroids + (GREATEST(t.size - c.size, 0)), t.size) AS totalroundroids,
                                    COALESCE(c.totallostroids + (GREATEST(c.size - t.size, 0)), 0) AS totallostroids
                                  FROM cluster AS c, (SELECT x,
@@ -231,7 +220,7 @@ while True:
                                    sum(xp) as xp
                                  FROM planet_temp
                                    GROUP BY x) AS t
-                                   WHERE c.x = t.x);
+                                   WHERE c.x = t.x;
                              """, bindparams=[true]))
 
         session.execute(text("""UPDATE cluster AS c,
@@ -394,14 +383,14 @@ while True:
                                   real_score INT 
                                 );
 
-                                 INSERT INTO temp_1 VALUES (SELECT t.*,
+                                 INSERT INTO temp_1 SELECT t.*,
                                    COALESCE(g.totalroundroids + (GREATEST(t.size - g.size, 0)), t.size) AS totalroundroids,
                                    COALESCE(g.totallostroids + (GREATEST(g.size - t.size, 0)), 0) AS totallostroids
                                  FROM galaxy AS g, galaxy_temp AS t
-                                   WHERE g.id = t.id AND g.active = :true);
+                                   WHERE g.id = t.id AND g.active = :true;
 
-                                 INSERT INTO temp_2 VALUES (SELECT x, y, count(*) AS count, SUM(score) AS real_score 
-                                                              FROM planet_temp GROUP BY x, y);
+                                 INSERT INTO temp_2 SELECT x, y, count(*) AS count, SUM(score) AS real_score 
+                                                              FROM planet_temp GROUP BY x, y;
                              """, bindparams=[true]))
 
         session.execute(text("""UPDATE galaxy AS g, 
@@ -706,11 +695,11 @@ while True:
                                   totallostroids INT
                                 );
 
-                                 INSERT INTO temp_1 (id, x, y, z, planetname, rulername, race, size, score, value, xp, totalroundroids, totallostroids) VALUES (SELECT t.*,
+                                 INSERT INTO temp_1 SELECT t.*,
                                    COALESCE(p.totalroundroids + (GREATEST(t.size - p.size, 0)), t.size) AS totalroundroids,
                                    COALESCE(p.totallostroids + (GREATEST(p.size - t.size, 0)), 0) AS totallostroids
                                  FROM planet AS p, planet_temp AS t
-                                   WHERE p.id = t.id AND p.active = :true);
+                                   WHERE p.id = t.id AND p.active = :true;
                              """, bindparams=[true]))
 
         session.execute(text("""UPDATE planet AS p, (SELECT t.*,

@@ -1,2 +1,4 @@
-cd /home/vm/merlin/
-       python2 excalibur.py
+#!/bin/bash
+cd /home/merlin/
+python excalibur.py
+
