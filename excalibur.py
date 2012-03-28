@@ -403,7 +403,6 @@ while True:
 
                                  INSERT INTO temp_2 SELECT x, y, count(*) AS count, SUM(score) AS real_score 
                                                               FROM planet_temp GROUP BY x, y;
-
                              """, bindparams=[true]))
 
         session.execute(text("""UPDATE galaxy AS g, 
