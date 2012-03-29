@@ -27,7 +27,7 @@ __all__ = ["system",
            "help",
            "user",
            "propsandcookies",
-#           "sms",
+           "sms",#
            "fuckthatnameusethis",
            "lookup",
            "details",
@@ -42,5 +42,5 @@ __all__ = ["system",
            "ships",
            "quotes",
            "links",
-#           "galstatus",
+           "galstatus",#
            ]

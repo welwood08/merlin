@@ -237,22 +237,26 @@ class sms(loadable):
 
     def send_email(self, user, receiver, public_text, email, message):
         try:
-            smtp = SMTP(Config.get("smtp", "host"), Config.get("smtp", "port"))
+            if (Config.get("smtp", "port") == "0"):
+                smtp = SMTP("localhost")
+            else:
+                smtp = SMTP(Config.get("smtp", "host"), Config.get("smtp", "port"))
+            
+            if not ((Config.get("smtp", "host") == "localhost") or (Config.get("smtp", "host") == "127.0.0.1")): 
+                try:
+                    smtp.starttls()
+                except SMTPException as e:
+                    raise SMSError("unable to shift connection into TLS: %s" % (str(e),))
+                
+                try:
+                    smtp.login(Config.get("smtp", "user"), Config.get("smtp", "pass"))
+                except SMTPException as e:
+                    raise SMSError("unable to authenticate: %s" % (str(e),))
             
             try:
-                smtp.starttls()
-            except SMTPException as e:
-                raise SMSError("unable to shift connection into TLS: %s" % (str(e),))
-            
-            try:
-                smtp.login(Config.get("smtp", "user"), Config.get("smtp", "pass"))
-            except SMTPException as e:
-                raise SMSError("unable to authenticate: %s" % (str(e),))
-            
-            try:
-                smtp.sendmail(Config.get("smtp", "user"), email, 
+                 smtp.sendmail(Config.get("smtp", "frommail"), email, 
                               "To:%s\nFrom:%s\nSubject:%s\n%s\n" % (email,
-                                                                    Config.get("smtp", "user"),
+                                                                    Config.get("smtp", "frommail"),
                                                                     Config.get("Alliance", "name"),
                                                                     message,))
             except SMTPSenderRefused as e:
