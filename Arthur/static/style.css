@@ -89,11 +89,11 @@ tr.header {
 }
 
 tr.datahigh {
- background-color: #181C29;
+ background-color: #222;
 }
 
 td.datahigh {
- background-color: #181C29;
+ background-color: #333;
 }
 
 tr.odd {
