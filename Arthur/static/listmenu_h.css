@@ -79,8 +79,8 @@ the #RGB border/background colours where suitable to customise for your site!
 }
 .menulist  a.highlighted {
  color: #000;
- //background-color: #660099;
- background-color: #660099;
+ //background-color: #CCC;
+ background-color: #CCC;
 }
 
 /*
