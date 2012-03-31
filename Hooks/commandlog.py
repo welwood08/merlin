@@ -18,7 +18,7 @@
 # You should have received a copy of the GNU General Public License
 # along with this program; if not, write to the Free Software
 # Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA 02110-1301 USA
- 
+
 from sqlalchemy.sql import desc
 from Core.db import session
 from Core.maps import User, Command
@@ -58,7 +58,7 @@ class commandlog(loadable):
         if len(result) < 1:
             message.reply("No logs matching command '%s' with parameters like '%s'"%(cmd,prms,))
             return
-        
+
         reply = "\n".join(map(lambda c: "[ %5s | %s | %-30s | %-15s | %-15s | %s]" % (c.id, c.command, c.command_parameters.strip(), c.nick, c.username, c.command_time.ctime(),), result))
         message.reply(reply)
     
