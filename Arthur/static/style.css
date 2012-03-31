@@ -97,11 +97,11 @@ td.datahigh {
 }
 
 tr.odd {
-	background-color: #292d3a;
+	background-color: #222;
 }
 
 tr.even {
-	background-color: #252936;
+	background-color: #333;
 }
 
 td.odd {
