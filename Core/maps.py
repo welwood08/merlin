@@ -1399,7 +1399,7 @@ class Attack(Base):
     id = Column(Integer, primary_key=True)
     landtick = Column(Integer)
     comment = Column(Text)
-    _waves = 5
+    _waves = 3
     _active_ticks = 12
     _show_jgp_ticks = 4
     
