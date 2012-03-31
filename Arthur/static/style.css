@@ -30,12 +30,12 @@ table {
 }
 
 a {
-	color: #9999c9;
+	color: #CCC;
 	text-decoration: none;
 }
 
 a:hover {
-	color: #ccccfc;
+	color: #999;
 }
 
 a.myplanet {
