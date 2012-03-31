@@ -46,10 +46,10 @@ the #RGB border/background colours where suitable to customise for your site!
 .menulist li {
  float: left;
  position: relative;
- //background: #FED;
- background: #CCF;
- //border: 1px solid #330;
- border: 1px solid #FFF;
+ //background: #222;
+ background: #222;
+ //border: 1px solid #000;
+ border: 1px solid #000;
  margin-right: -1px;
 }
 
@@ -67,20 +67,20 @@ the #RGB border/background colours where suitable to customise for your site!
 .menulist a {
  display: block;
  padding: 3px;
- color: #000;
+ color: #FFF;
  text-decoration:  none;
 }
 
 /* Lit  items: 'hover' is mouseover, 'highlighted' are parent items to visible menus */
 .menulist a:hover, .menulist a.highlighted:hover, .menulist a:focus {
- color: #FFF;
- //background-color: #A64;
- background-color: #66F;
+ color: #000;
+ //background-color: #CCC;
+ background-color: #CCC;
 }
 .menulist  a.highlighted {
- color: #FFF;
- //background-color: #C86;
- background-color: #99F;
+ color: #000;
+ //background-color: #660099;
+ background-color: #660099;
 }
 
 /*
