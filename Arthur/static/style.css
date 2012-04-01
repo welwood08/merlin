@@ -56,13 +56,13 @@ a.gray:hover {
 }
 
 input {
-	font-family: Verdana, Arial, Helvetica;
+	font-family: Lucida Sans Unicode, Lucida Grande, sans-serif;
 	font-size: x-small;
 	background-color: rgb(221, 221, 221);
 }
 
 select {
-	font-family: Verdana, Arial, Helvetica;
+	font-family: Lucida Sans Unicode, Lucida Grande, sans-serif;
 	font-size: x-small;
 }
 
@@ -165,7 +165,7 @@ tr.nolongerexists {
 }
 
 .orange {
-	color: #ffa500;
+	color: #999;
 }
 
 .Cat {
