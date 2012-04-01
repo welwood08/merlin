@@ -1847,7 +1847,7 @@ class DevScan(Base):
         return total
         
     def __str__(self):
-        reply = " Travel: %s, Infrajerome: %s, Hulls: %s," % (self.travel_str(),self.infra_str(),self.hulls_str(),)
+        reply = " Travel: %s, Infrastructure: %s, Hulls: %s," % (self.travel_str(),self.infra_str(),self.hulls_str(),)
         reply+= " Waves: %s, Core: %s, Covop: %s, Mining: %s" % (self.waves_str(),self.core_str(),self.covop_str(),self.mining_str(),)
         reply+= "\n"
         reply+= "Structures: LFac: %s, MFac: %s, HFac: %s, Amp: %s," % (self.light_factory,self.medium_factory,self.heavy_factory,self.wave_amplifier,)
