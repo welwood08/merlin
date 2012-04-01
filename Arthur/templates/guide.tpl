@@ -6,7 +6,7 @@ Introduction to {{ bot }}
 </th></tr>
 <td>{% filter force_escape|linebreaks %}
 Things you need to do as soon as you join {{ alliance }}:
-!pref password=xxx - Do this in PM with {{ bot }}, this will allow you to use {{ alliance }}.tv and !letmein if P is down.
+!pref password=xxx - Do this in PM with {{ bot }}, this will allow you to use lolidunno.co.uk and !letmein if P is down.
 
 !pref planet=x:y:z - This will allow {{ bot }} to use your co ords for things such as !lookup, !xp, !basher etc.
 
