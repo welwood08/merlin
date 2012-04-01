@@ -6,4 +6,4 @@ class newb(loadable):
     def execute(self, message, user, params):
 
         webby = ["lolidunno.co.uk",]
-        message.reply("set !pref planet=*:*:* and !pref password=***** then you can sign into "+" | ".join(webby))
+        message.reply("PM me and set !pref planet=*:*:* and !pref password=***** then you can sign into "+" | ".join(webby))
