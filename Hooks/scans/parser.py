@@ -136,6 +136,7 @@ class parse(Thread):
         Q = Q.filter(Request.target==planet)
         Q = Q.filter(Request.scan==None)
         Q = Q.filter(Request.active==True)
+        Q = Q.filter(Request.tick<=tick)
         result = Q.all()
         
         users = []
