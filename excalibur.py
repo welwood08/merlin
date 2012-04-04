@@ -391,20 +391,35 @@ while True:
 
                                  INSERT INTO temp_2 SELECT x, y, count(*) AS count, SUM(score) AS real_score 
                                                               FROM planet_temp GROUP BY x, y;
+
                              """, bindparams=[true]))
 
         session.execute(text("""UPDATE galaxy AS g, 
                                 (SELECT *,
-                                  (SELECT COUNT(*) + 1 FROM temp_1 WHERE totalroundroids > temp_1.totalroundroids) as totalroundroids_rank,
-                                  (SELECT COUNT(*) + 1 FROM temp_1 WHERE totallostroids > temp_1.totallostroids) as totallostroids_rank,
-                                  (SELECT COUNT(*) + 1 FROM temp_1 WHERE size > temp_1.size) as size_rank,
-                                  (SELECT COUNT(*) + 1 FROM temp_1 WHERE score > temp_1.score) as score_rank,
-                                  (SELECT COUNT(*) + 1 FROM temp_1 WHERE value > temp_1.value) as value_rank,
-                                  (SELECT COUNT(*) + 1 FROM temp_1 WHERE xp > temp_1.xp) as xp_rank
-                                FROM temp_1) AS t,
-                                (SELECT a.x, a.y, a.count, a.real_score,
-                                  (SELECT COUNT(*) + 1 FROM temp_2 WHERE real_score > temp_2.real_score) as real_score_rank
-                                   FROM temp_2 AS a
+                                   (SELECT COUNT(t2.totalroundroids) FROM temp_1 t1 JOIN temp_1 t2 ON 
+                                      t1.totalroundroids < t2.totalroundroids OR (t1.totalroundroids=t2.totalroundroids AND t1.id=t2.id) WHERE t1.x=t.x AND t1.y=t.y
+                                      GROUP BY t1.id) as totalroundroids_rank,
+                                   (SELECT COUNT(t2.totallostroids) FROM temp_1 t1 JOIN temp_1 t2 ON 
+                                      t1.totallostroids < t2.totallostroids OR (t1.totallostroids=t2.totallostroids AND t1.id=t2.id) WHERE t1.x=t.x AND t1.y=t.y
+                                      GROUP BY t1.id) as totallostroids_rank,
+                                   (SELECT COUNT(t2.size) FROM temp_1 t1 JOIN temp_1 t2 ON 
+                                      t1.size < t2.size OR (t1.size=t2.size AND t1.id=t2.id) WHERE t1.x=t.x AND t1.y=t.y
+                                      GROUP BY t1.id) as size_rank,
+                                   (SELECT COUNT(t2.score) FROM temp_1 t1 JOIN temp_1 t2 ON 
+                                      t1.score < t2.score OR (t1.score=t2.score AND t1.id=t2.id) WHERE t1.x=t.x AND t1.y=t.y
+                                      GROUP BY t1.id) as score_rank,
+                                   (SELECT COUNT(t2.value) FROM temp_1 t1 JOIN temp_1 t2 ON 
+                                      t1.value < t2.value OR (t1.value=t2.value AND t1.id=t2.id) WHERE t1.x=t.x AND t1.y=t.y
+                                      GROUP BY t1.id) as value_rank,
+                                   (SELECT COUNT(t2.xp) FROM temp_1 t1 JOIN temp_1 t2 ON 
+                                      t1.xp < t2.xp OR (t1.xp=t2.xp AND t1.id=t2.id) WHERE t1.x=t.x AND t1.y=t.y
+                                      GROUP BY t1.id) as xp_rank
+                                FROM temp_1 AS t) AS t,
+                                (SELECT x, y, count, real_score,
+                                  (SELECT COUNT(t2.real_score) FROM temp_2 t1 JOIN temp_2 t2 ON 
+                                      t1.real_score < t2.real_score OR (t1.real_score=t2.real_score AND t1.x=t2.x AND t1.y=t2.y) WHERE t1.x=t.x AND t1.y=t.y
+                                      GROUP BY t1.x,t1.y) AS real_score_rank
+                                   FROM temp_2 AS t
                                 ) AS p SET
                                   g.age = COALESCE(g.age, 0) + 1,
                                   g.x = t.x, g.y = t.y,
@@ -499,7 +514,7 @@ while True:
                                 WHERE g.id = t.id
                                    AND g.x = p.x AND g.y = p.y
                                 AND g.active = :true
-                            ; DROP TABLE temp_1; DROP TABLE temp_2;""", bindparams=[tick, true, bindparam("priv_gal",PA.getint("numbers", "priv_gal"))]))
+                            ; DROP TABLE temp_1; DROP TABLE temp_2; DROP TABLE temp_3;""", bindparams=[tick, true, bindparam("priv_gal",PA.getint("numbers", "priv_gal"))]))
 
         t2=time.time()-t1
         excaliburlog("Update galaxies from temp and generate ranks in %.3f seconds" % (t2,))
