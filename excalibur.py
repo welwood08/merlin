@@ -225,17 +225,29 @@ while True:
 
         session.execute(text("""UPDATE cluster AS c,
                                  (SELECT *,
-                                   (SELECT COUNT(*) + 1 FROM temp_1 WHERE totalroundroids > temp_1.totalroundroids) as totalroundroids_rank,
-                                   (SELECT COUNT(*) + 1 FROM temp_1 WHERE totallostroids > temp_1.totallostroids) as totallostroids_rank,
-                                   (SELECT COUNT(*) + 1 FROM temp_1 WHERE size > temp_1.size) as size_rank,
-                                   (SELECT COUNT(*) + 1 FROM temp_1 WHERE score > temp_1.score) as score_rank,
-                                   (SELECT COUNT(*) + 1 FROM temp_1 WHERE value > temp_1.value) as value_rank,
-                                   (SELECT COUNT(*) + 1 FROM temp_1 WHERE xp > temp_1.xp) as xp_rank
+                                   (SELECT COUNT(t2.totalroundroids) FROM temp_1 t1 JOIN temp_1 t2 ON 
+                                      t1.totalroundroids < t2.totalroundroids OR (t1.totalroundroids=t2.totalroundroids AND t1.x=t2.x) WHERE t1.x=t.x
+                                      GROUP BY t1.x) as totalroundroids_rank,
+                                   (SELECT COUNT(t2.totallostroids) FROM temp_1 t1 JOIN temp_1 t2 ON 
+                                      t1.totallostroids < t2.totallostroids OR (t1.totallostroids=t2.totallostroids AND t1.x=t2.x) WHERE t1.x=t.x
+                                      GROUP BY t1.x) as totallostroids_rank,
+                                   (SELECT COUNT(t2.size) FROM temp_1 t1 JOIN temp_1 t2 ON 
+                                      t1.size < t2.size OR (t1.size=t2.size AND t1.x=t2.x) WHERE t1.x=t.x
+                                      GROUP BY t1.x) as size_rank,
+                                   (SELECT COUNT(t2.score) FROM temp_1 t1 JOIN temp_1 t2 ON 
+                                      t1.score < t2.score OR (t1.score=t2.score AND t1.x=t2.x) WHERE t1.x=t.x
+                                      GROUP BY t1.x) as score_rank,
+                                   (SELECT COUNT(t2.value) FROM temp_1 t1 JOIN temp_1 t2 ON 
+                                      t1.value < t2.value OR (t1.value=t2.value AND t1.x=t2.x) WHERE t1.x=t.x
+                                      GROUP BY t1.x) as value_rank,
+                                   (SELECT COUNT(t2.xp) FROM temp_1 t1 JOIN temp_1 t2 ON 
+                                      t1.xp < t2.xp OR (t1.xp=t2.xp AND t1.x=t2.x) WHERE t1.x=t.x
+                                      GROUP BY t1.x) as xp_rank
                                    """+
                                 #    (SET @rownum := 0; SELECT @rownum := @rownum + 1 AS rank FROM (SELECT totalroundroids))
                                 #     """+
                                  """
-                                 FROM temp_1) AS t SET
+                                 FROM temp_1 AS t) AS t SET
                                   c.age = COALESCE(c.age, 0) + 1,
                                   c.size = t.size, c.score = t.score, c.value = t.value, c.xp = t.xp,
                                   c.ratio = CASE WHEN (t.value != 0) THEN 10000.0 * t.size / t.value ELSE 0 END,
@@ -397,22 +409,22 @@ while True:
         session.execute(text("""UPDATE galaxy AS g, 
                                 (SELECT *,
                                    (SELECT COUNT(t2.totalroundroids) FROM temp_1 t1 JOIN temp_1 t2 ON 
-                                      t1.totalroundroids < t2.totalroundroids OR (t1.totalroundroids=t2.totalroundroids AND t1.id=t2.id) WHERE t1.x=t.x AND t1.y=t.y
+                                      t1.totalroundroids < t2.totalroundroids OR (t1.totalroundroids=t2.totalroundroids AND t1.id=t2.id) WHERE t1.id=t.id
                                       GROUP BY t1.id) as totalroundroids_rank,
                                    (SELECT COUNT(t2.totallostroids) FROM temp_1 t1 JOIN temp_1 t2 ON 
-                                      t1.totallostroids < t2.totallostroids OR (t1.totallostroids=t2.totallostroids AND t1.id=t2.id) WHERE t1.x=t.x AND t1.y=t.y
+                                      t1.totallostroids < t2.totallostroids OR (t1.totallostroids=t2.totallostroids AND t1.id=t2.id) WHERE t1.id=t.id
                                       GROUP BY t1.id) as totallostroids_rank,
                                    (SELECT COUNT(t2.size) FROM temp_1 t1 JOIN temp_1 t2 ON 
-                                      t1.size < t2.size OR (t1.size=t2.size AND t1.id=t2.id) WHERE t1.x=t.x AND t1.y=t.y
+                                      t1.size < t2.size OR (t1.size=t2.size AND t1.id=t2.id) WHERE t1.id=t.id
                                       GROUP BY t1.id) as size_rank,
                                    (SELECT COUNT(t2.score) FROM temp_1 t1 JOIN temp_1 t2 ON 
-                                      t1.score < t2.score OR (t1.score=t2.score AND t1.id=t2.id) WHERE t1.x=t.x AND t1.y=t.y
+                                      t1.score < t2.score OR (t1.score=t2.score AND t1.id=t2.id) WHERE t1.id=t.id
                                       GROUP BY t1.id) as score_rank,
                                    (SELECT COUNT(t2.value) FROM temp_1 t1 JOIN temp_1 t2 ON 
-                                      t1.value < t2.value OR (t1.value=t2.value AND t1.id=t2.id) WHERE t1.x=t.x AND t1.y=t.y
+                                      t1.value < t2.value OR (t1.value=t2.value AND t1.id=t2.id) WHERE t1.id=t.id
                                       GROUP BY t1.id) as value_rank,
                                    (SELECT COUNT(t2.xp) FROM temp_1 t1 JOIN temp_1 t2 ON 
-                                      t1.xp < t2.xp OR (t1.xp=t2.xp AND t1.id=t2.id) WHERE t1.x=t.x AND t1.y=t.y
+                                      t1.xp < t2.xp OR (t1.xp=t2.xp AND t1.id=t2.id) WHERE t1.id=t.id
                                       GROUP BY t1.id) as xp_rank
                                 FROM temp_1 AS t) AS t,
                                 (SELECT x, y, count, real_score,
