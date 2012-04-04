@@ -43,6 +43,9 @@ class request(loadable):
             return
         
         scan = params.group(6).upper()
+        if scan == "I":
+            message.alert("Incoming scans can only be performed by the planet under attack.")
+            return
         dists = int(params.group(7) or 0)
         
         request = self.request(message, user, planet, scan, dists)
