@@ -94,9 +94,25 @@ class view(loadable):
                 group[-1][1].append(planet.scan("D"))
                 scans.append(planet.scan("D"))
             
-            if planet.scan("A") or planet.scan("U"):
-                group[-1][1].append(planet.scan("A") or planet.scan("U"))
-                scans.append(planet.scan("A") or planet.scan("U"))
+            if planet.scan("A"):
+                if planet.scan("U") 
+                    if planet.scan("U").tick > planet.scan("A").tick + 12:
+                        group[-1][1].append(planet.scan("U"))
+                        scans.append(planet.scan("U"))
+                    elif planet.scan("U").tick > planet.scan("A").tick:
+                        group[-1][1].append(planet.scan("U"))
+                        scans.append(planet.scan("U"))
+                        group[-1][1].append(planet.scan("A"))
+                        scans.append(planet.scan("A"))
+                    else:
+                        group[-1][1].append(planet.scan("A"))
+                        scans.append(planet.scan("A"))
+                else:
+                    group[-1][1].append(planet.scan("A"))
+                    scans.append(planet.scan("A"))
+            elif planet.scan("U"):
+                group[-1][1].append(planet.scan("U"))
+                scans.append(planet.scan("U"))
             
             if show_jgps and planet.scan("J"):
                 group[-1][1].append(planet.scan("J"))
