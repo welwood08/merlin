@@ -35,7 +35,7 @@ from Core.loadable import system
 from Core.robocop import push
 
 scanre=re.compile("http://[^/]+/(?:showscan|waves).pl\?scan_id=([0-9a-zA-Z]+)")
-scangrpre=re.compile("http://[^/]+/showscan.pl\?scan_grp=([0-9a-zA-Z]+)")
+scangrpre=re.compile("http://[^/]+/(?:showscan|waves).pl\?scan_grp=([0-9a-zA-Z]+)")
 
 @system('PRIVMSG')
 def catcher(message):
