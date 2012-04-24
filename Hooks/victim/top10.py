@@ -52,7 +52,7 @@ class top10(loadable):
         planet = aliased(Planet)
         planet_intel = aliased(Intel)
         
-        Q = session.query(planet.x, planet.y, planet.z, planet.score, planet.value, planet_intel.nick)
+        Q = session.query(planet.x, planet.y, planet.z, planet.score, planet.value, planet.size, planet.race, planet_intel.nick)
         if alliance:
             Q = Q.join((planet.intel, planet_intel))
             Q = Q.filter(planet_intel.alliance == alliance)
@@ -63,10 +63,10 @@ class top10(loadable):
         reply = "Top planets"
         if alliance:
             reply+="in %s"%(alliance.name,)
-        reply+=":  "
+        reply+=":\n"
         prev = []
         i=0
-        for x, y, z, score, value, nick in result[:10]:
+        for x, y, z, score, value, size, race, nick in result[:10]:
             i+=1
-            prev.append("#%s - %s (%s:%s:%s) - S:%s V:%s"%(i,nick,x,y,z,score,value))
-        message.reply(reply+" | ".join(prev))
+            prev.append("#%s - %s (%s %s:%s:%s) - Score: %s Value: %s Size: %s"%(i,nick,race,x,y,z,score,value,size))
+        message.reply(reply+"\n".join(prev))
