@@ -23,8 +23,8 @@ from sqlalchemy.orm import aliased
 from sqlalchemy.sql import desc
 from sqlalchemy.sql.functions import count
 from Core.db import session
-from Core.maps import Updates, Galaxy, Planet, Alliance, User, Intel, FleetScan
-from Core.loadable import loadable, route, require_planet
+from Core.maps import Updates, Galaxy, Planet, Alliance, User, Intel
+from Core.loadable import loadable, route
 from Core.config import Config
 from Core.paconf import PA
 
@@ -52,7 +52,7 @@ class top10(loadable):
         planet = aliased(Planet)
         planet_intel = aliased(Intel)
         
-        Q = session.query(planet.x, planet.y, planet.z, planet.score, planet.value, planet.size, planet.race, planet_intel.nick)
+        Q = session.query(planet.x, planet.y, planet.z, planet.score, planet.value, planet.size, planet.xp, planet.race, planet_intel.nick)
         if alliance:
             Q = Q.join((planet.intel, planet_intel))
             Q = Q.filter(planet_intel.alliance == alliance)
@@ -66,7 +66,7 @@ class top10(loadable):
         reply+=":\n"
         prev = []
         i=0
-        for x, y, z, score, value, size, race, nick in result[:10]:
+        for x, y, z, score, value, size, xp, race, nick in result[:10]:
             i+=1
-            prev.append("#%s - %s (%s %s:%s:%s) - Score: %s Value: %s Size: %s"%(i,nick,race,x,y,z,score,value,size))
+            prev.append("#%s - %s (%s %s:%s:%s) - Score: %s Value: %s Size: %s XP: %s"%(i,nick,race,x,y,z,score,value,size,xp))
         message.reply(reply+"\n".join(prev))
