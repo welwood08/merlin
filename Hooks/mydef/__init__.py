@@ -26,4 +26,5 @@ __all__ = [
            "searchdef",
            "usedef",
            "logdef",
+           "finddef",
            ]
