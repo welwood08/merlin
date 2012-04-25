@@ -32,38 +32,59 @@ class top10(loadable):
     """Top planets in a given alliance"""
     usage = " [alliance]"
     access = "member"
-    
-    @route(r"(\S+)")
-    def user_alliance(self, message, user, params):
-        alliance = Alliance.load(params.group(1))
+
+    @route(r"(\S+)\s+(\S+)")
+    def twogroups(self, message, user, params):
+        sortby=params.group(1).lower()
+        alliance = Alliance.load(params.group(2))
         if alliance is None:
             message.reply("No alliance or user matching '%s' found" % (params.group(1),))
         else:
-            self.execute(message, alliance=alliance)
-    
+            self.execute(message, alliance=alliance, sortby=sortby)
+
+    @route(r"(\S+)")
+    def agroup(self, message, user, params):
+        sortby = params.group(1).lower()
+        if sortby in ["score","value","size","xp"]:
+            self.execute(message, sortby=sortby)
+        else:
+            alliance = Alliance.load(params.group(1))
+            if alliance is None:
+                message.reply("No alliance or user matching '%s' found" % (params.group(1),))
+            else:
+                self.execute(message, alliance=alliance)
+
     @route(r"")
-    def me(self, message, user, params):
+    def nogroup(self, message, user, params):
         self.execute(message)
     
-    def execute(self, message, alliance=None):
+    def execute(self, message, alliance=None, sortby="score"):
         tick = Updates.current_tick()
         target = aliased(Planet)
         target_intel = aliased(Intel)
         planet = aliased(Planet)
         planet_intel = aliased(Intel)
         
+
         Q = session.query(planet.x, planet.y, planet.z, planet.score, planet.value, planet.size, planet.xp, planet.race, planet_intel.nick)
         if alliance:
             Q = Q.join((planet.intel, planet_intel))
             Q = Q.filter(planet_intel.alliance == alliance)
         Q = Q.group_by(planet.x, planet.y, planet.z)
-        Q = Q.order_by(desc(planet.score))
+        if sortby == "xp":
+            Q = Q.order_by(desc(planet.xp))
+        elif sortby == "size":
+            Q = Q.order_by(desc(planet.size))
+        elif sortby == "value":
+            Q = Q.order_by(desc(planet.value))
+        else:
+            Q = Q.order_by(desc(planet.score))
         result = Q.all()
         
         reply = "Top planets"
         if alliance:
             reply+="in %s"%(alliance.name,)
-        reply+=":\n"
+        reply+=" by %s:\n"%(sortby)
         prev = []
         i=0
         for x, y, z, score, value, size, xp, race, nick in result[:10]:
