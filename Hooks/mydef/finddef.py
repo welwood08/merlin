@@ -26,6 +26,7 @@ from Core.maps import Updates, User, Ship, UserFleet
 from Core.loadable import loadable, route
 
 class finddef(loadable):
+    """Search mydef for ships by target class and, optionally, ship class or target level."""
     usage = " [<class>] <target class> [t1|t2|t3]"
     
     @route(r"(\S+)\s+(\S+)\s+[tT]([1-3])", access = "member")
@@ -53,11 +54,11 @@ class finddef(loadable):
         tick = Updates.current_tick()
         for t in trange:
             result = self.getships(target, shipclass, t)
-            if len(result) < 1:
-                replies.append("There are no planets with free %sfleets targetting %s T%s"%(shipclass+" " if shipclass else "",target,t))
-            else:
+            if len(result) > 0:
                 replies.append("%sFleets targetting %s T%s: "%(shipclass+" " if shipclass else "",target,t))
                 replies.append( ", ".join(map(lambda (u, x, s): "   %s(%s) %s: %s %s"%(u.name,u.fleetupdated-tick,u.fleetcount,self.num2short(x.ship_count),s.name),result)))
+        if replies == []:
+            replies.append("There are no planets with free %sfleets targetting %s %s"%(shipclass+" " if shipclass else "",target,"T"+trange[0] if trange != [1,2,3] else ""))
         message.reply("\n".join(replies))
 
     def getships(self, target, shipclass=None, target_level=1):
