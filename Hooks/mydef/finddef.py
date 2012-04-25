@@ -48,6 +48,9 @@ class finddef(loadable):
     def execute(self, message, target, shipclass=None, trange=[1,2,3]):
         
         target=self.tconvert(target)
+        if not target:
+            message.reply("invalid ship class")
+            return
         if shipclass:
             shipclass=self.tconvert(shipclass)
         replies = []
@@ -97,4 +100,4 @@ class finddef(loadable):
             return "Battleship"
         else:
             print target
-            raise
+            return None
