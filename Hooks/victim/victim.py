@@ -129,7 +129,7 @@ class victim(loadable):
             return
         
         replies = []
-        for planet, intel, maxcap in result[:5]:
+        for planet, intel, maxcap in result[:15]:
             reply="%s:%s:%s (%s)" % (planet.x,planet.y,planet.z,planet.race)
             reply+=" Value: %s Size: %s MaxCap: %s" % (planet.value,planet.size, maxcap)
             if intel:
@@ -138,6 +138,6 @@ class victim(loadable):
                 if not alliance.name and intel.alliance:
                     reply+=" Alliance: %s" % (intel.alliance.name,)
             replies.append(reply)
-        if len(result) > 5:
+        if len(result) > 15:
             replies[-1]+=" (Too many results to list, please refine your search)"
         message.reply("\n".join(replies))
