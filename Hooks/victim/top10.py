@@ -30,13 +30,17 @@ from Core.paconf import PA
 
 class top10(loadable):
     """Top planets in a given alliance"""
-    usage = " [alliance]"
+    usage = " [alliance] [score|value|size|xp]"
     access = "member"
 
     @route(r"(\S+)\s+(\S+)")
     def twogroups(self, message, user, params):
         sortby=params.group(1).lower()
-        alliance = Alliance.load(params.group(2))
+        if sortby in ["score","value","size","xp"]:
+            alliance = Alliance.load(params.group(2))
+        else:
+            sortby=params.group(2).lower()
+            alliance = Alliance.load(params.group(1))
         if alliance is None:
             message.reply("No alliance or user matching '%s' found" % (params.group(1),))
         else:
