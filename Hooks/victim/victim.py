@@ -110,7 +110,7 @@ class victim(loadable):
         Q = Q.order_by(desc("maxcap"))
         Q = Q.order_by(desc(Planet.size))
         Q = Q.order_by(desc(Planet.value))
-        result = Q[:6]
+        result = Q[:16]
         
         if len(result) < 1:
             reply="No"
