@@ -71,10 +71,10 @@ class top10(loadable):
         
 
         Q = session.query(planet.x, planet.y, planet.z, planet.score, planet.value, planet.size, planet.xp, planet.race, planet_intel.nick)
+        Q = Q.join((planet.intel, planet_intel))
         if alliance:
-            Q = Q.join((planet.intel, planet_intel))
             Q = Q.filter(planet_intel.alliance == alliance)
-        Q = Q.group_by(planet.x, planet.y, planet.z)
+        Q = Q.group_by(planet.x, planet.y, planet.z, planet.score, planet.value, planet.size, planet.xp, planet.race, planet_intel.nick)
         if sortby == "xp":
             Q = Q.order_by(desc(planet.xp))
         elif sortby == "size":
