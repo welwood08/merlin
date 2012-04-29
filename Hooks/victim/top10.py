@@ -87,7 +87,7 @@ class top10(loadable):
         
         reply = "Top planets"
         if alliance:
-            reply+="in %s"%(alliance.name,)
+            reply+=" in %s"%(alliance.name,)
         reply+=" by %s:\n"%(sortby)
         prev = []
         i=0
