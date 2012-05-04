@@ -93,5 +93,8 @@ class top10(loadable):
         i=0
         for x, y, z, score, value, size, xp, race, nick in result[:10]:
             i+=1
-            prev.append("#%s - %s (%s %s:%s:%s) - Score: %s Value: %s Size: %s XP: %s"%(i,nick,race,x,y,z,score,value,size,xp))
+            line = "#%s - %s:%s:%s (%s) - Score: %s Value: %s Size: %s XP: %s"%(i,x,y,z,race,score,value,size,xp)
+            if nick:
+                line = "%s Nick: %s"%(line,nick)
+            prev.append(line)
         message.reply(reply+"\n".join(prev))
