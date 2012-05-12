@@ -1,5 +1,6 @@
 cmd.exe.lnk
 *.pyc
+*.DS_Store
 log.txt
 dumplog.txt
 errorlog.txt
