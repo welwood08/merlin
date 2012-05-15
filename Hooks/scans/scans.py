@@ -55,9 +55,11 @@ class scans(loadable):
         message.reply(reply)
     
     @robohci
-    def robocop(self, message, scantype, pa_id, x, y, z, names):
+    def robocop(self, message, scantype, pa_id, x, y, z, names, scanner):
         nicks = []
         reply = "%s on %s:%s:%s " % (PA.get(scantype,"name"),x,y,z,)
+        if ("showscanner" in Config.options("Misc") and Config.getboolean("Misc", "showscanner")):
+            reply+= "from %s " % (User.load(id=scanner).name) 
         reply+= Config.get("URL","viewscan") % (pa_id,)
         
         for name in names.split(","):

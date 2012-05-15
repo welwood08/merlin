@@ -148,7 +148,7 @@ class parse(Thread):
         session.commit()
         
         if len(users) > 0:
-            push("scans", scantype=scantype, pa_id=pa_id, x=planet.x, y=planet.y, z=planet.z, names=",".join(users))
+            push("scans", scantype=scantype, pa_id=pa_id, x=planet.x, y=planet.y, z=planet.z, names=",".join(users), scanner=uid)
     
     def parse_P(self, scan_id, scan, page):
         planetscan = scan.planetscan = PlanetScan()
