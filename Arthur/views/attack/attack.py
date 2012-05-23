@@ -95,7 +95,7 @@ class view(loadable):
                 scans.append(planet.scan("D"))
             
             if planet.scan("A"):
-                if planet.scan("U") 
+                if planet.scan("U"):
                     if planet.scan("U").tick > planet.scan("A").tick + 12:
                         group[-1][1].append(planet.scan("U"))
                         scans.append(planet.scan("U"))
