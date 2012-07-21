@@ -27,4 +27,5 @@ __all__ = [
            "usedef",
            "logdef",
            "finddef",
+           "theirdef",
            ]
