@@ -21,8 +21,8 @@
  
 import sys
 import jinja2
-if not 2.6 <= float(jinja2.__version__[0:3]):
-    sys.exit("Jinja2 2.6.0+ Required")
+#if not 2.6 <= float(jinja2.__version__[0:3]):
+#    sys.exit("Jinja2 2.6.0+ Required")
 
 from jinja2 import Environment, FileSystemLoader
 

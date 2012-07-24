@@ -23,6 +23,6 @@ from django.conf.urls.defaults import include, patterns, url
 handler404 = 'Arthur.errors.page_not_found'
 handler500 = 'Arthur.errors.server_error'
 urlpatterns = patterns('',
-    (r'^static/(?P<path>.*)$', 'django.views.static.serve', {'document_root': 'F:/Code/Git/merlin/Arthur/static/'}),
+    (r'^static/(?P<path>.*)$', 'django.views.static.serve', {'document_root': '/home/merlin/Arthur/static/'}),
     (r'', include('Arthur.views')),
 )
