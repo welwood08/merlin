@@ -25,7 +25,7 @@ from sqlalchemy.sql import asc
 from Core.config import Config
 from Core.paconf import PA
 from Core.db import session
-from Core.maps import Updates, Planet, User, Request
+from Core.maps import Updates, Planet, User, Request, Intel
 from Core.chanusertracker import CUT
 from Core.loadable import loadable, route, require_user, robohci
 
@@ -133,6 +133,14 @@ class request(loadable):
             message.reply("Scan request %s isn't yours and you're not a scanner!"%(id,))
             return
         
+        # Update Intel
+        planet = request.target
+        if planet.intel is None:
+            planet.intel = Intel()
+        planet.intel.dists = max(planet.intel.dists, dists)
+#        else:
+#            planet.intel.dists = dists
+
         request.dists = max(request.dists, dists)
         session.commit()
         
