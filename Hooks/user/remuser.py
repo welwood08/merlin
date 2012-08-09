@@ -47,7 +47,7 @@ class remuser(loadable):
         
         if member.active and member.access >= mbraxx:
             message.privmsg("remuser %s %s"%(home, member.name,), Config.get("Services", "nick"))
-            message.privmsg("ban %s *!*@%s.%s GTFO, EAAD"%(home, member.name, Config.get("Services", "usermask"),), Config.get("Services", "nick"))
+#            message.privmsg("ban %s *!*@%s.%s GTFO, EAAD"%(home, member.name, Config.get("Services", "usermask"),), Config.get("Services", "nick"))
         session.delete(member)
         session.commit()
         message.reply("Removed user %s" % (member.name,))
