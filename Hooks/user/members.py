@@ -19,23 +19,28 @@
 # along with this program; if not, write to the Free Software
 # Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA 02110-1301 USA
  
-# List of package modules
-__all__ = [
-           "adduser",
-           "galmate",
-           "edituser",
-           "getanewdaddy",
-           "remuser",
-           "whois",
-           "aids",
-           "pref",
-           "phone",
-           "quitter",
-           "quits",
-           "addchan",
-           "galchan",
-           "remchan",
-           "alias",
-           "forcepref",
-           "members"
-           ]
+from sqlalchemy.sql import asc, desc
+from Core.db import session
+from Core.maps import User
+from Core.loadable import loadable, route
+from Core.config import Config
+
+class members(loadable):
+    """List all members, in format nick (alias) level"""
+    usage = " "
+    
+    @route(access = "admin")
+    def execute(self, message, user, params):
+        reply = ""
+        for o in reversed(Config.options("Access")):
+            Q = session.query(User)
+            Q = Q.filter(User.access == Config.getint("Access", o))
+            Q = Q.order_by(asc(User.name))
+            result = Q.all()
+            if len(result) < 1:
+                continue
+            printable=map(lambda (u): "%s%s" % (u.name,' ('+u.alias+')' if u.alias else ''),result)
+            reply += "%s:  " % (o)
+            reply += ', '.join(printable)
+            reply += '\n'
+        message.reply(reply)
