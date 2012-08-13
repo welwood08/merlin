@@ -27,11 +27,12 @@ from Core.config import Config
 
 class members(loadable):
     """List all members, in format nick (alias) level"""
-    usage = " "
+    usage = " [coords]"
     
-    @route(access = "admin")
+    @route(r"(.*)", access = "admin")
     def execute(self, message, user, params):
         reply = ""
+        opts = params.group(1).split()
         for o in reversed(Config.options("Access")):
             Q = session.query(User)
             Q = Q.filter(User.access == Config.getint("Access", o))
@@ -39,7 +40,7 @@ class members(loadable):
             result = Q.all()
             if len(result) < 1:
                 continue
-            printable=map(lambda (u): "%s%s" % (u.name,' ('+u.alias+')' if u.alias else ''),result)
+            printable=map(lambda (u): "%s%s%s" % (u.name,' ('+u.alias+')' if u.alias else '', ' ('+"%d:%d:%d" % (u.planet.x, u.planet.y, u.planet.z)+')' if "coords" in opts and u.planet is not None else ''),result)
             reply += "%s:  " % (o)
             reply += ', '.join(printable)
             reply += '\n'
