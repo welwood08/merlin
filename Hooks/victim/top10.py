@@ -30,39 +30,56 @@ from Core.paconf import PA
 
 class top10(loadable):
     """Top planets in a given alliance"""
-    usage = " [alliance] [score|value|size|xp]"
+    usage = " [alliance] [race] [score|value|size|xp]"
     access = "member"
 
-    @route(r"(\S+)\s+(\S+)")
-    def twogroups(self, message, user, params):
-        sortby=params.group(1).lower()
-        if sortby in ["score","value","size","xp"]:
-            alliance = Alliance.load(params.group(2))
-        else:
-            sortby=params.group(2).lower()
-            alliance = Alliance.load(params.group(1))
-        if alliance is None:
-            message.reply("No alliance or user matching '%s' found" % (params.group(1),))
-        else:
-            self.execute(message, alliance=alliance, sortby=sortby)
+    @route(r"")
+    def nogroup(self, message, user, params):
+        self.execute(message)
 
     @route(r"(\S+)")
-    def agroup(self, message, user, params):
-        sortby = params.group(1).lower()
-        if sortby in ["score","value","size","xp"]:
-            self.execute(message, sortby=sortby)
+    def onegroup(self, message, user, params):
+        opt = params.group(1).lower()
+        if opt in ["score","value","size","xp"]:
+            self.execute(message, sortby=opt)
+        elif opt in ["terran"[:len(opt)], "cathaar"[:len(opt)], "xandathrii"[:len(opt)], "zikonian"[:len(opt)], "eitraides"[:len(opt)]]:
+            self.execute(message, race=opt)
         else:
-            alliance = Alliance.load(params.group(1))
+            alliance = Alliance.load(opt)
             if alliance is None:
                 message.reply("No alliance or user matching '%s' found" % (params.group(1),))
             else:
                 self.execute(message, alliance=alliance)
 
-    @route(r"")
-    def nogroup(self, message, user, params):
-        self.execute(message)
-    
-    def execute(self, message, alliance=None, sortby="score"):
+    @route(r"(.*)")
+    def groups(self, message, user, params):
+        opts=params.group(1).lower().split()
+        
+        alliance=None
+        sortby="score"
+        race=None
+
+        for opt in opts:
+            if opt in ["score","value","size","xp"]:
+                sortby=opt
+            elif opt in ["terran"[:len(opt)], "cathaar"[:len(opt)], "xandathrii"[:len(opt)], "zikonian"[:len(opt)], "eitraides"[:len(opt)]]:
+                if opt[0] == "t":
+                    race="Ter"
+                elif opt[0] == "c":
+                    race="Cat"
+                elif opt[0] == "x":
+                    race="Xan"
+                elif opt[0] == "z":
+                    race="Zik"
+                elif opt[0] == "e":
+                    race="Etd"
+            else:
+                alliance=Alliance.load(opt)
+                if alliance is None:
+                    message.reply("No alliance or user matching '%s' found" % (params.group(1),))
+        self.execute(message, alliance=alliance, race=race, sortby=sortby)
+
+    def execute(self, message, alliance=None, race=None, sortby="score"):
         tick = Updates.current_tick()
         target = aliased(Planet)
         target_intel = aliased(Intel)
@@ -74,6 +91,8 @@ class top10(loadable):
         Q = Q.join((planet.intel, planet_intel))
         if alliance:
             Q = Q.filter(planet_intel.alliance == alliance)
+        if race:
+            Q = Q.filter(planet.race == race)
         Q = Q.group_by(planet.x, planet.y, planet.z, planet.score, planet.value, planet.size, planet.xp, planet.race, planet_intel.nick)
         if sortby == "xp":
             Q = Q.order_by(desc(planet.xp))
@@ -85,7 +104,7 @@ class top10(loadable):
             Q = Q.order_by(desc(planet.score))
         result = Q.all()
         
-        reply = "Top planets"
+        reply = "Top%s planets" % (" "+race if race is not None else "")
         if alliance:
             reply+=" in %s"%(alliance.name,)
         reply+=" by %s:\n"%(sortby)
