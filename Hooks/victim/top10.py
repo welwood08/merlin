@@ -29,7 +29,7 @@ from Core.config import Config
 from Core.paconf import PA
 
 class top10(loadable):
-    """Top planets in a given alliance"""
+    """Top planets by specified criteria"""
     usage = " [alliance] [race] [score|value|size|xp]"
     access = "member"
 
