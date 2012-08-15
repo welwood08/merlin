@@ -21,17 +21,18 @@
  
 from sqlalchemy.sql import asc, desc
 from Core.db import session
-from Core.maps import User
+from Core.maps import User, Updates
 from Core.loadable import loadable, route
 from Core.config import Config
 
 class members(loadable):
     """List all members, in format nick (alias) level"""
-    usage = " [coords]"
+    usage = " [coords] [defage] [mydef]"
     
     @route(r"(.*)", access = "admin")
     def execute(self, message, user, params):
         reply = ""
+        tick=Updates.current_tick()
         opts = params.group(1).split()
         for o in reversed(Config.options("Access")):
             Q = session.query(User)
@@ -40,7 +41,10 @@ class members(loadable):
             result = Q.all()
             if len(result) < 1:
                 continue
-            printable=map(lambda (u): "%s%s%s" % (u.name,' ('+u.alias+')' if u.alias else '', ' ('+"%d:%d:%d" % (u.planet.x, u.planet.y, u.planet.z)+')' if "coords" in opts and u.planet is not None else ''),result)
+            printable=map(lambda (u): "%s%s%s%s%s" % (u.name,' ('+u.alias+')' if u.alias else '',
+                " (%d:%d:%d)" % (u.planet.x, u.planet.y, u.planet.z) if "coords" in opts and u.planet is not None else '', 
+                " (%s)" % (u.fleetupdated-tick) if "defage" in opts else '',
+                " (%s)" % (u.fleetupdated) if "mydef" in opts else ''),result)
             reply += "%s:  " % (o)
             reply += ', '.join(printable)
             reply += '\n'
