@@ -26,7 +26,7 @@ from Core.loadable import loadable, route
 from Core.config import Config
 
 class members(loadable):
-    """List all members, in format nick (alias) level"""
+    """List all members, in format nick (alias)"""
     usage = " [coords] [defage] [mydef]"
     
     @route(r"(.*)", access = "admin")
@@ -43,8 +43,8 @@ class members(loadable):
                 continue
             printable=map(lambda (u): "%s%s%s%s%s" % (u.name,' ('+u.alias+')' if u.alias else '',
                 " (%d:%d:%d)" % (u.planet.x, u.planet.y, u.planet.z) if "coords" in opts and u.planet is not None else '', 
-                " (%s)" % (u.fleetupdated-tick) if "defage" in opts else '',
-                " (%s)" % (u.fleetupdated) if "mydef" in opts else ''),result)
+                " (%s)" % ((u.fleetupdated or 0)-tick) if "defage" in opts else '',
+                " (%s)" % (u.fleetupdated or 0) if "mydef" in opts else ''),result)
             reply += "%s:  " % (o)
             reply += ', '.join(printable)
             reply += '\n'
