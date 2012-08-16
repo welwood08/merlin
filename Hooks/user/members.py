@@ -26,8 +26,8 @@ from Core.loadable import loadable, route
 from Core.config import Config
 
 class members(loadable):
-    """List all members, in format nick (alias)"""
-    usage = " [coords] [defage] [mydef]"
+    """List all members, in format nick (alias). Optionally include coordinates, mydef age, tick of last mydef update."""
+    usage = " [coords] [defage] [mydef] [galmates]"
     
     @route(r"(.*)", access = "admin")
     def execute(self, message, user, params):
@@ -35,6 +35,8 @@ class members(loadable):
         tick=Updates.current_tick()
         opts = params.group(1).split()
         for o in reversed(Config.options("Access")):
+            if ("galmates" not in opts) and (Config.getint("Access", o) == 0):
+                continue;
             Q = session.query(User)
             Q = Q.filter(User.access == Config.getint("Access", o))
             Q = Q.order_by(asc(User.name))
