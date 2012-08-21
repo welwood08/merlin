@@ -165,7 +165,8 @@ class request(loadable):
             message.reply("There are no open scan requests")
             return
         
-        message.reply(" ".join(map(lambda request: "[%s: %s %s:%s:%s]" % (request.id, request.scantype, request.target.x, request.target.y, request.target.z,), Q.all())))
+        message.reply(" ".join(map(lambda request: "[%s: (i:%s/r:%s) %s %s:%s:%s]" % (request.id, request.target.intel.dists if request.target.intel else "0",
+                request.dists, request.scantype, request.target.x, request.target.y, request.target.z,), Q.all())))
     
     @route(r"links? ?(.*)", access = "member")
     def links(self, message, user, params):
@@ -186,10 +187,8 @@ class request(loadable):
             message.reply("There are no open scan requests")
             return
 
-        if i>0:
-            message.reply(self.url(" ".join(map(lambda request: "[%s: %s]" % (request.id, request.link,), Q[:i])), user))
-        else:
-            message.reply(self.url(" ".join(map(lambda request: "[%s: %s]" % (request.id, request.link,), Q.all())), user))
+        message.reply(self.url(" ".join(map(lambda request: "[%s (i:%s/r:%s): %s]" % (request.id, request.target.intel.dists if request.target.intel else "0", 
+                    request.dists, request.link), Q[:i] if i>0 else Q.all())), user))
     
     def scanchan(self):
         return Config.get("Channels", "scans") if "scans" in Config.options("Channels") else Config.get("Channels", "home")
