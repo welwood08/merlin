@@ -134,15 +134,14 @@ class request(loadable):
             return
         
         # Update Intel
-        planet = request.target
-        if planet.intel is None:
-            planet.intel = Intel()
-        planet.intel.dists = max(planet.intel.dists, dists)
-#        else:
-#            planet.intel.dists = dists
+        if user.access >= Config.getint("Access", "member") if "member" in Config.options("Access") else 0:
+            planet = request.target
+            if planet.intel is None:
+                planet.intel = Intel()
+            planet.intel.dists = max(planet.intel.dists, dists)
 
-        request.dists = max(request.dists, dists)
-        session.commit()
+            request.dists = max(request.dists, dists)
+            session.commit()
         
         reply = "Updated request %s dists to %s" % (id, request.dists,)
         message.reply(reply)
