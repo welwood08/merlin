@@ -167,8 +167,16 @@ class request(loadable):
         
         message.reply(" ".join(map(lambda request: "[%s: %s %s:%s:%s]" % (request.id, request.scantype, request.target.x, request.target.y, request.target.z,), Q.all())))
     
-    @route(r"links?", access = "member")
+    @route(r"links? ?(.*)", access = "member")
     def links(self, message, user, params):
+        try:
+            if params.group(1) == "all":
+                i=0
+            else:
+                i=int(params.group(1))
+        except:
+            i=5
+            
         Q = session.query(Request)
         Q = Q.filter(Request.tick > Updates.current_tick() - 5)
         Q = Q.filter(Request.active == True)
@@ -177,8 +185,11 @@ class request(loadable):
         if Q.count() < 1:
             message.reply("There are no open scan requests")
             return
-        
-        message.reply(self.url(" ".join(map(lambda request: "[%s: %s]" % (request.id, request.link,), Q[:5])), user))
+
+        if i>0:
+            message.reply(self.url(" ".join(map(lambda request: "[%s: %s]" % (request.id, request.link,), Q[:i])), user))
+        else:
+            message.reply(self.url(" ".join(map(lambda request: "[%s: %s]" % (request.id, request.link,), Q.all())), user))
     
     def scanchan(self):
         return Config.get("Channels", "scans") if "scans" in Config.options("Channels") else Config.get("Channels", "home")
