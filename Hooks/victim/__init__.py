@@ -28,4 +28,5 @@ __all__ = [
            "topcunts",
            "surprisesex",
            "top10",
+           "top10lookup",
            ]
