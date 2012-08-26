@@ -37,7 +37,7 @@ class seagal(loadable):
         
         sum=params.group(6)
         res=user.planet.resources_per_agent(p)
-        reply="Your Seagals will ninja %s resources from %s:%s:%s - 13: %s, 35: %s."%(res,p.x,p.y,p.z,self.num2short(res*13),self.num2short(res*35))
+        reply="Your Seagals will ninja %s resources from %s:%s:%s - 5: %s, 10: %s, 20: %s."%(res,p.x,p.y,p.z,self.num2short(res*5),self.num2short(res*10),self.num2short(res*20))
         if sum:
             reply+=" You need %s Seagals to ninja %sk res."%(int(math.ceil((float(sum)*1000)/res)),sum)
         message.reply(reply)
