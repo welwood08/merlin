@@ -26,13 +26,16 @@ class ship(loadable):
     """Returns the stats of the specified ship"""
     usage = " <ship>"
     
-    @route(r"(\w+)")
+    @route(r"(.+)")
     def execute(self, message, user, params):
         
-        name = params.group(1)
-        
-        ship = Ship.load(name=name)
-        if ship is None:
-            message.alert("No Ship called: %s" % (name,))
-            return
-        message.reply(str(ship))
+        names = params.group(1).split()
+        reply = ""        
+
+        for name in names:
+            ship = Ship.load(name=name)
+            if ship is None:
+                message.alert("No Ship called: %s" % (name,))
+                continue
+            reply += str(ship) + "\n"
+        message.reply(reply[:-1])
