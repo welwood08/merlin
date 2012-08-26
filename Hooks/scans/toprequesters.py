@@ -39,7 +39,8 @@ class toprequesters(loadable):
         age = int(params.group(1))
         num = int(params.group(2))
         Q = session.query(Request, count())
-        Q = Q.filter(Request.tick >= tick-age)
+        if age > 0:
+            Q = Q.filter(Request.tick >= tick-age)
         Q = Q.group_by(Request.requester_id)
         Q = Q.order_by(desc(count()))
         result = Q.all()
