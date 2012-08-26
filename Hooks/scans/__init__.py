@@ -26,4 +26,5 @@ __all__ = [
            "request",
            "parser",
            "toprequesters",
+           "topscanners",
            ]
