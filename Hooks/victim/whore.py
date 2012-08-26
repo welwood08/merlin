@@ -86,10 +86,10 @@ class whore(loadable):
         maxcap = PA.getfloat("roids","maxcap")
         mincap = PA.getfloat("roids","mincap")
         modifier = (cast(Planet.value,Float).op("/")(float(attacker.value))).op("^")(0.5)
-        caprate = func.float8larger(mincap,func.float8smaller(modifier.op("*")(maxcap),maxcap))
+        caprate = func.greatest(mincap,func.least(modifier.op("*")(maxcap),maxcap))
         maxcap = cast(func.floor(cast(Planet.size,Float).op("*")(caprate)),Integer)
         
-        bravery = (func.float8larger(0.0,( func.float8smaller(2.0, cast(Planet.value,Float).op("/")(float(attacker.value)))-0.1) * (func.float8smaller(2.0, cast(Planet.score,Float).op("/")(float(attacker.score)))-0.2))).op("*")(10.0)
+        bravery = (func.greatest(0.0,( func.least(2.0, cast(Planet.value,Float).op("/")(float(attacker.value)))-0.1) * (func.least(2.0, cast(Planet.score,Float).op("/")(float(attacker.score)))-0.2))).op("*")(10.0)
         xp_gain = cast(func.floor(maxcap.op("*")(bravery)),Integer)
         
         Q = session.query(Planet, Intel, xp_gain.label("xp_gain"))
