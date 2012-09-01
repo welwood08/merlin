@@ -20,9 +20,12 @@
 # Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA 02110-1301 USA
  
 from Core.exceptions_ import PNickParseError, UserError
-from Core.maps import Channel
+from Core.maps import Channel, Command
+from Core.db import session
 from Core.loadable import loadable, route
 from Core.callbacks import Callbacks
+from sqlalchemy.sql import desc
+from datetime import datetime, timedelta
 
 class help(loadable):
     """Help"""
@@ -34,6 +37,16 @@ class help(loadable):
     
     @route(r"")
     def execute(self, message, user, params):
+        Q = session.query(Command)
+        Q = Q.filter(Command.username == user.name)
+        Q = Q.filter(Command.command.ilike("help"))
+        Q = Q.order_by(desc(Command.command_time))
+        time = datetime.now() - Q[0].command_time
+        print "DEBUG::: %s" % (time)
+        if time.days == 0 and time.seconds < 10:
+            message.reply("Slow down!")
+            return
+        
         commands = []
         message.reply(self.doc+". For more information use: "+self.usage)
         if message.in_chan():
