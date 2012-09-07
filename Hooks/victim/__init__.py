@@ -30,4 +30,5 @@ __all__ = [
            "top10",
            "top10lookup",
            "last10",
+           "last5",
            ]

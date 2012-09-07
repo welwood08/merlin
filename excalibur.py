@@ -960,7 +960,6 @@ while True:
 
         # Update everything from the temp table and generate ranks
         # Deactivated items are untouched but NULLed earlier
-
         session.execute(text("""CREATE TABLE temp_1 (
                                   id INT, 
                                   name VARCHAR(255), 
@@ -976,11 +975,11 @@ while True:
                                   totallostroids INT
                                 );
 
-                                 INSERT INTO temp_1 VALUES (SELECT t.*,
+                                 INSERT INTO temp_1 SELECT t.*,
                                    COALESCE(a.totalroundroids + (GREATEST(t.size - a.size, 0)), t.size) AS totalroundroids,
                                    COALESCE(a.totallostroids + (GREATEST(a.size - t.size, 0)), 0) AS totallostroids
                                  FROM alliance AS a, alliance_temp AS t
-                                   WHERE a.id = t.id AND a.active = :true);
+                                   WHERE a.id = t.id AND a.active = :true;
                              """, bindparams=[true]))
 
         session.execute(text("""UPDATE alliance AS a,

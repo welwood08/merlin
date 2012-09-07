@@ -28,7 +28,7 @@ from Core.loadable import loadable, route
 from Core.config import Config
 from Core.paconf import PA
 
-class last10(loadable):
+class last5(loadable):
     """Bottom planets by specified criteria"""
     usage = " [alliance] [race] [score|value|size|xp]"
     access = "member"
@@ -113,7 +113,7 @@ class last10(loadable):
             i = alliance.members # Not set for some reason... It should be.
         else:
             i = Updates.load().planets
-        for x, y, z, score, value, size, xp, race, nick in result[:10]:
+        for x, y, z, score, value, size, xp, race, nick in result[:5]:
             i-=1
             line = "#%s - %s:%s:%s (%s) - Score: %s Value: %s Size: %s XP: %s"%(i,x,y,z,race,score,value,size,xp)
             if nick:
