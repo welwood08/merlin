@@ -26,6 +26,7 @@ from Core.db import session
 from Core.maps import Planet, Alliance, Intel
 from Core.loadable import loadable, route, require_planet
 from Core.paconf import PA
+from time import sleep
 
 class victim(loadable):
     """Target search, ordered by maxcap"""
@@ -48,6 +49,7 @@ class victim(loadable):
         bash=False
         attacker=user.planet
         cluster=None
+        limit=5
 
         params=params.group(1).split()
 
@@ -80,6 +82,8 @@ class victim(loadable):
                     message.reply("No alliance matching '%s' found" % (m.group(1),))
                     return
                 continue
+            if p[:4] == "lots" and user.is_admin():
+                limit = int(p[4:])
 
         maxcap = PA.getfloat("roids","maxcap")
         mincap = PA.getfloat("roids","mincap")
@@ -110,7 +114,7 @@ class victim(loadable):
         Q = Q.order_by(desc("maxcap"))
         Q = Q.order_by(desc(Planet.size))
         Q = Q.order_by(desc(Planet.value))
-        result = Q[:16]
+        result = Q[:(limit+1)]
         
         if len(result) < 1:
             reply="No"
@@ -129,7 +133,7 @@ class victim(loadable):
             return
         
         replies = []
-        for planet, intel, maxcap in result[:15]:
+        for planet, intel, maxcap in result[:limit]:
             reply="%s:%s:%s (%s)" % (planet.x,planet.y,planet.z,planet.race)
             reply+=" Value: %s Size: %s MaxCap: %s" % (planet.value,planet.size, maxcap)
             if intel:
@@ -138,6 +142,11 @@ class victim(loadable):
                 if not alliance.name and intel.alliance:
                     reply+=" Alliance: %s" % (intel.alliance.name,)
             replies.append(reply)
-        if len(result) > 15:
-            replies[-1]+=" (Too many results to list, please refine your search)"
+            print(len(replies))
+            if len(replies) == 5:
+                message.reply("\n".join(replies))
+                replies = []
+                sleep(3)
+        if len(result) > limit:
+            replies.append("(Too many results to list, please refine your search)")
         message.reply("\n".join(replies))
