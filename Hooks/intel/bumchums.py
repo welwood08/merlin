@@ -26,30 +26,50 @@ from Core.loadable import loadable, route
 
 class bumchums(loadable):
     """Pies"""
-    usage = " <alliance> [number]"
+    usage = " <alliance> [alliance] [number]"
     
-    @route(r"(\S+)(?:\s+(\d+))?", access = "member")
+    @route(r"(\S+)(?:\s+([A-Za-z].*?))?(?:\s+(\d+))?", access = "member")
     def execute(self, message, user, params):
         
         alliance = Alliance.load(params.group(1))
         if alliance is None:
             message.reply("No alliance matching '%s' found"%(params.group(1),))
             return
-        bums = int(params.group(2) or 2)
+        if params.group(2):
+            alliance2 = Alliance.load(params.group(2))
+            if alliance2 is None:
+                message.reply("No alliance matching '%s' found"%(params.group(2),))
+                return
+        bums = int(params.group(3) or 2)
         Q = session.query(Galaxy.x, Galaxy.y, count())
         Q = Q.join(Galaxy.planets)
         Q = Q.join(Planet.intel)
         Q = Q.filter(Galaxy.active == True)
         Q = Q.filter(Planet.active == True)
+        if params.group(2):
+            R = Q.filter(Intel.alliance==alliance2)
+            R = R.group_by(Galaxy.x, Galaxy.y)
+            R = R.having(count() >= bums)
         Q = Q.filter(Intel.alliance==alliance)
         Q = Q.group_by(Galaxy.x, Galaxy.y)
         Q = Q.having(count() >= bums)
-        result = Q.all()
-        if len(result) < 1:
-            message.reply("No galaxies with at least %s bumchums from %s"%(bums,alliance.name,))
-            return
-        prev=[]
-        for x, y, chums in result:
-            prev.append("%s:%s (%s)"%(x, y, chums))
-        reply="Galaxies with at least %s bums from %s: "%(bums,alliance.name)+ ' | '.join(prev)
+        prev = []
+        if params.group(2):
+            for x1, y1, c1 in Q.all():
+                for x2, y2, c2 in R.all():
+                    if x1 == x2 and y1 == y2:
+                        prev.append("%s:%s (%s,%s)"%(x1, y1, c1, c2))
+            if len(prev) < 1:
+                message.reply("No galaxies with at least %s bumchums from %s and %s"%(bums,alliance.name,alliance2.name))
+                return
+            reply="Galaxies with at least %s bums from %s and %s: "%(bums,alliance.name, alliance2.name)+ ' | '.join(prev)
+        else:
+            result = Q.all()    
+            if len(result) < 1:
+                message.reply("No galaxies with at least %s bumchums from %s"%(bums,alliance.name,))
+                return
+            prev=[]
+            for x, y, chums in result:
+                prev.append("%s:%s (%s)"%(x, y, chums))
+            reply="Galaxies with at least %s bums from %s: "%(bums,alliance.name)+ ' | '.join(prev)
         message.reply(reply)
