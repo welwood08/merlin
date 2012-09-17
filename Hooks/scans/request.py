@@ -28,6 +28,7 @@ from Core.db import session
 from Core.maps import Updates, Planet, Galaxy, User, Request, Intel
 from Core.chanusertracker import CUT
 from Core.loadable import loadable, route, require_user, robohci
+from time import sleep
 
 class request(loadable):
     """Request a scan"""
@@ -64,7 +65,10 @@ class request(loadable):
             
                 scan = planet.scan(scan)
                 if scan and request.tick - scan.tick < PA.getint(scan.scantype,"expire"):
-                    message.reply("%s Scan of %s:%s:%s is already available from %s ticks ago: %s. !request cancel %s if this is suitable." % (scan.scantype, planet.x, planet.y, planet.z, request.tick - scan.tick, scan.link, request.id,))
+                    message.reply("%s Scan of %s:%s:%s is already available from %s ticks ago: %s. !request cancel %s if this is suitable." % (
+                                  scan.scantype, planet.x, planet.y, planet.z, request.tick - scan.tick, scan.link, request.id,))
+                
+                sleep(1)
     
     @robohci
     def robocop(self, message, request_id, mode):
@@ -106,22 +110,40 @@ class request(loadable):
         
         return request
     
-    @route(r"c(?:ancel)?\s+(\d+)", access = "member")
+    @route(r"c(?:ancel)?\s+(\d+(?:[: -]\d+)*)", access = "member")
     @require_user
     def cancel(self, message, user, params):
-        id = params.group(1)
-        request = Request.load(id)
-        if request is None:
-            message.reply("No open request number %s exists (idiot)."%(id,))
-            return
-        if request.user is not user and not user.is_member() and not self.is_chan(message, self.scanchan()):
-            message.reply("Scan request %s isn't yours and you're not a scanner!"%(id,))
-            return
-        
-        request.active = False
-        session.commit()
-        
-        reply = "Cancelled scan request %s" % (id,)
+        cancel_ids = []
+        reply_ids = []
+
+        for id in params.group(1).split():
+            if ':' in id:
+                [start,end] = id.split(':')
+                cancel_ids += range(int(start), int(end)+1)
+            elif '-' in id:
+                [start,end] = id.split('-')
+                cancel_ids += range(int(start), int(end)+1)
+            else:
+                cancel_ids.append(int(id))
+
+        for id in cancel_ids:
+            id = str(id)
+            request = Request.load(id)
+            if request is None:
+                message.reply("No open request number %s exists (idiot)."%(id,))
+                sleep(2)
+                continue
+            if request.user is not user and not user.is_member() and not self.is_chan(message, self.scanchan()):
+                message.reply("Scan request %s isn't yours and you're not a scanner!"%(id,))
+                sleep(2)
+                continue
+            
+            request.active = False
+            session.commit()
+            
+            reply_ids.append(id)
+
+        reply = "Cancelled scan request %s" % (", ".join(reply_ids))
         message.reply(reply)
         if message.get_chan() != self.scanchan():
             message.privmsg(reply, self.scanchan())
