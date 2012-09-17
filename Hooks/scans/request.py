@@ -32,7 +32,7 @@ from Core.loadable import loadable, route, require_user, robohci
 class request(loadable):
     """Request a scan"""
     alias = "req"
-    usage = " <x.y.z> <scantype> [dists] | <id> blocks <amps> | cancel <id> | list | links"
+    usage = " <x.y.z> <scantype(s)> [dists] | <id> blocks <amps> | cancel <id> | list | links"
     
     @route(loadable.planet_coord+"\s+(["+"".join(PA.options("scans"))+r"]+)\w*(?:\s+(\d+))?", access = "member")
     @require_user
