@@ -64,10 +64,7 @@ class surprisesex(loadable):
                 planet = u.planet
                 self.execute(message, planet=planet)
         else:
-            if params.group(2) is None:
-                self.execute(message, alliance=alliance)
-            else:
-                self.execute(message, alliance=alliance, showall=True)
+            self.execute(message, alliance=alliance, showall=(params.group(2) is not None))
     
     @route(r"")
     @require_planet
