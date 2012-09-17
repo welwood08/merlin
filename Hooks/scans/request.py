@@ -34,7 +34,7 @@ class request(loadable):
     alias = "req"
     usage = " <x.y.z> <scantype> [dists] | <id> blocks <amps> | cancel <id> | list | links"
     
-    @route(loadable.planet_coord+"\s+("+"|".join(PA.options("scans"))+r")\w*(?:\s+(\d+))?", access = "member")
+    @route(loadable.planet_coord+"\s+(["+"".join(PA.options("scans"))+r"]+)\w*(?:\s+(\d+))?", access = "member")
     @require_user
     def execute(self, message, user, params):
         planet = Planet.load(*params.group(1,3,5))
@@ -42,19 +42,20 @@ class request(loadable):
             message.alert("No planet with coords %s:%s:%s" % params.group(1,3,5))
             return
         
-        scan = params.group(6).upper()
-        if scan == "I":
-            message.alert("Incoming scans can only be performed by the planet under attack.")
-            return
         dists = int(params.group(7) or 0)
         
-        request = self.request(message, user, planet, scan, dists)
-        if message.get_chan() != self.scanchan():
-            message.reply("Requested a %s Scan of %s:%s:%s. !request cancel %s to cancel the request." % (request.type, planet.x, planet.y, planet.z, request.id,))
+        for scan in params.group(6).upper():
+            if scan == "I":
+                message.alert("Incoming scans can only be performed by the planet under attack.")
+                continue
         
-        scan = planet.scan(scan)
-        if scan and request.tick - scan.tick < PA.getint(scan.scantype,"expire"):
-            message.reply("%s Scan of %s:%s:%s is already available from %s ticks ago: %s. !request cancel %s if this is suitable." % (scan.scantype, planet.x, planet.y, planet.z, request.tick - scan.tick, scan.link, request.id,))
+            request = self.request(message, user, planet, scan, dists)
+            if message.get_chan() != self.scanchan():
+                message.reply("Requested a %s Scan of %s:%s:%s. !request cancel %s to cancel the request." % (request.type, planet.x, planet.y, planet.z, request.id,))
+        
+            scan = planet.scan(scan)
+            if scan and request.tick - scan.tick < PA.getint(scan.scantype,"expire"):
+                message.reply("%s Scan of %s:%s:%s is already available from %s ticks ago: %s. !request cancel %s if this is suitable." % (scan.scantype, planet.x, planet.y, planet.z, request.tick - scan.tick, scan.link, request.id,))
     
     @robohci
     def robocop(self, message, request_id, mode):
