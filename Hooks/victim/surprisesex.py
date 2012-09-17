@@ -51,7 +51,7 @@ class surprisesex(loadable):
             else:
                 self.execute(message, galaxy=galaxy)
     
-    @route(r"(\S+)")
+    @route(r"(\S+)(\s+all)?")
     def user_alliance(self, message, user, params):
         alliance = Alliance.load(params.group(1))
         if alliance is None:
@@ -64,14 +64,17 @@ class surprisesex(loadable):
                 planet = u.planet
                 self.execute(message, planet=planet)
         else:
-            self.execute(message, alliance=alliance)
+            if params.group(2) is None:
+                self.execute(message, alliance=alliance)
+            else:
+                self.execute(message, alliance=alliance, showall=True)
     
     @route(r"")
     @require_planet
     def me(self, message, user, params):
         self.execute(message, planet=user.planet)
     
-    def execute(self, message, planet=None, galaxy=None, alliance=None):
+    def execute(self, message, planet=None, galaxy=None, alliance=None, showall=False):
         tick = Updates.current_tick()
         target = aliased(Planet)
         target_intel = aliased(Intel)
@@ -115,6 +118,6 @@ class surprisesex(loadable):
             reply+=" alliance %s"%(alliance.name,)
         reply+=" are (total: %s) "%(sum([attacks for name, attacks in result]),)
         prev = []
-        for name, attacks in result[:5]:
+        for name, attacks in (result if showall else result[:5]):
             prev.append("%s - %s"%(name or "Unknown",attacks))
         message.reply(reply+" | ".join(prev))
