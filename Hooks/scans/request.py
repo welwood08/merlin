@@ -25,7 +25,7 @@ from sqlalchemy.sql import asc
 from Core.config import Config
 from Core.paconf import PA
 from Core.db import session
-from Core.maps import Updates, Planet, User, Request, Intel
+from Core.maps import Updates, Planet, Galaxy, User, Request, Intel
 from Core.chanusertracker import CUT
 from Core.loadable import loadable, route, require_user, robohci
 
@@ -34,28 +34,37 @@ class request(loadable):
     alias = "req"
     usage = " <x.y.z> <scantype(s)> [dists] | <id> blocks <amps> | cancel <id> | list | links"
     
-    @route(loadable.planet_coord+"\s+(["+"".join(PA.options("scans"))+r"]+)\w*(?:\s+(\d+))?", access = "member")
+    @route(loadable.coord+"\s+(["+"".join(PA.options("scans"))+r"]+)\w*(?:\s+(\d+))?", access = "member")
     @require_user
     def execute(self, message, user, params):
-        planet = Planet.load(*params.group(1,3,5))
-        if planet is None:
-            message.alert("No planet with coords %s:%s:%s" % params.group(1,3,5))
-            return
+        if params.group(5) is None:
+            galaxy = Galaxy.load(*params.group(1,3))
+            if galaxy is None:
+                message.alert("No galaxy with coords %s:%s" % params.group(1,3))
+                return
+            planets = galaxy.planets
+        else:
+            planet = Planet.load(*params.group(1,3,5))
+            if planet is None:
+                message.alert("No planet with coords %s:%s:%s" % params.group(1,3,5))
+                return
+            planets = [planet]
         
-        dists = int(params.group(7) or 0)
-        
-        for scan in params.group(6).upper():
-            if scan == "I":
-                message.alert("Incoming scans can only be performed by the planet under attack.")
-                continue
-        
-            request = self.request(message, user, planet, scan, dists)
-            if message.get_chan() != self.scanchan():
-                message.reply("Requested a %s Scan of %s:%s:%s. !request cancel %s to cancel the request." % (request.type, planet.x, planet.y, planet.z, request.id,))
-        
-            scan = planet.scan(scan)
-            if scan and request.tick - scan.tick < PA.getint(scan.scantype,"expire"):
-                message.reply("%s Scan of %s:%s:%s is already available from %s ticks ago: %s. !request cancel %s if this is suitable." % (scan.scantype, planet.x, planet.y, planet.z, request.tick - scan.tick, scan.link, request.id,))
+        for planet in planets:
+            dists = int(params.group(7) or 0)
+            
+            for scan in params.group(6).upper():
+                if scan == "I":
+                    message.alert("Incoming scans can only be performed by the planet under attack.")
+                    continue
+            
+                request = self.request(message, user, planet, scan, dists)
+                if message.get_chan() != self.scanchan():
+                    message.reply("Requested a %s Scan of %s:%s:%s. !request cancel %s to cancel the request." % (request.type, planet.x, planet.y, planet.z, request.id,))
+            
+                scan = planet.scan(scan)
+                if scan and request.tick - scan.tick < PA.getint(scan.scantype,"expire"):
+                    message.reply("%s Scan of %s:%s:%s is already available from %s ticks ago: %s. !request cancel %s if this is suitable." % (scan.scantype, planet.x, planet.y, planet.z, request.tick - scan.tick, scan.link, request.id,))
     
     @robohci
     def robocop(self, message, request_id, mode):
