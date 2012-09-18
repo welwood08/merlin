@@ -37,5 +37,6 @@ __all__ = [
            "remchan",
            "alias",
            "forcepref",
-           "members"
+           "members",
+           "paranoidcunts",
            ]
