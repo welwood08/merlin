@@ -84,7 +84,7 @@ class covop(loadable):
             reply += "\nResults:   SD: %1.1f%% (%dXP) NC: %d%% (%dXP) EF: %d roids (%dXP) S: %d ships (%dXP) SGP: %d guards (%dXP)" % (0.5*agents, self.xpcalc(agents,1),
                      agents, self.xpcalc(agents,2), agents/3, self.xpcalc(agents,3), agents, self.xpcalc(agents,4), 10*agents, self.xpcalc(agents,5))
             reply += "\n           IB: %d amps+dists (%dXP) RT: %dM %dC %dE (%dXP) H: %d buildings (%dXP)" % (agents/15, self.xpcalc(agents,6),
-                     min(max_res, pscan.res_metal), min(max_res, pscan.res_crystal), min(max_res, pscan.res_eonium), self.xpcalc(agents,7), agents/20, self.xpcalc(agents,8))
+                     min(max_res, pscan.res_metal/10), min(max_res, pscan.res_crystal/10), min(max_res, pscan.res_eonium/10), self.xpcalc(agents,7), agents/20, self.xpcalc(agents,8))
 
             if params.group(7):
                 stealth = int(params.group(7))
