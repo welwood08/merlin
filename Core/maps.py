@@ -1390,8 +1390,8 @@ class Target(Base):
     planet_id = Column(Integer, ForeignKey(Planet.id, ondelete='cascade'), index=True)
     tick = Column(Integer)
 User.bookings = relation(Target, backref=backref('user', lazy='dynamic'))
-Planet.bookings = relation(Target, backref=backref('planet', lazy='dynamic', order_by=(asc(Target.tick))))
-Galaxy.bookings = relation(Target, Planet.__table__, lazy='dynamic') # dynamic_loader(Target, Planet.__table__) # Most likely place I broke it.
+Planet.bookings = relation(Target, backref=backref('planet'), lazy='dynamic', order_by=(asc(Target.tick)))
+Galaxy.bookings = relation(Target, Planet.__table__, lazy='dynamic')
 #Alliance.bookings = dynamic_loader(Target, Intel.__table__)
 
 class Attack(Base):

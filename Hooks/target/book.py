@@ -88,7 +88,7 @@ class book(loadable):
             reply = "You've been beaten to %s:%s:%s by %s and %s you slow retarded faggot. I feel sorry for you, so have tick %s (eta %s)" % (planet.x,planet.y,planet.z, book1.user.name, book2.user.name, free, (free-tick),)
         
         try:
-            planet.bookings.append(Target(user=user, tick=free))
+            planet.bookings.append(Target(user=[user], tick=free))
             session.commit()
             message.reply(reply)
             return
