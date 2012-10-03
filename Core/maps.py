@@ -267,7 +267,7 @@ class ClusterHistory(Base):
     xp_lowest_rank_tick = Column(Integer)
     def galaxy(self, y):
         return self.planet_loader.filter_by(y=y).first()
-Cluster.history_loader = dynamic_loader(ClusterHistory, backref="current")
+Cluster.history_loader = relation(ClusterHistory, backref=backref('current', lazy='dynamic'))
 
 class Galaxy(Base):
     __tablename__ = 'galaxy'
@@ -484,7 +484,7 @@ class GalaxyHistory(Base):
     private = Column(Boolean)
     def planet(self, z):
         return self.planet_loader.filter_by(z=z).first()
-Galaxy.history_loader = dynamic_loader(GalaxyHistory, backref="current")
+Galaxy.history_loader = relation(GalaxyHistory, backref=backref('current', lazy='dynamic'))
 ClusterHistory.galaxies = relation(GalaxyHistory, order_by=asc(GalaxyHistory.y), backref="cluster")
 ClusterHistory.galaxy_loader = dynamic_loader(GalaxyHistory)
 
@@ -775,7 +775,7 @@ class PlanetHistory(Base):
     xp_highest_rank_tick = Column(Integer)
     xp_lowest_rank = Column(Integer)
     xp_lowest_rank_tick = Column(Integer)
-Planet.history_loader = dynamic_loader(PlanetHistory, backref="current")
+Planet.history_loader = relation(PlanetHistory, backref=backref('current', lazy='dynamic'))
 GalaxyHistory.planets = relation(PlanetHistory, order_by=asc(PlanetHistory.z), backref="galaxy")
 GalaxyHistory.planet_loader = dynamic_loader(PlanetHistory)
 class PlanetExiles(Base):
@@ -1078,7 +1078,7 @@ class AllianceHistory(Base):
     points_avg_highest_rank_tick = Column(Integer)
     points_avg_lowest_rank = Column(Integer)
     points_avg_lowest_rank_tick = Column(Integer)
-Alliance.history_loader = dynamic_loader(AllianceHistory, backref="current")
+Alliance.history_loader = relation(AllianceHistory, backref=backref('current', lazy='dynamic'))
 
 # ########################################################################### #
 # ##########################    EXCALIBUR TABLES    ######################### #
@@ -1389,9 +1389,9 @@ class Target(Base):
     user_id = Column(Integer, ForeignKey(User.id, ondelete='cascade'), index=True)
     planet_id = Column(Integer, ForeignKey(Planet.id, ondelete='cascade'), index=True)
     tick = Column(Integer)
-User.bookings = dynamic_loader(Target, backref="user")
-Planet.bookings = dynamic_loader(Target, backref="planet", order_by=(asc(Target.tick)))
-Galaxy.bookings = dynamic_loader(Target, Planet.__table__)
+User.bookings = relation(Target, backref=backref('user', lazy='dynamic'))
+Planet.bookings = relation(Target, backref=backref('planet', lazy='dynamic', order_by=(asc(Target.tick))))
+Galaxy.bookings = relation(Target, Planet.__table__, lazy='dynamic') # dynamic_loader(Target, Planet.__table__) # Most likely place I broke it.
 #Alliance.bookings = dynamic_loader(Target, Intel.__table__)
 
 class Attack(Base):

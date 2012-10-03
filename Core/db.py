@@ -26,7 +26,7 @@
 #    sys.exit("psycopg2 2.2.1+ Required")
 import sys
 import sqlalchemy
-if not 6.3 <= float(sqlalchemy.__version__[2:5]) < 7.0:
+if not 6.3 <= float(sqlalchemy.__version__[2:5]): # < 7.0:
     sys.exit("SQLAlchemy 0.6.3+ Required")
 from sqlalchemy import create_engine
 from sqlalchemy.orm import sessionmaker, scoped_session
