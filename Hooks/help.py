@@ -41,11 +41,12 @@ class help(loadable):
         Q = Q.filter(Command.username == user.name)
         Q = Q.filter(Command.command.ilike("help"))
         Q = Q.order_by(desc(Command.command_time))
-        time = datetime.now() - Q[0].command_time
-        print "DEBUG::: %s" % (time)
-        if time.days == 0 and time.seconds < 10:
-            message.reply("Slow down!")
-            return
+        if len(Q.all()) > 0:
+            time = datetime.now() - Q[0].command_time
+            print "DEBUG::: %s" % (time)
+            if time.days == 0 and time.seconds < 10:
+                message.reply("Slow down!")
+                return
         
         commands = []
         message.reply(self.doc+". For more information use: "+self.usage)
