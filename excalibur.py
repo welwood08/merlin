@@ -28,6 +28,8 @@ from Core.db import true, false, session
 from Core.maps import Updates, Cluster, Galaxy, Planet, Alliance, epenis, galpenis, apenis
 from Core.maps import galaxy_temp, planet_temp, alliance_temp, planet_new_id_search, planet_old_id_search
 
+prefixes = ['enti_']
+
 if len(sys.argv) > 1:
     Config.set("URL", "dumps", sys.argv[1])
 excaliburlog("Dumping from %s" %(Config.get("URL", "dumps"),))
@@ -1169,12 +1171,6 @@ t_start=time.time()
 last_tick = Updates.current_tick()
 history_tick = bindparam("tick",max(last_tick-72, 1))
 t1=time.time()
-session.execute(epenis.__table__.delete())
-#session.execute(text("SELECT setval('epenis_rank_seq', 1, :false);", bindparams=[false]))
-session.execute(text("INSERT INTO epenis (user_id, penis) SELECT users.id, planet.score - planet_history.score FROM users, planet, planet_history WHERE users.active = :true AND users.access >= :member AND planet.active = :true AND users.planet_id = planet.id AND planet.id = planet_history.id AND planet_history.tick = :tick ORDER BY planet.score - planet_history.score DESC;", bindparams=[bindparam("member",Config.getint("Access","member")), history_tick, true]))
-t2=time.time()-t1
-excaliburlog("epenis in %.3f seconds" % (t2,))
-t1=time.time()
 session.execute(galpenis.__table__.delete())
 #session.execute(text("SELECT setval('galpenis_rank_seq', 1, :false);", bindparams=[false]))
 session.execute(text("INSERT INTO galpenis (galaxy_id, penis) SELECT galaxy.id, galaxy.score - galaxy_history.score FROM galaxy, galaxy_history WHERE galaxy.active = :true AND galaxy.x != 200 AND galaxy.id = galaxy_history.id AND galaxy_history.tick = :tick ORDER BY galaxy.score - galaxy_history.score DESC;", bindparams=[history_tick, true]))
@@ -1186,6 +1182,17 @@ session.execute(apenis.__table__.delete())
 session.execute(text("INSERT INTO apenis (alliance_id, penis) SELECT alliance.id, alliance.score - alliance_history.score FROM alliance, alliance_history WHERE alliance.active = :true AND alliance.id = alliance_history.id AND alliance_history.tick = :tick ORDER BY alliance.score - alliance_history.score DESC;", bindparams=[history_tick, true,]))
 t2=time.time()-t1
 excaliburlog("apenis in %.3f seconds" % (t2,))
+t1=time.time()
+for prefix in prefixes:
+    t2=time.time()
+    session.execute("DELETE FROM %sepenis;" % (prefix))
+#    session.execute(epenis.__table__.delete())
+    #session.execute(text("SELECT setval('epenis_rank_seq', 1, :false);", bindparams=[false]))
+    session.execute(text("INSERT INTO %sepenis (user_id, penis) SELECT %susers.id, planet.score - planet_history.score FROM %susers, planet, planet_history WHERE %susers.active = :true AND %susers.access >= :member AND planet.active = :true AND %susers.planet_id = planet.id AND planet.id = planet_history.id AND planet_history.tick = :tick ORDER BY planet.score - planet_history.score DESC;" % (prefix, prefix, prefix, prefix, prefix, prefix), bindparams=[bindparam("member",Config.getint("Access","member")), history_tick, true]))
+    t3=time.time()-t2
+    excaliburlog("epenis for %s in %.3f seconds" % (prefix,t2,))
+t2=time.time()-t1
+excaliburlog("epenis in %.3f seconds" % (t2,))
 session.commit()
 t1=time.time()-t_start
 excaliburlog("Total penis time: %.3f seconds" % (t1,))

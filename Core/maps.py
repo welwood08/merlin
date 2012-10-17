@@ -1147,7 +1147,7 @@ planet_old_id_search = Table('planet_old_id_search', Base.metadata,
 # ########################################################################### #
 
 class User(Base):
-    __tablename__ = 'users'
+    __tablename__ = Config.get('DB', 'prefix') + 'users'
     _sms_modes = {"C":"Clickatell", "G":"GoogleVoice", "R":"Retard", "E":"Email",}
     id = Column(Integer, primary_key=True)
     name = Column(String(255)) # pnick
@@ -1284,7 +1284,7 @@ for lvl, num in Config.items("Access"):
     setattr(User, "is_"+lvl, user_access_function(int(num)))
 
 class Arthur(Base):
-    __tablename__ = 'session'
+    __tablename__ = Config.get('DB', 'prefix') + 'session'
     key = Column(String(255), primary_key=True)
     user_id = Column(Integer, ForeignKey(User.id, ondelete='set null'))
     expire = Column(DateTime)
@@ -1301,7 +1301,7 @@ class Arthur(Base):
 Arthur.user = relation(User)
 
 class PhoneFriend(Base):
-    __tablename__ = 'phonefriends'
+    __tablename__ = Config.get('DB', 'prefix') + 'phonefriends'
     id = Column(Integer, primary_key=True)
     user_id = Column(Integer, ForeignKey(User.id, ondelete='cascade'))
     friend_id = Column(Integer, ForeignKey(User.id, ondelete='cascade'))
@@ -1312,7 +1312,7 @@ PhoneFriend.user = relation(User, primaryjoin=PhoneFriend.user_id==User.id)
 PhoneFriend.friend = relation(User, primaryjoin=PhoneFriend.friend_id==User.id)
 
 class Channel(Base):
-    __tablename__ = 'channels'
+    __tablename__ = Config.get('DB', 'prefix') + 'channels'
     id = Column(Integer, primary_key=True)
     name = Column(String(255), unique=True)
     userlevel = Column(Integer)
@@ -1329,7 +1329,7 @@ class Channel(Base):
 # ########################################################################### #
 
 class Intel(Base):
-    __tablename__ = 'intel'
+    __tablename__ = Config.get('DB', 'prefix') + 'intel'
     planet_id = Column(Integer, ForeignKey(Planet.id, ondelete='cascade'), primary_key=True, autoincrement=False)
     alliance_id = Column(Integer, ForeignKey(Alliance.id, ondelete='set null'), index=True)
     nick = Column(String(255))
@@ -1383,7 +1383,7 @@ Alliance.planets = relation(Planet, Intel.__table__, order_by=(asc(Planet.x), as
 # ########################################################################### #
 
 class Target(Base):
-    __tablename__ = 'target'
+    __tablename__ = Config.get('DB', 'prefix') + 'target'
     __table_args__ = (UniqueConstraint('planet_id','tick'), {})
     id = Column(Integer, primary_key=True)
     user_id = Column(Integer, ForeignKey(User.id, ondelete='cascade'), index=True)
@@ -1395,7 +1395,7 @@ Galaxy.bookings = relation(Target, Planet.__table__, lazy='dynamic')
 #Alliance.bookings = dynamic_loader(Target, Intel.__table__)
 
 class Attack(Base):
-    __tablename__ = 'attack'
+    __tablename__ = Config.get('DB', 'prefix') + 'attack'
     id = Column(Integer, primary_key=True)
     landtick = Column(Integer)
     comment = Column(Text)
@@ -1446,7 +1446,7 @@ class Attack(Base):
         return encode(reply)
         return reply
 class AttackTarget(Base):
-    __tablename__ = 'attack_target'
+    __tablename__ = Config.get('DB', 'prefix') + 'attack_target'
     id = Column(Integer, primary_key=True)
     attack_id = Column(Integer, ForeignKey(Attack.id, ondelete='cascade'))
     planet_id = Column(Integer, ForeignKey(Planet.id, ondelete='cascade'))
@@ -1520,7 +1520,7 @@ class Ship(Base):
 # ########################################################################### #
 
 class Scan(Base):
-    __tablename__ = 'scan'
+    __tablename__ = Config.get('DB', 'prefix') + 'scan'
     __table_args__ = (UniqueConstraint('pa_id','tick'), {})
     _scan_types = sorted(PA.options("scans"), cmp=lambda x,y: cmp(PA.getint(x, "type"), PA.getint(y, "type")))
     id = Column(Integer, primary_key=True)
@@ -1655,7 +1655,7 @@ Planet.scans = dynamic_loader(Scan, backref="planet")
 Scan.scanner = relation(User, backref="scans")
 
 class Request(Base):
-    __tablename__ = 'request'
+    __tablename__ = Config.get('DB', 'prefix') + 'request'
     _requestable = [(type, PA.get(type, "name"),) for type in Scan._scan_types if PA.getboolean(type, "request")]
     id = Column(Integer, primary_key=True)
     requester_id = Column(Integer, ForeignKey(User.id, ondelete='cascade'))
@@ -1685,7 +1685,7 @@ Request.target = relation(Planet)
 Request.scan = relation(Scan)
 
 class PlanetScan(Base):
-    __tablename__ = 'planetscan'
+    __tablename__ = Config.get('DB', 'prefix') + 'planetscan'
     id = Column(Integer, primary_key=True)
     scan_id = Column(Integer, ForeignKey(Scan.id, ondelete='cascade'))
     roid_metal = Column(Integer)
@@ -1713,7 +1713,7 @@ class PlanetScan(Base):
 Scan.planetscan = relation(PlanetScan, uselist=False, backref="scan")
 
 class DevScan(Base):
-    __tablename__ = 'devscan'
+    __tablename__ = Config.get('DB', 'prefix') + 'devscan'
     id = Column(Integer, primary_key=True)
     scan_id = Column(Integer, ForeignKey(Scan.id, ondelete='cascade'))
     light_factory = Column(Integer)
@@ -1857,7 +1857,7 @@ class DevScan(Base):
 Scan.devscan = relation(DevScan, uselist=False, backref="scan")
 
 class UnitScan(Base):
-    __tablename__ = 'unitscan'
+    __tablename__ = Config.get('DB', 'prefix') + 'unitscan'
     id = Column(Integer, primary_key=True)
     scan_id = Column(Integer, ForeignKey(Scan.id, ondelete='cascade'))
     ship_id = Column(Integer, ForeignKey(Ship.id, ondelete='cascade'))
@@ -1873,7 +1873,7 @@ Scan.units = relation(UnitScan, backref="scan", order_by=asc(UnitScan.ship_id))
 UnitScan.ship = relation(Ship)
 
 class FleetScan(Base):
-    __tablename__ = 'fleetscan'
+    __tablename__ = Config.get('DB', 'prefix') + 'fleetscan'
     __table_args__ = (UniqueConstraint('owner_id','target_id','fleet_size','fleet_name','landing_tick','mission'), {})
     id = Column(Integer, primary_key=True)
     scan_id = Column(Integer, ForeignKey(Scan.id, ondelete='cascade'))
@@ -1900,7 +1900,7 @@ FleetScan.owner = relation(Planet, primaryjoin=FleetScan.owner_id==Planet.id)
 FleetScan.target = relation(Planet, primaryjoin=FleetScan.target_id==Planet.id)
 
 class CovOp(Base):
-    __tablename__ = 'covop'
+    __tablename__ = Config.get('DB', 'prefix') + 'covop'
     id = Column(Integer, primary_key=True)
     scan_id = Column(Integer, ForeignKey(Scan.id, ondelete='cascade'))
     covopper_id = Column(Integer, ForeignKey(Planet.id, ondelete='set null'))
@@ -1914,7 +1914,7 @@ CovOp.target = relation(Planet, primaryjoin=CovOp.target_id==Planet.id)
 # ########################################################################### #
 
 class epenis(Base):
-    __tablename__ = 'epenis'
+    __tablename__ = Config.get('DB', 'prefix') + 'epenis'
     rank = Column(Integer, primary_key=True)
     user_id = Column(Integer, ForeignKey(User.id, ondelete='cascade'), index=True)
     penis = Column(Integer)
@@ -1940,7 +1940,7 @@ Alliance.penis = association_proxy("apenis", "penis")
 # ########################################################################### #
 
 class Slogan(Base):
-    __tablename__ = 'slogans'
+    __tablename__ = Config.get('DB', 'prefix') + 'slogans'
     id = Column(Integer, primary_key=True)
     text = Column(String(255))
     @staticmethod
@@ -1954,7 +1954,7 @@ class Slogan(Base):
         return self.text
 
 class Quote(Base):
-    __tablename__ = 'quotes'
+    __tablename__ = Config.get('DB', 'prefix') + 'quotes'
     id = Column(Integer, primary_key=True)
     text = Column(String(255))
     @staticmethod
@@ -1972,7 +1972,7 @@ class Quote(Base):
 # ########################################################################### #
 
 class UserFleet(Base):
-    __tablename__ = 'user_fleet'
+    __tablename__ = Config.get('DB', 'prefix') + 'user_fleet'
     id = Column(Integer, primary_key=True)
     user_id = Column(Integer, ForeignKey(User.id, ondelete='cascade'))
     ship_id = Column(Integer, ForeignKey(Ship.id, ondelete='cascade'))
@@ -1981,7 +1981,7 @@ User.fleets = dynamic_loader(UserFleet, backref="user")
 UserFleet.ship = relation(Ship)
 
 class FleetLog(Base):
-    __tablename__ = 'fleet_log'
+    __tablename__ = Config.get('DB', 'prefix') + 'fleet_log'
     id = Column(Integer, primary_key=True)
     taker_id = Column(Integer, ForeignKey(User.id, ondelete='cascade'))
     user_id = Column(Integer, ForeignKey(User.id, ondelete='cascade'))
@@ -1997,7 +1997,7 @@ FleetLog.ship = relation(Ship)
 # ########################################################################### #
 
 class Cookie(Base):
-    __tablename__ = 'cookie_log'
+    __tablename__ = Config.get('DB', 'prefix') + 'cookie_log'
     id = Column(Integer, primary_key=True)
     log_time = Column(DateTime, default=current_timestamp())
     year = Column(Integer)
@@ -2009,7 +2009,7 @@ User.cookies = dynamic_loader(Cookie, primaryjoin=User.id==Cookie.receiver_id, b
 Cookie.giver = relation(User, primaryjoin=Cookie.giver_id==User.id)
 
 class Invite(Base):
-    __tablename__ = 'invite_proposal'
+    __tablename__ = Config.get('DB', 'prefix') + 'invite_proposal'
 #    id = Column(Integer, Sequence('proposal_id_seq'), primary_key=True, server_default=text("nextval('proposal_id_seq')"))
 #    id = Column(Integer, Sequence('proposal_id_seq'), primary_key=True, autoincrement=False, server_default=text("nextval('proposal_id_seq')"))
     id = Column(Integer, primary_key=True)
@@ -2024,7 +2024,7 @@ class Invite(Base):
 Invite.proposer = relation(User)
 
 class Kick(Base):
-    __tablename__ = 'kick_proposal'
+    __tablename__ = Config.get('DB', 'prefix') + 'kick_proposal'
 #    id = Column(Integer, Sequence('proposal_id_seq'), primary_key=True, server_default=text("nextval('proposal_id_seq')"))
     id = Column(Integer, primary_key=True)
     active = Column(Boolean, default=True)
@@ -2040,7 +2040,7 @@ Kick.kicked = relation(User, primaryjoin=Kick.person_id==User.id)
 Kick.person = association_proxy("kicked", "name")
 
 class Suggestion(Base):
-    __tablename__ = 'suggestion_proposal'
+    __tablename__ = Config.get('DB', 'prefix') + 'suggestion_proposal'
 #    id = Column(Integer, Sequence('proposal_id_seq'), primary_key=True, server_default=text("nextval('proposal_id_seq')"))
     id = Column(Integer, primary_key=True)
     active = Column(Boolean, default=True)
@@ -2053,7 +2053,7 @@ class Suggestion(Base):
 Suggestion.proposer = relation(User)
 
 class Vote(Base):
-    __tablename__ = 'prop_vote'
+    __tablename__ = Config.get('DB', 'prefix') + 'prop_vote'
     id = Column(Integer, primary_key=True)
     vote = Column(String(255))
     carebears = Column(Integer)
@@ -2069,7 +2069,7 @@ Suggestion.votes = dynamic_loader(Vote, foreign_keys=(Vote.prop_id,), primaryjoi
 # ########################################################################### #
 
 class Command(Base):
-    __tablename__ = 'command_log'
+    __tablename__ = Config.get('DB', 'prefix') + 'command_log'
     id = Column(Integer, primary_key=True)
     command_prefix = Column(String(255))
     command = Column(String(255))
@@ -2082,7 +2082,7 @@ class Command(Base):
     command_time = Column(DateTime, default=current_timestamp())
 
 class PageView(Base):
-    __tablename__ = 'arthur_log'
+    __tablename__ = Config.get('DB', 'prefix') + 'arthur_log'
     id = Column(Integer, primary_key=True)
     page = Column(String(255))
     full_request = Column(String(255))
@@ -2093,7 +2093,7 @@ class PageView(Base):
     request_time = Column(DateTime, default=current_timestamp())
 
 class SMS(Base):
-    __tablename__ = 'sms_log'
+    __tablename__ = Config.get('DB', 'prefix') + 'sms_log'
     id = Column(Integer, primary_key=True)
     sender_id = Column(Integer, ForeignKey(User.id, ondelete='cascade'))
     receiver_id = Column(Integer, ForeignKey(User.id, ondelete='cascade'))
