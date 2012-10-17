@@ -37,23 +37,14 @@ class help(loadable):
     
     @route(r"")
     def execute(self, message, user, params):
-        Q = session.query(Command)
-        Q = Q.filter(Command.username == user.name)
-        Q = Q.filter(Command.command.ilike("help"))
-        Q = Q.order_by(desc(Command.command_time))
-        if len(Q.all()) > 0:
-            time = datetime.now() - Q[0].command_time
-            print "DEBUG::: %s" % (time)
-            if time.days == 0 and time.seconds < 10:
-                message.reply("Slow down!")
-                return
-        
         commands = []
-        message.reply(self.doc+". For more information use: "+self.usage)
         if message.in_chan():
             channel = Channel.load(message.get_chan())
         else:
             channel = None
+            if not user.id:
+                return
+        message.reply(self.doc+". For more information use: "+self.usage)
         for callback in Callbacks.callbacks["PRIVMSG"]:
             try:
                 if callback.check_access(message, None, user, channel) is not None:
