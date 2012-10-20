@@ -81,14 +81,11 @@ class top10(loadable):
 
     def execute(self, message, alliance=None, race=None, sortby="score"):
         tick = Updates.current_tick()
-        target = aliased(Planet)
-        target_intel = aliased(Intel)
         planet = aliased(Planet)
         planet_intel = aliased(Intel)
-        
 
         Q = session.query(planet.x, planet.y, planet.z, planet.score, planet.value, planet.size, planet.xp, planet.race, planet_intel.nick)
-        Q = Q.join((planet.intel, planet_intel))
+        Q = Q.outerjoin((planet.intel, planet_intel))
         if alliance:
             Q = Q.filter(planet_intel.alliance == alliance)
         if race:
@@ -116,4 +113,5 @@ class top10(loadable):
             if nick:
                 line = "%s Nick: %s"%(line,nick)
             prev.append(line)
+        print(prev)
         message.reply(reply+"\n".join(prev))

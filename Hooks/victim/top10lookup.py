@@ -82,14 +82,12 @@ class top10lookup(loadable):
 
     def execute(self, message, alliance=None, race=None, sortby="score"):
         tick = Updates.current_tick()
-        target = aliased(Planet)
-        target_intel = aliased(Intel)
         planet = aliased(Planet)
         planet_intel = aliased(Intel)
         
 
         Q = session.query(planet)
-        Q = Q.join((planet.intel, planet_intel))
+        Q = Q.outerjoin((planet.intel, planet_intel))
         if alliance:
             Q = Q.filter(planet_intel.alliance == alliance)
         if race:
@@ -113,6 +111,6 @@ class top10lookup(loadable):
         i=0
         for p in result[:10]:
             i+=1
-            line = "#%2s %12s%s"%(i, "["+p.intel.nick+"] " if p.intel.nick else "", p)
+            line = "#%2s %12s%s"%(i, "["+p.intel.nick+"] " if (p.intel and p.intel.nick) else "", p)
             prev.append(line)
         message.reply(reply+"\n".join(prev))
