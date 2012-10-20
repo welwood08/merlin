@@ -85,7 +85,7 @@ class top10(loadable):
         planet_intel = aliased(Intel)
 
         Q = session.query(planet.x, planet.y, planet.z, planet.score, planet.value, planet.size, planet.xp, planet.race, planet_intel.nick)
-        Q = Q.outerjoin((planet.intel, planet_intel))
+        Q = Q.outerjoin(planet.intel, planet_intel)
         if alliance:
             Q = Q.filter(planet_intel.alliance == alliance)
         if race:
