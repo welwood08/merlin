@@ -86,13 +86,12 @@ class top10lookup(loadable):
         planet_intel = aliased(Intel)
         
 
-        Q = session.query(planet)
+        Q = session.query(planet.x, planet.y, planet.z, planet_intel.nick)
         Q = Q.outerjoin((planet.intel, planet_intel))
         if alliance:
             Q = Q.filter(planet_intel.alliance == alliance)
         if race:
             Q = Q.filter(planet.race == race)
-        Q = Q.group_by(planet.x, planet.y, planet.z, planet.score, planet.value, planet.size, planet.xp, planet.race, planet_intel.nick)
         if sortby == "xp":
             Q = Q.order_by(desc(planet.xp))
         elif sortby == "size":
@@ -109,8 +108,8 @@ class top10lookup(loadable):
         reply+=" by %s:\n"%(sortby)
         prev = []
         i=0
-        for p in result[:10]:
+        for x, y, z, nick in result[:10]:
             i+=1
-            line = "#%2s %12s%s"%(i, "["+p.intel.nick+"] " if (p.intel and p.intel.nick) else "", p)
+            line = "#%2s %12s%s"%(i, "["+nick+"] " if nick else "", Planet.load(x,y,z))
             prev.append(line)
         message.reply(reply+"\n".join(prev))
