@@ -88,7 +88,7 @@ class connection(object):
             if ponging:
                 self.sock.send(line + CRLF)
             else:
-                while self.last + 2 >= time.time():
+                while self.last + Config.getfloat("Connection", "antiflood") >= time.time():
                     time.sleep(0.5)
                 self.sock.send(encode(line) + CRLF)
                 self.last = time.time()

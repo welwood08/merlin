@@ -24,6 +24,7 @@
 from Core.connection import Connection
 from Core.chanusertracker import CUT
 from Core.messages import Message, PUBLIC_REPLY, PRIVATE_REPLY, NOTICE_REPLY
+from Core.config import Config
 
 class Action(Message):
     # This object holds the parse, and will enable users to send messages to the server on a higher level
@@ -42,7 +43,10 @@ class Action(Message):
     
     def privmsg(self, text, target=None):
         # Privmsg someone. Target defaults to the person who triggered this line
-        self.write("PRIVMSG %s :%s" % (target or self.get_nick(), text))
+        if Config.has_option("Connection", "color"):
+            self.write("PRIVMSG %s :%s" % (target or self.get_nick(), "\x03"+Config.get("Connection", "color", raw=True)+text+"\x0F"))
+        else:
+            self.write("PRIVMSG %s :%s" % (target or self.get_nick(), text))
     
     def notice(self, text, target=None):
         # If we're opped in a channel in common with the user, we can reply with
