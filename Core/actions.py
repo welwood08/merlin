@@ -41,9 +41,9 @@ class Action(Message):
         else:
             Connection.write(params[:-1])
     
-    def privmsg(self, text, target=None, stripcol=False):
+    def privmsg(self, text, target=None):
         # Privmsg someone. Target defaults to the person who triggered this line
-        if (Config.has_option("Connection", "color") and target not in [Config.get("Services", "login"), Config.get("Services", "nick")] and not stripcol):
+        if (Config.has_option("Connection", "color") and not Config.has_option("NoColor", target) and not (target[0] in ['#','&'] and Config.has_option("NoColorChan", target[1:]))):
             self.write("PRIVMSG %s :%s" % (target or self.get_nick(), "\x03"+Config.get("Connection", "color")+text+"\x0F"))
         else:
             self.write("PRIVMSG %s :%s" % (target or self.get_nick(), text))
