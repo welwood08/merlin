@@ -55,7 +55,7 @@ class scans(loadable):
         message.reply(reply)
     
     @robohci
-    def robocop(self, message, scantype, pa_id, x, y, z, names, scanner):
+    def robocop(self, message, scantype, pa_id, x, y, z, names, scanner, reqs):
         nicks = []
         reply = "%s on %s:%s:%s " % (PA.get(scantype,"name"),x,y,z,)
         if ("showscanner" in Config.options("Misc") and Config.getboolean("Misc", "showscanner")):
@@ -68,7 +68,7 @@ class scans(loadable):
                 nicks.append(nick)
                 message.privmsg(self.url(reply, user), nick)
         
-        reply = "%s on %s:%s:%s " % (PA.get(scantype,"name"),x,y,z,)
+        reply = "[%s] %s on %s:%s:%s " % (reqs,PA.get(scantype,"name"),x,y,z,)
         reply+= "delivered to: "
         reply+= ", ".join(nicks) if not Config.getboolean("Misc", "anonscans") else "Anon"
         from Hooks.scans.request import request

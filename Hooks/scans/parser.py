@@ -140,15 +140,17 @@ class parse(Thread):
         result = Q.all()
         
         users = []
+        req_ids = []
         for request in result:
             scanlog("Scan %s matches request %s for %s" %(pa_id, request.id, request.user.name,))
             request.scan_id = scan_id
             request.active = False
             users.append(request.user.name)
+            req_ids.append(str(request.id))
         session.commit()
         
         if len(users) > 0:
-            push("scans", scantype=scantype, pa_id=pa_id, x=planet.x, y=planet.y, z=planet.z, names=",".join(users), scanner=uid)
+            push("scans", scantype=scantype, pa_id=pa_id, x=planet.x, y=planet.y, z=planet.z, names=",".join(users), scanner=uid, reqs=",".join(req_ids))
     
     def parse_P(self, scan_id, scan, page):
         planetscan = scan.planetscan = PlanetScan()
