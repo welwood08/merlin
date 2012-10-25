@@ -28,7 +28,7 @@ from Core.db import session
 from Core.maps import Updates, Planet, Galaxy, User, Request, Intel
 from Core.chanusertracker import CUT
 from Core.loadable import loadable, route, require_user, robohci
-from time import sleep
+#from time import sleep
 
 class request(loadable):
     """Request a scan"""
@@ -38,6 +38,9 @@ class request(loadable):
     @route(loadable.coord+"\s+(["+"".join(PA.options("scans"))+r"]+)\w*(?:\s+(\d+))?", access = "member")
     @require_user
     def execute(self, message, user, params):
+        tick = Updates.current_tick()
+        reqs = session.query(Request.id).filter(Request.requester_id == user.id).filter(Request.tick == tick).count()
+
         if params.group(5) is None:
             galaxy = Galaxy.load(*params.group(1,3))
             if galaxy is None:
@@ -55,6 +58,16 @@ class request(loadable):
             dists = int(params.group(7) or 0)
             
             for scan in params.group(6).upper():
+                # Scan Quota
+                opts = Config.options("ScanQuota")
+                q = []
+                for o in opts:
+                    if int(o) >= user.access:
+                        q.append(int(o))
+                if q and reqs >= Config.getint("ScanQuota", str(min(q))):
+                    message.reply("You've reached your scan quota for this tick. Try searching with !planet, !dev, !unit, !news, !jgp, !au.")
+                    return
+
                 if scan == "I":
                     message.alert("Incoming scans can only be performed by the planet under attack.")
                     continue
@@ -67,8 +80,8 @@ class request(loadable):
                 if scan and request.tick - scan.tick < PA.getint(scan.scantype,"expire"):
                     message.reply("%s Scan of %s:%s:%s is already available from %s ticks ago: %s. !request cancel %s if this is suitable." % (
                                   scan.scantype, planet.x, planet.y, planet.z, request.tick - scan.tick, scan.link, request.id,))
-                
-                sleep(1)
+                reqs -= 1                
+#                sleep(1)
     
     @robohci
     def robocop(self, message, request_id, mode):
