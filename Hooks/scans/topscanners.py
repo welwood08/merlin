@@ -39,18 +39,17 @@ class topscanners(loadable):
         age = int(params.group(1))
         num = int(params.group(2))
 
-        Q = session.query(Scan, count())
+        totals = session.query(Scan.scanner_id, count('*').label('s_count'))
         if params.group(3) is None:
-            Q = Q.filter(Scan.id == Request.scan_id)
+            totals = totals.join((Request, Scan.id == Request.scan_id))
+        totals = totals.filter(Scan.tick >= (tick-age) if age > 0 else 0).group_by(Scan.scanner_id).subquery()
 
-        if age > 0:
-            Q = Q.filter(Scan.tick >= tick-age)
-        Q = Q.group_by(Scan.scanner_id)
-        Q = Q.order_by(desc(count()))
+        Q = session.query(User.name, User.alias, totals.c.s_count)
+        Q = Q.outerjoin((totals, User.id == totals.c.scanner_id))
+        Q = Q.order_by(desc(totals.c.s_count))
         result = Q.all()
         if len(result) < 1:
-            message.reply("No scan requests found in the last %d ticks" % (age))
-        printable=map(lambda (r, c): "%s%s: %s" % ((r.scanner.name,' ('+r.scanner.alias +')' if r.scanner.alias else '', c) if r.scanner else ('unknown','',c)),result[:num])
+            message.reply("No scans found in the last %d ticks" % (age))
+        printable=map(lambda (name, alias, c): "%s%s: %s" % (name,' ('+alias +')' if alias else '', c),result[:num])
         reply += ', '.join(printable)
-        reply += '\n'
         message.reply(reply)

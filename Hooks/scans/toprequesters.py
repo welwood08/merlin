@@ -38,15 +38,17 @@ class toprequesters(loadable):
         tick=Updates.current_tick()
         age = int(params.group(1))
         num = int(params.group(2))
-        Q = session.query(Request, count())
-        if age > 0:
-            Q = Q.filter(Request.tick >= tick-age)
-        Q = Q.group_by(Request.requester_id)
-        Q = Q.order_by(desc(count()))
+        totals = session.query(Request.requester_id, count('*').label('req_count')).filter(Request.tick >= (tick-age) if age > 0 else 0).group_by(Request.requester_id).subquery()
+
+        Q = session.query(User.name, User.alias, totals.c.req_count)
+        Q = Q.outerjoin((totals, User.id == totals.c.requester_id))
+        Q = Q.order_by(desc(totals.c.req_count))
         result = Q.all()
         if len(result) < 1:
            message.reply("No scan requests found in the last %d ticks" % (age))
-        printable=map(lambda (r, c): "%s%s: %s" % (r.user.name,' ('+r.user.alias+')' if r.user.alias else '', c),result[:num])
+#        printable=[]
+#        for n, a, c in result[:num]:
+#            printable.append("%s%s: %s" % (n,' ('+a+')' if a else '', c))
+        printable=map(lambda (name, alias, c): "%s%s: %s" % (name,' ('+alias +')' if alias else '', c),result[:num])
         reply += ', '.join(printable)
-        reply += '\n'
         message.reply(reply)
