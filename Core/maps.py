@@ -267,7 +267,7 @@ class ClusterHistory(Base):
     xp_lowest_rank_tick = Column(Integer)
     def galaxy(self, y):
         return self.planet_loader.filter_by(y=y).first()
-Cluster.history_loader = relation(ClusterHistory, backref=backref('current', lazy='dynamic'))
+Cluster.history_loader = relation(ClusterHistory, backref=backref('current', lazy='dynamic'), lazy='dynamic')
 
 class Galaxy(Base):
     __tablename__ = 'galaxy'
@@ -484,7 +484,7 @@ class GalaxyHistory(Base):
     private = Column(Boolean)
     def planet(self, z):
         return self.planet_loader.filter_by(z=z).first()
-Galaxy.history_loader = relation(GalaxyHistory, backref=backref('current', lazy='dynamic'))
+Galaxy.history_loader = relation(GalaxyHistory, backref=backref('current', lazy='dynamic'), lazy='dynamic')
 ClusterHistory.galaxies = relation(GalaxyHistory, order_by=asc(GalaxyHistory.y), backref="cluster")
 ClusterHistory.galaxy_loader = dynamic_loader(GalaxyHistory)
 
@@ -775,7 +775,7 @@ class PlanetHistory(Base):
     xp_highest_rank_tick = Column(Integer)
     xp_lowest_rank = Column(Integer)
     xp_lowest_rank_tick = Column(Integer)
-Planet.history_loader = relation(PlanetHistory, backref=backref('current', lazy='dynamic'))
+Planet.history_loader = relation(PlanetHistory, backref=backref('current', lazy='dynamic'), lazy='dynamic')
 GalaxyHistory.planets = relation(PlanetHistory, order_by=asc(PlanetHistory.z), backref="galaxy")
 GalaxyHistory.planet_loader = dynamic_loader(PlanetHistory)
 class PlanetExiles(Base):
@@ -1078,7 +1078,7 @@ class AllianceHistory(Base):
     points_avg_highest_rank_tick = Column(Integer)
     points_avg_lowest_rank = Column(Integer)
     points_avg_lowest_rank_tick = Column(Integer)
-Alliance.history_loader = relation(AllianceHistory, backref=backref('current', lazy='dynamic'))
+Alliance.history_loader = relation(AllianceHistory, backref=backref('current', lazy='dynamic'), lazy='dynamic')
 
 # ########################################################################### #
 # ##########################    EXCALIBUR TABLES    ######################### #
