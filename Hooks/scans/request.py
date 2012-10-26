@@ -153,6 +153,12 @@ class request(loadable):
             
             request.active = False
             session.commit()
+
+            reply = "Cancelled scan request %s" % (id)
+            nicks = CUT.get_user_nicks(request.user.name)
+            if message.get_nick() not in nicks:
+                for nick in nicks:
+                    message.privmsg(reply, nick)
             
             reply_ids.append(id)
 
@@ -162,14 +168,12 @@ class request(loadable):
         if len(noaccess) > 0:
             message.reply("Scan requests: %s aren't yours and you're not a scanner!"%(", ".join(noaccess),))
             sleep(2)
-        message.reply("Cancelled scan request %s" % (", ".join(reply_ids)))
-        if message.get_chan() != self.scanchan():
-            message.privmsg(reply, self.scanchan())
+        if len(reply_ids) > 0:
+            reply = "Cancelled scan request %s" % (", ".join(reply_ids))
+            message.reply(reply)
+            if message.get_chan() != self.scanchan():
+                message.privmsg(reply, self.scanchan())
         
-        nicks = CUT.get_user_nicks(request.user.name)
-        if message.get_nick() not in nicks:
-            for nick in nicks:
-                message.privmsg(reply, nick)
     
     @route(r"(\d+)\s+b(?:lock(?:s|ed)?)?\s+(\d+)", access = "member")
     def blocks(self, message, user, params):
