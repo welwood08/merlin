@@ -6,3 +6,11 @@ dumplog.txt
 errorlog.txt
 scanlog.txt
 arthurlog.txt
+.bashrc
+.bash_logout
+.profile
+dumplog.old.txt
+*.todo
+*_test/*
+messy_merlin/*
+tablenames
