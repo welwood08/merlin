@@ -54,7 +54,7 @@ if round:
 
 print "Importing database models"
 from Core.maps import Channel
-
+"""
 print "Creating schema and tables"
 try:
     session.execute(text("CREATE SCHEMA public;"))
@@ -65,7 +65,7 @@ else:
     session.commit()
 finally:
     session.close()
-
+"""
 Base.metadata.create_all()
 
 print "Setting up default channels"
@@ -113,20 +113,20 @@ if round:
         print "An error occurred during migration: %s" %(str(e),)
         session.rollback()
         print "Reverting to previous schema"
-        session.execute(text("DROP SCHEMA public CASCADE;"))
-        session.execute(text("ALTER SCHEMA %s RENAME TO public;" % (round,)))
+        """session.execute(text("DROP SCHEMA public CASCADE;"))
+        session.execute(text("ALTER SCHEMA %s RENAME TO public;" % (round,)))"""
         session.commit()
         sys.exit()
     else:
         session.commit()
     finally:
         session.close()
-
+"""
 if round == "temp":
     print "Deleting temporary schema"
     session.execute(text("DROP SCHEMA temp CASCADE;"))
     session.commit()
     session.close()
-
+"""
 print "Inserting ship stats"
 shipstats.main()

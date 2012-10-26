@@ -276,7 +276,7 @@ class Galaxy(Base):
     age = Column(Integer)
     x = Column(Integer, ForeignKey(Cluster.x))
     y = Column(Integer)
-    name = Column(String)
+    name = Column(String(255))
     size = Column(Integer)
     score = Column(Integer)
     real_score = Column(Integer)
@@ -405,7 +405,7 @@ class GalaxyHistory(Base):
     age = Column(Integer)
     x = Column(Integer)
     y = Column(Integer)
-    name = Column(String)
+    name = Column(String(255))
     size = Column(Integer)
     score = Column(Integer)
     real_score = Column(Integer)
@@ -497,9 +497,9 @@ class Planet(Base):
     x = Column(Integer)
     y = Column(Integer)
     z = Column(Integer)
-    planetname = Column(String)
-    rulername = Column(String)
-    race = Column(String)
+    planetname = Column(String(255))
+    rulername = Column(String(255))
+    race = Column(String(255))
     size = Column(Integer)
     score = Column(Integer)
     value = Column(Integer)
@@ -675,9 +675,9 @@ class PlanetHistory(Base):
     x = Column(Integer)
     y = Column(Integer)
     z = Column(Integer)
-    planetname = Column(String)
-    rulername = Column(String)
-    race = Column(String)
+    planetname = Column(String(255))
+    rulername = Column(String(255))
+    race = Column(String(255))
     size = Column(Integer)
     score = Column(Integer)
     value = Column(Integer)
@@ -832,8 +832,8 @@ class Alliance(Base):
     id = Column(Integer, primary_key=True)
     active = Column(Boolean)
     age = Column(Integer)
-    name = Column(String, index=True)
-    alias = Column(String)
+    name = Column(String(255), index=True)
+    alias = Column(String(255))
     size = Column(Integer)
     members = Column(Integer)
     score = Column(Integer)
@@ -984,8 +984,8 @@ class AllianceHistory(Base):
     id = Column(Integer, ForeignKey(Alliance.id), primary_key=True, autoincrement=False)
     active = Column(Boolean)
     age = Column(Integer)
-    name = Column(String)
-    alias = Column(String)
+    name = Column(String(255))
+    alias = Column(String(255))
     size = Column(Integer)
     members = Column(Integer)
     score = Column(Integer)
@@ -1088,7 +1088,7 @@ galaxy_temp = Table('galaxy_temp', Base.metadata,
     Column('id', Integer),
     Column('x', Integer, primary_key=True),
     Column('y', Integer, primary_key=True),
-    Column('name', String),
+    Column('name', String(255)),
     Column('size', Integer),
     Column('score', Integer),
     Column('value', Integer),
@@ -1098,16 +1098,16 @@ planet_temp = Table('planet_temp', Base.metadata,
     Column('x', Integer, primary_key=True),
     Column('y', Integer, primary_key=True),
     Column('z', Integer, primary_key=True),
-    Column('planetname', String),
-    Column('rulername', String),
-    Column('race', String),
+    Column('planetname', String(255)),
+    Column('rulername', String(255)),
+    Column('race', String(255)),
     Column('size', Integer),
     Column('score', Integer),
     Column('value', Integer),
     Column('xp', Integer))
 alliance_temp = Table('alliance_temp', Base.metadata,
     Column('id', Integer),
-    Column('name', String, primary_key=True),
+    Column('name', String(255), primary_key=True),
     Column('size', Integer),
     Column('members', Integer),
     Column('score', Integer),
@@ -1121,9 +1121,9 @@ planet_new_id_search = Table('planet_new_id_search', Base.metadata,
     Column('x', Integer, primary_key=True),
     Column('y', Integer, primary_key=True),
     Column('z', Integer, primary_key=True),
-    Column('planetname', String),
-    Column('rulername', String),
-    Column('race', String),
+    Column('planetname', String(255)),
+    Column('rulername', String(255)),
+    Column('race', String(255)),
     Column('size', Integer),
     Column('score', Integer),
     Column('value', Integer),
@@ -1133,9 +1133,9 @@ planet_old_id_search = Table('planet_old_id_search', Base.metadata,
     Column('x', Integer, primary_key=True),
     Column('y', Integer, primary_key=True),
     Column('z', Integer, primary_key=True),
-    Column('planetname', String),
-    Column('rulername', String),
-    Column('race', String),
+    Column('planetname', String(255)),
+    Column('rulername', String(255)),
+    Column('race', String(255)),
     Column('size', Integer),
     Column('score', Integer),
     Column('value', Integer),
@@ -1150,25 +1150,25 @@ class User(Base):
     __tablename__ = 'users'
     _sms_modes = {"C":"Clickatell", "G":"GoogleVoice", "R":"Retard", "E":"Email",}
     id = Column(Integer, primary_key=True)
-    name = Column(String) # pnick
-    alias = Column(String)
-    passwd = Column(String)
+    name = Column(String(255)) # pnick
+    alias = Column(String(255))
+    passwd = Column(String(255))
     active = Column(Boolean, default=True)
     access = Column(Integer, default=(Config.getint("Access","galmate") if "galmate" in Config.options("Access") else 0))
     planet_id = Column(Integer, ForeignKey(Planet.id, ondelete='set null'), index=True)
-    url = Column(String)
-    email = Column(String)
+    url = Column(String(255))
+    email = Column(String(255))
     emailre = re.compile(r"^([\w.-]+@[\w.-]+)")
-    phone = Column(String)
+    phone = Column(String(255))
     pubphone = Column(Boolean, default=False) # Asc
     _smsmode = Column(Enum(*_sms_modes.keys(), name="smsmode"))
-    sponsor = Column(String) # Asc
+    sponsor = Column(String(255)) # Asc
     quits = Column(Integer, default=0) # Asc
     available_cookies = Column(Integer, default=0)
     carebears = Column(Integer, default=0)
     last_cookie_date = Column(DateTime)
     fleetcount = Column(Integer, default=0)
-    fleetcomment = Column(String)
+    fleetcomment = Column(String(255))
     fleetupdated = Column(Integer, default=0)
     levels = filter(lambda lev: not lev[0] == "galmate", sorted(Config.items("Access"), key=lambda acc: int(acc[1]), reverse=True))
     
@@ -1285,7 +1285,7 @@ for lvl, num in Config.items("Access"):
 
 class Arthur(Base):
     __tablename__ = 'session'
-    key = Column(String, primary_key=True)
+    key = Column(String(255), primary_key=True)
     user_id = Column(Integer, ForeignKey(User.id, ondelete='set null'))
     expire = Column(DateTime)
     @staticmethod
@@ -1314,7 +1314,7 @@ PhoneFriend.friend = relation(User, primaryjoin=PhoneFriend.friend_id==User.id)
 class Channel(Base):
     __tablename__ = 'channels'
     id = Column(Integer, primary_key=True)
-    name = Column(String, unique=True)
+    name = Column(String(255), unique=True)
     userlevel = Column(Integer)
     maxlevel = Column(Integer)
     
@@ -1332,17 +1332,17 @@ class Intel(Base):
     __tablename__ = 'intel'
     planet_id = Column(Integer, ForeignKey(Planet.id, ondelete='cascade'), primary_key=True, autoincrement=False)
     alliance_id = Column(Integer, ForeignKey(Alliance.id, ondelete='set null'), index=True)
-    nick = Column(String)
-    fakenick = Column(String)
+    nick = Column(String(255))
+    fakenick = Column(String(255))
     defwhore = Column(Boolean, default=False)
     covop = Column(Boolean, default=False)
     amps = Column(Integer, default=0)
     dists = Column(Integer, default=0)
-    bg = Column(String)
-    gov = Column(String)
+    bg = Column(String(255))
+    gov = Column(String(255))
     relay = Column(Boolean, default=False)
-    reportchan = Column(String)
-    comment = Column(String)
+    reportchan = Column(String(255))
+    comment = Column(String(255))
     def __str__(self):
         ret = "" 
         if self.nick:
@@ -1461,12 +1461,12 @@ Attack.planets = relation(Planet, secondary=AttackTarget.__table__,
 class Ship(Base):
     __tablename__ = 'ships'
     id = Column(Integer, primary_key=True)
-    name = Column(String)
-    class_ = Column(String)
-    t1 = Column(String)
-    t2 = Column(String)
-    t3 = Column(String)
-    type = Column(String)
+    name = Column(String(255))
+    class_ = Column(String(255))
+    t1 = Column(String(255))
+    t2 = Column(String(255))
+    t3 = Column(String(255))
+    type = Column(String(255))
     init = Column(Integer)
     guns = Column(Integer)
     armor = Column(Integer)
@@ -1476,7 +1476,7 @@ class Ship(Base):
     crystal = Column(Integer)
     eonium = Column(Integer)
     total_cost = Column(Integer)
-    race = Column(String)
+    race = Column(String(255))
     
     @staticmethod
     def load(name=None, id=None):
@@ -1527,8 +1527,8 @@ class Scan(Base):
     planet_id = Column(Integer, ForeignKey(Planet.id, ondelete='cascade'), index=True)
     scantype = Column(Enum(*_scan_types, name="scantype"))
     tick = Column(Integer)
-    pa_id = Column(String, index=True)
-    group_id = Column(String, index=True)
+    pa_id = Column(String(255), index=True)
+    group_id = Column(String(255), index=True)
     scanner_id = Column(Integer, ForeignKey(User.id, ondelete='cascade'))
     
     @property
@@ -1694,9 +1694,9 @@ class PlanetScan(Base):
     res_metal = Column(Integer)
     res_crystal = Column(Integer)
     res_eonium = Column(Integer)
-    factory_usage_light = Column(String)
-    factory_usage_medium = Column(String)
-    factory_usage_heavy = Column(String)
+    factory_usage_light = Column(String(255))
+    factory_usage_medium = Column(String(255))
+    factory_usage_heavy = Column(String(255))
     prod_res = Column(Integer)
     agents = Column(Integer)
     guards = Column(Integer)
@@ -1880,10 +1880,10 @@ class FleetScan(Base):
     owner_id = Column(Integer, ForeignKey(Planet.id, ondelete='cascade'))
     target_id = Column(Integer, ForeignKey(Planet.id, ondelete='set null'))
     fleet_size = Column(Integer)
-    fleet_name = Column(String)
+    fleet_name = Column(String(255))
     launch_tick = Column(Integer)
     landing_tick = Column(Integer)
-    mission = Column(String)
+    mission = Column(String(255))
     in_cluster = Column(Boolean)
     in_galaxy = Column(Boolean)
     
@@ -1942,7 +1942,7 @@ Alliance.penis = association_proxy("apenis", "penis")
 class Slogan(Base):
     __tablename__ = 'slogans'
     id = Column(Integer, primary_key=True)
-    text = Column(String)
+    text = Column(String(255))
     @staticmethod
     def search(text):
         text = text or ""
@@ -1956,7 +1956,7 @@ class Slogan(Base):
 class Quote(Base):
     __tablename__ = 'quotes'
     id = Column(Integer, primary_key=True)
-    text = Column(String)
+    text = Column(String(255))
     @staticmethod
     def search(text):
         text = text or ""
@@ -2010,26 +2010,29 @@ Cookie.giver = relation(User, primaryjoin=Cookie.giver_id==User.id)
 
 class Invite(Base):
     __tablename__ = 'invite_proposal'
-    id = Column(Integer, Sequence('proposal_id_seq'), primary_key=True, server_default=text("nextval('proposal_id_seq')"))
+#    id = Column(Integer, Sequence('proposal_id_seq'), primary_key=True, server_default=text("nextval('proposal_id_seq')"))
+#    id = Column(Integer, Sequence('proposal_id_seq'), primary_key=True, autoincrement=False, server_default=text("nextval('proposal_id_seq')"))
+    id = Column(Integer, primary_key=True)
     active = Column(Boolean, default=True)
     proposer_id = Column(Integer, ForeignKey(User.id, ondelete='cascade'))
-    person = Column(String)
+    person = Column(String(255))
     created = Column(DateTime, default=current_timestamp())
     closed = Column(DateTime)
-    vote_result = Column(String)
+    vote_result = Column(String(255))
     comment_text = Column(Text)
     type = "invite"
 Invite.proposer = relation(User)
 
 class Kick(Base):
     __tablename__ = 'kick_proposal'
-    id = Column(Integer, Sequence('proposal_id_seq'), primary_key=True, server_default=text("nextval('proposal_id_seq')"))
+#    id = Column(Integer, Sequence('proposal_id_seq'), primary_key=True, server_default=text("nextval('proposal_id_seq')"))
+    id = Column(Integer, primary_key=True)
     active = Column(Boolean, default=True)
     proposer_id = Column(Integer, ForeignKey(User.id, ondelete='cascade'))
     person_id = Column(Integer, ForeignKey(User.id, ondelete='cascade'))
     created = Column(DateTime, default=current_timestamp())
     closed = Column(DateTime)
-    vote_result = Column(String)
+    vote_result = Column(String(255))
     comment_text = Column(Text)
     type = "kick"
 Kick.proposer = relation(User, primaryjoin=Kick.proposer_id==User.id)
@@ -2038,12 +2041,13 @@ Kick.person = association_proxy("kicked", "name")
 
 class Suggestion(Base):
     __tablename__ = 'suggestion_proposal'
-    id = Column(Integer, Sequence('proposal_id_seq'), primary_key=True, server_default=text("nextval('proposal_id_seq')"))
+#    id = Column(Integer, Sequence('proposal_id_seq'), primary_key=True, server_default=text("nextval('proposal_id_seq')"))
+    id = Column(Integer, primary_key=True)
     active = Column(Boolean, default=True)
     proposer_id = Column(Integer, ForeignKey(User.id, ondelete='cascade'))
     created = Column(DateTime, default=current_timestamp())
     closed = Column(DateTime)
-    vote_result = Column(String)
+    vote_result = Column(String(255))
     comment_text = Column(Text)
     type = "suggestion"
 Suggestion.proposer = relation(User)
@@ -2051,7 +2055,7 @@ Suggestion.proposer = relation(User)
 class Vote(Base):
     __tablename__ = 'prop_vote'
     id = Column(Integer, primary_key=True)
-    vote = Column(String)
+    vote = Column(String(255))
     carebears = Column(Integer)
     prop_id = Column(Integer)
     voter_id = Column(Integer, ForeignKey(User.id, ondelete='cascade'))
@@ -2067,25 +2071,25 @@ Suggestion.votes = dynamic_loader(Vote, foreign_keys=(Vote.prop_id,), primaryjoi
 class Command(Base):
     __tablename__ = 'command_log'
     id = Column(Integer, primary_key=True)
-    command_prefix = Column(String)
-    command = Column(String)
-    subcommand = Column(String)
-    command_parameters = Column(String)
-    nick = Column(String)
-    username = Column(String)
-    hostname = Column(String)
-    target = Column(String)
+    command_prefix = Column(String(255))
+    command = Column(String(255))
+    subcommand = Column(String(255))
+    command_parameters = Column(String(255))
+    nick = Column(String(255))
+    username = Column(String(255))
+    hostname = Column(String(255))
+    target = Column(String(255))
     command_time = Column(DateTime, default=current_timestamp())
 
 class PageView(Base):
     __tablename__ = 'arthur_log'
     id = Column(Integer, primary_key=True)
-    page = Column(String)
-    full_request = Column(String)
-    username = Column(String)
-    session = Column(String)
+    page = Column(String(255))
+    full_request = Column(String(255))
+    username = Column(String(255))
+    session = Column(String(255))
     planet_id = Column(Integer)
-    hostname = Column(String)
+    hostname = Column(String(255))
     request_time = Column(DateTime, default=current_timestamp())
 
 class SMS(Base):
@@ -2093,8 +2097,8 @@ class SMS(Base):
     id = Column(Integer, primary_key=True)
     sender_id = Column(Integer, ForeignKey(User.id, ondelete='cascade'))
     receiver_id = Column(Integer, ForeignKey(User.id, ondelete='cascade'))
-    phone = Column(String)
-    sms_text = Column(String)
-    mode = Column(String)
+    phone = Column(String(255))
+    sms_text = Column(String(255))
+    mode = Column(String(255))
 SMS.sender = relation(User, primaryjoin=SMS.sender_id==User.id)
 SMS.receiver = relation(User, primaryjoin=SMS.receiver_id==User.id)
