@@ -128,6 +128,8 @@ class request(loadable):
     def cancel(self, message, user, params):
         cancel_ids = []
         reply_ids = []
+        noexist = []
+        noaccess = []
 
         for id in params.group(1).split():
             if ':' in id:
@@ -143,12 +145,10 @@ class request(loadable):
             id = str(id)
             request = Request.load(id)
             if request is None:
-                message.reply("No open request number %s exists (idiot)."%(id,))
-                sleep(2)
+                noexist.append(id)
                 continue
             if request.user is not user and not user.is_member() and not self.is_chan(message, self.scanchan()):
-                message.reply("Scan request %s isn't yours and you're not a scanner!"%(id,))
-                sleep(2)
+                noaccess.append(id)
                 continue
             
             request.active = False
@@ -156,8 +156,13 @@ class request(loadable):
             
             reply_ids.append(id)
 
-        reply = "Cancelled scan request %s" % (", ".join(reply_ids))
-        message.reply(reply)
+        if len(noexist) > 0:
+            message.reply("No open request number %s exists (idiot)."%(", ".join(noexist),))
+            sleep(2)
+        if len(noaccess) > 0:
+            message.reply("Scan requests: %s aren't yours and you're not a scanner!"%(", ".join(noaccess),))
+            sleep(2)
+        message.reply("Cancelled scan request %s" % (", ".join(reply_ids)))
         if message.get_chan() != self.scanchan():
             message.privmsg(reply, self.scanchan())
         
