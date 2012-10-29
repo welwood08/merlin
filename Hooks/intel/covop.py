@@ -79,19 +79,20 @@ class covop(loadable):
         alert_min = int((50+5*min(pscan.guards/(planet.size+1),15))*(1+dscan.security_centre*2/dscan.total + (gov_bonus if gov != "Unknown" else -0.10) + 0.0))
         alert_max = int((50+5*min(pscan.guards/(planet.size+1),15))*(1+dscan.security_centre*2/dscan.total + (gov_bonus if gov != "Unknown" else +0.25) + 0.5))
 
-        reply = "Planet: %s:%s:%s  Government: %s  Alert: %s-%s  (Scan Age P:%s D:%s)" % (planet.x, planet.y, planet.z, gov, alert_min, alert_max, p_age, d_age)
+        message.reply("Planet: %s:%s:%s  Government: %s  Alert: %s-%s  (Scan Age P:%s D:%s)" % (planet.x, planet.y, planet.z, gov, alert_min, alert_max, p_age, d_age))
         if params.group(6):
             agents = int(params.group(6))
             max_res = user.planet.resources_per_agent(planet)
-            reply += "\nResults:   SD: %1.1f%% (%dXP) NC: %d%% (%dXP) EF: %d roids (%dXP) S: %d ships (%dXP) SGP: %d guards (%dXP)" % (0.5*agents, self.xpcalc(agents,1),
-                     agents, self.xpcalc(agents,2), agents/3, self.xpcalc(agents,3), agents, self.xpcalc(agents,4), 10*agents, self.xpcalc(agents,5))
-            reply += "\n           IB: %d amps+dists (%dXP) RT: %dM %dC %dE (%dXP) H: %d buildings (%dXP)" % (agents/15, self.xpcalc(agents,6),
-                     min(max_res, pscan.res_metal/10), min(max_res, pscan.res_crystal/10), min(max_res, pscan.res_eonium/10), self.xpcalc(agents,7), agents/20, self.xpcalc(agents,8))
+            message.reply("Results:   SD: %1.1f%% (%dXP) NC: %d%% (%dXP) EF: %d roids (%dXP) S: %d ships (%dXP) SGP: %d guards (%dXP)" % (0.5*agents, self.xpcalc(agents,1),
+                     agents, self.xpcalc(agents,2), agents/3, self.xpcalc(agents,3), agents, self.xpcalc(agents,4), 10*agents, self.xpcalc(agents,5)))
+            message.reply("           IB: %d amps+dists (%dXP) RT: %dM %dC %dE (%dXP) H: %d buildings (%dXP)" % (agents/15, self.xpcalc(agents,6),
+                     min(max_res, pscan.res_metal/10), min(max_res, pscan.res_crystal/10), min(max_res, pscan.res_eonium/10), self.xpcalc(agents,7), agents/20, self.xpcalc(agents,8)))
 
             if params.group(7):
                 stealth = int(params.group(7))
                 stealth = stealth - 5 - int(agents/2)
-                prob = 100-5*(alert_max-stealth+1)
+                t=19-alert_min
+                prob = 100*(t+stealth)/(t+alert_max)
                 if prob < 0:
                     prob = 0
                 elif prob > 100:
@@ -109,7 +110,7 @@ class covop(loadable):
                 elif race == "Etd":
                     growth = 6
                 from math import ceil
-                reply += "\nNew stealth: %s  Success rate: %s%%  Recovery time: %1.1f ticks" % (stealth, prob, ceil((5+int(agents/2))/growth))
+                message.reply("New stealth: %s  Success rate: %s%%  Recovery time: %1.1f ticks" % (stealth, prob, ceil((5+int(agents/2))/growth)))
 # base_max_stealth * (1 + gov_bonus / 100) + cumulative_success_bonus
 # base_recovery*bonus_from_government (rounded down)
 
@@ -119,7 +120,6 @@ class covop(loadable):
 # Note: "int()" means "take the integer part of", e.g. int(5.x) = 5
 # (1-20)* + new_stealth - target_alertness must be higher than 1 for the operation to succeed.
 # *chosen randomly
-        message.reply(reply)
 
     def xpcalc(self, agents, num):
         return int(2*(num+agents/5))
