@@ -29,4 +29,5 @@ __all__ = [
            "spam",
            "racism",
            "covop",
+           "spamin",
            ]
