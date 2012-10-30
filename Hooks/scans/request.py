@@ -59,7 +59,7 @@ class request(loadable):
             
             for scan in params.group(6).upper():
                 # Scan Quota
-                opts = Config.options("ScanQuota")
+                opts = Config.options("ScanQuota") if Config.has_section("ScanQuota") else []
                 q = []
                 for o in opts:
                     if int(o) >= user.access:
