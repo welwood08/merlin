@@ -19,12 +19,14 @@
 # along with this program; if not, write to the Free Software
 # Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA 02110-1301 USA
  
+import re
 from Core.db import session
 from Core.maps import Updates, User, Ship, UserFleet, FleetLog
 from Core.loadable import loadable, route, require_user
 
 class usedef(loadable):
-    usage = " <pnick> <ship>"
+    usage = " <pnick> [num] <ship>"
+    countre = re.compile(r"^((?:\d+(?:\.\d+)?[mk]?)|(?:[\d,]+))$",re.I)
     
     @route(r"(\S+)\s+(.*)", access = "member")
     @require_user
@@ -52,16 +54,29 @@ class usedef(loadable):
     def drop_ships(self,user,taker,ships):
         removed={}
         tick = Updates.current_tick()
+        count = None
         for name in ships.split():
+            if not count:
+                mc=self.countre.match(name)
+                if mc:
+                    count = self.short2num(mc.group(1))
+                    continue
             ship = Ship.load(name=name)
             if ship is None:
+                count=None
                 continue
             for fleet in user.fleets.filter_by(ship=ship):
-                removed[fleet.ship.name] = fleet.ship_count
-                self.delete_ships(user,taker,fleet,tick)
+                removed[fleet.ship.name] = count or fleet.ship_count
+                self.delete_ships(user,taker,fleet,tick, count)
+                count=None
         session.commit()
         return removed
     
-    def delete_ships(self,user,taker,fleet,tick):
-        session.delete(fleet)
-        session.add(FleetLog(taker=taker, user=user, ship=fleet.ship, ship_count=fleet.ship_count, tick=tick))
+    def delete_ships(self,user,taker,fleet,tick, count):
+        if count:
+            fleet.ship_count -= count
+            if fleet.ship_count < 1:
+                session.delete(fleet)
+        else:
+            session.delete(fleet)
+        session.add(FleetLog(taker=taker, user=user, ship=fleet.ship, ship_count=(count or fleet.ship_count), tick=tick))
