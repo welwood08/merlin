@@ -55,8 +55,10 @@ keys = ['race', 'name', 'class_', 't1', 't2', 't3', 'type', 'init',
 def main(url = Config.get("URL", "ships"), debug=False):
     stats = urllib2.urlopen(url).read()
     session.execute(Ship.__table__.delete())
-#    session.execute(text("SELECT setval('ships_id_seq', 1, :false);", bindparams=[false]))
-    session.execute(text("ALTER TABLE ships AUTO_INCREMENT=1;", bindparams=[false]))
+    if Config.get("DB", "dbms") == "mysql":
+        session.execute(text("ALTER TABLE ships AUTO_INCREMENT=1;", bindparams=[false]))
+    else:
+        session.execute(text("SELECT setval('ships_id_seq', 1, :false);", bindparams=[false]))
     
     for line in sre.findall(stats):
         ship = Ship()
