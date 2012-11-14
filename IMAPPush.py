@@ -121,10 +121,11 @@ class Idler(threading.Thread):
         # Wrap it up in a bow
         lines = []
         for line in newfleets:
-            lines.append("DEFCALL :type=%s to=%s tick=%s name=%s x=%s y=%s z=%s eta=%s size=%s" % ("new", to, tick, line[0], line[1], line[2], line[3], line[4], line[5]))
-        for line in newfleets:
-            lines.append("DEFCALL :type=%s to=%s tick=%s name=%s x=%s y=%s z=%s" % ("rec", to, tick, line[0], line[1], line[2], line[3]))
-        lines.append("DEFCALL :type=%s to=%s tick=%s res=%s con=%s" % ("fin", to, tick, res, cons))
+            lines.append("DEFCALL :etype=%s to=%s tick=%s name=%s x=%s y=%s z=%s eta=%s size=%s" % ("new", to, tick, line[0], line[1], line[2], line[3], line[4], line[5]))
+        for line in recalls:
+            lines.append("DEFCALL :etype=%s to=%s tick=%s name=%s x=%s y=%s z=%s" % ("rec", to, tick, line[0], line[1], line[2], line[3]))
+        if res + cons > 0:
+            lines.append("DEFCALL :etype=%s to=%s tick=%s res=%s" % ("fin", to, tick, 1 if res else 0))
 
         # Connect to merlin...
         port = Config.getint("Misc", "robocop")
