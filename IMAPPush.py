@@ -240,6 +240,7 @@ class Idler(threading.Thread):
 				
 				#get From and Subject fields from header
 				headerFields = self.getMessageHeaderFieldsById(id, ('From', 'To', 'Subject'))
+				print self.imap.fetch(id, '(BODY[TEXT])')[1][0][1]
 				
 				debugMsg('headerFields dict. (from showNewMailMessage()):')
 				debugMsg(headerFields, 0)
