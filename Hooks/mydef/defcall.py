@@ -31,9 +31,10 @@ from ssl import SSLError
 from Core.exceptions_ import SMSError
 
 class defcall(loadable):
-    usage = " <x:y:z>"
+    """Make a broadcast to the channel requesting defence"""
+    usage = " <x:y:z> <eta> <description>"
     
-    @route(loadable.planet_coord + r"\W+(\d+)\W+(.+)", access = "half")
+    @route(loadable.planet_coord + r"\W+(\d+)\W+(.+)", access = "dc")
     def execute(self, message, user, params):
         
         planet = Planet.load(*params.group(1,3,5))
