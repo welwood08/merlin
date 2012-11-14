@@ -99,7 +99,7 @@ ServerTimeout	  = 29 # Mins   		(leave if you're not sure)
 # But, as it is, this should work. As before, make sure you have IMAP enabled.
 
 #'True' to enter debug mode
-DEBUG = False # debugMsg() prints the parameter passed if DEBUG is True
+DEBUG = True # debugMsg() prints the parameter passed if DEBUG is True
 
 
 """
@@ -239,13 +239,13 @@ class Idler(threading.Thread):
 			if not id in self.knownAboutMail:
 				
 				#get From and Subject fields from header
-				headerFields = self.getMessageHeaderFieldsById(id, ('From', 'Subject'))
+				headerFields = self.getMessageHeaderFieldsById(id, ('From', 'To', 'Subject'))
 				
 				debugMsg('headerFields dict. (from showNewMailMessage()):')
 				debugMsg(headerFields, 0)
 				
 				#notify
-				self.growlnotify(" ".join(['Mail', headerFields['From']]), "'"+headerFields['Subject']+"'")
+				self.growlnotify(" ".join(['Mail', headerFields['From'], headerFields['To']]), "'"+headerFields['Subject']+"'")
 				
 				#add this message to the list of known messages
 				self.knownAboutMail.append(id)
