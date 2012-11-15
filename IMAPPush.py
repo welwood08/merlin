@@ -36,8 +36,7 @@ from time import sleep
 
 ServerTimeout = 29 # Mins (leave if you're not sure)
 
-#'True' to enter debug mode
-DEBUG = True # debugMsg() prints the parameter passed if DEBUG is True
+DEBUG = False # debugMsg() prints the parameter passed if DEBUG is True
 
 
 """
@@ -107,7 +106,7 @@ class Idler(threading.Thread):
             
     
     """
-    
+    Relay email contents to merlin via robocop.
     """
     def robonotify(self, header, body):
         # Check for correct "From" address?
@@ -123,31 +122,11 @@ class Idler(threading.Thread):
         lines = []
         for line in newfleets:
             push("defcall", etype="new", uname=uname, tick=tick, name=line[0], x=line[1], y=line[2], z=line[3], eta=line[4], size=line[5])
-#            lines.append("DEFCALL etype=new to=%s tick=%s name=%s x=%s y=%s z=%s eta=%s size=%s" % (to, tick, line[0], line[1], line[2], line[3], line[4], line[5]))
         for line in recalls:
             push("defcall", etype="rec", uname=uname, tick=tick, name=line[0], x=line[1], y=line[2], z=line[3])
-#            lines.append("DEFCALL etype=rec to=%s tick=%s name=%s x=%s y=%s z=%s" % (to, tick, line[0], line[1], line[2], line[3]))
         if res + cons > 0:
             push("defcall", etype="fin", uname=uname, tick=tick, res=(1 if res else 0))
-#            lines.append("DEFCALL etype=fin to=%s tick=%s res=%s" % (to, tick, 1 if res else 0))
 
-        
-#            monkey
-#            def __init__(self, line, **kwargs):
-#            line = " ".join([line] + map(lambda i: "%s=%s"%i, kwargs.items()))
-#            port = Config.getint("Misc", "robocop")
-#            sock = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
-#            sock.settimeout(30)
-#            sock.connect(("127.0.0.1", port,))
-#            sock.send(line + CRLF)
-#    push("scans", scantype=scantype, pa_id=pa_id, x=planet.x, y=planet.y, z=planet.z, names=",".join(users), scanner=uid, reqs=",".join(req_ids))
-#        def robocop(self, message, scantype, pa_id, x, y, z, names, scanner, reqs):
-#    Wed Nov 14 15:44:54 2012 <<< :RoboCop!33133/44 SCANS :scantype=P scanner=1 pa_id=5gv1ox5blqd4rn0 reqs=142 names=pit y=1 x=1 z=1
-#    dd
-#    Report of events in tick 590
-#    
-#    We have detected an open jumpgate from Ole, located at 2:5:6. The fleet will approach our system in tick 598 and appears to have 82237 visible ships.
-    
         
     """
     Name says it all really: get (just) the specified header fields from the server for the 
@@ -199,7 +178,6 @@ class Idler(threading.Thread):
                 
                 #notify
                 self.robonotify(headerFields, self.imap.fetch(id, '(BODY[TEXT])')[1][0][1])
-#                self.growlnotify(" ".join(['Mail', headerFields['From'], headerFields['To']]), "'"+headerFields['Subject']+"'")
                 
                 #add this message to the list of known messages
                 self.knownAboutMail.append(id)
@@ -325,6 +303,6 @@ def main():
 if __name__ == '__main__': # then this script is being run on its own, i.e. not imported
     main()
 else:
-    print 'I don\'t think you ment to import this'
+    print 'I don\'t think you meant to import this'
     sys.exit(1)
     
