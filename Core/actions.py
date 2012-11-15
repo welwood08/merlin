@@ -51,7 +51,7 @@ class Action(Message):
     def notice(self, text, target=None):
         # If we're opped in a channel in common with the user, we can reply with
         #  CNOTICE instead of NOTICE which doesn't count towards the flood limit.
-        if CUT.opped(self.get_chan()) and CUT.nick_in_chan(target or self.get_nick(), self.get_chan()):
+        if hasattr(self, "_channel") and CUT.opped(self.get_chan()) and CUT.nick_in_chan(target or self.get_nick(), self.get_chan()):
             self.write("CNOTICE %s %s :%s" % (target or self.get_nick(), self.get_chan(), text))
         else:
             self.write("NOTICE %s :%s" % (target or self.get_nick(), text))

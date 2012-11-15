@@ -1,4 +1,4 @@
 #!/bin/bash
 cd /home/merlin/
-python excalibur.py
+python excalibur.py >> dumplog.txt
 

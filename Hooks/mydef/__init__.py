@@ -28,4 +28,5 @@ __all__ = [
            "logdef",
            "finddef",
            "theirdef",
+           "defcall",
            ]
