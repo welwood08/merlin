@@ -47,20 +47,20 @@ class defcall(loadable):
         message.notice(notice, Config.get("Channels", "home"))
     
     @robohci
-    def robocop(self, message, etype, to, tick, x, y, z, name, eta, size, res):
+    def robocop(self, message, etype, uname="Unknown", tick=0, x=0, y=0, z=0, name="", eta=0, size=0, res=0):
         notice = ""
         email = ""
 
-        user = User.load(to)
+        user = User.load(uname)
         if user is None:
             errorlog("Defcall: Invalid user in email. Idiot.")
-            uname = "%s (whoever that is??)" % (to)
+            uname = "%s (whoever that is??)" % (uname)
             ucoords = "x:x:x"
             addr = Config.get("imap", "bounce")
             email = "Bad username in notifications: %s\n\nOriginal notification:\n\n\n"
         else:
             uname = "%s%s" % (user.name, ("(%s)" % (user.alias)) if user.alias else "")
-            ucoords = "%s:%s:s" % (user.planet.x, user.planet.y, user.planet.z)
+            ucoords = "%d:%d:%d" % (user.planet.x, user.planet.y, user.planet.z)
             addr = user.email
 
         p = Planet.load(x,y,z)
@@ -74,21 +74,23 @@ class defcall(loadable):
                 aally = "Unknown"
             else:
                 arace = p.race
-                i = p.intel()
+                i = p.intel
                 if i and i.alliance:
                     aally = i.alliance.name
                 else:
                     aally = "Unknown"
             
-            notice = "DEFCALL: %s (%s) has incoming eta %s(%s) from %s:%s:%s (%s, %s) - Fleet: %s Visible Ships: %s" % (uname, ucoords, eta, eta-tick,
+            notice = "DEFCALL: %s (%s) has incoming eta %s(%s) from %s:%s:%s (%s, %s) - Fleet: %s Visible Ships: %s" % (uname, ucoords, eta, int(eta)-int(tick),
                                                                                                                         x, y, z, arace, aally, name, size)
-            email += "Notification from Planetarion in tick %s\n\nIncoming Fleet %s from %s:%s:%s with %s visible ships expected to land in tick %s." +\
-                    "\n\nThis has been reported to the %s DCs." % (tick, name, x, y, z, size, eta, Config.get("Alliance", "name"))
+            email += "Notification from Planetarion in tick %s\n\n" % (tick) +\
+                     "Incoming Fleet %s from %s:%s:%s with %s visible ships expected to land in tick %s." % (name, x, y, z, size, eta) +\
+                    "\n\nThis has been reported to the %s DCs." % (Config.get("Alliance", "name"))
         elif etype == "rec":
             # Message to DC channel *and* main channel
-            notice = "RECALL: %s (%s) has had a recall: Fleet: %s eta %s(%s) from %s:%s:%s" % (uname, ucoords, name, eta, eta-tick, x, y, z)
-            email += "Notification from Planetarion in tick %s\n\nIncoming Fleet %s from %s:%s:%s with eta %s(%s) has recalled." +\
-                    "\n\nThis has been reported to %s." % (tick, name, x, y, z, eta, eta-tick, Config.get("Alliance", "name"))
+            notice = "RECALL: %s (%s) has had a recall: Fleet: %s eta %s(%s) from %s:%s:%s" % (uname, ucoords, name, eta, int(eta)-int(tick), x, y, z)
+            email += "Notification from Planetarion in tick %s\n\n" % (tick) +\
+                     "Incoming Fleet %s from %s:%s:%s with eta %s(%s) has recalled." % (name, x, y, z, eta, int(eta)-int(tick)) +\
+                    "\n\nThis has been reported to %s." % (Config.get("Alliance", "name"))
         elif etype == "fin":
             # Nothing to see here. Move along.
             notice = ""
@@ -106,7 +108,7 @@ class defcall(loadable):
             self.send_email("Relayed PA Notifications from tick %s" % (tick), email, addr)
 
 
-    def send_email(subject, message, addr):
+    def send_email(self, subject, message, addr):
         try:
             if (Config.get("smtp", "port") == "0"):
                 smtp = SMTP("localhost")

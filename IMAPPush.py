@@ -31,6 +31,7 @@ import threading, imaplib2, os, sys, getpass
 import re, socket
 from Core.string import CRLF
 from Core.config import Config
+from Core.robocop import push
 from time import sleep
 
 ServerTimeout = 29 # Mins (leave if you're not sure)
@@ -109,33 +110,26 @@ class Idler(threading.Thread):
     
     """
     def robonotify(self, header, body):
-        # Check for correct "From" address.
-
-        to = re.findall("(.+)@.+", header['To'])[0]
+        # Check for correct "From" address?
+        uname = re.findall("(.+)@.+", header['To'])[0].split()[1]
         tick = re.findall("events in tick (\d+)", body)[0]
-        newfleets = re.findall("We have detected an open jumpgate from (.+), located at (\d{1,2}):(\d{1,2}):(\d{1,2}). The fleet will approach our system in tick (\d+) and appears to have (\d+) visible ships.", body)
+        newfleets = re.findall("We have detected an open jumpgate from (.+), located at (\d{1,2}):(\d{1,2}):(\d{1,2}). " +\
+                               "The fleet will approach our system in tick (\d+) and appears to have (\d+) visible ships.", body)
         recalls = re.findall("The (.+) fleet from (\d{1,2}):(\d{1,2}):(\d{1,2}) has been recalled.", body)
-        cons = len(re.findall("Our construction team reports that .+ has been finished"))
-        res = len(re.findall("Our scientists report that .+ has been finished"))
+        cons = len(re.findall("Our construction team reports that .+ has been finished", body))
+        res = len(re.findall("Our scientists report that .+ has been finished", body))
 
         # Wrap it up in a bow
         lines = []
         for line in newfleets:
-            lines.append("DEFCALL :etype=%s to=%s tick=%s name=%s x=%s y=%s z=%s eta=%s size=%s" % ("new", to, tick, line[0], line[1], line[2], line[3], line[4], line[5]))
+            push("defcall", etype="new", uname=uname, tick=tick, name=line[0], x=line[1], y=line[2], z=line[3], eta=line[4], size=line[5])
+#            lines.append("DEFCALL etype=new to=%s tick=%s name=%s x=%s y=%s z=%s eta=%s size=%s" % (to, tick, line[0], line[1], line[2], line[3], line[4], line[5]))
         for line in recalls:
-            lines.append("DEFCALL :etype=%s to=%s tick=%s name=%s x=%s y=%s z=%s" % ("rec", to, tick, line[0], line[1], line[2], line[3]))
+            push("defcall", etype="rec", uname=uname, tick=tick, name=line[0], x=line[1], y=line[2], z=line[3])
+#            lines.append("DEFCALL etype=rec to=%s tick=%s name=%s x=%s y=%s z=%s" % (to, tick, line[0], line[1], line[2], line[3]))
         if res + cons > 0:
-            lines.append("DEFCALL :etype=%s to=%s tick=%s res=%s" % ("fin", to, tick, 1 if res else 0))
-
-        # Connect to merlin...
-        port = Config.getint("Misc", "robocop")
-        sock = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
-        sock.settimeout(30)
-        sock.connect(("127.0.0.1", port,))
-        for line in lines:
-            sock.send(line + CRLF)
-        sleep(5)
-        sock.close()
+            push("defcall", etype="fin", uname=uname, tick=tick, res=(1 if res else 0))
+#            lines.append("DEFCALL etype=fin to=%s tick=%s res=%s" % (to, tick, 1 if res else 0))
 
         
 #            monkey
