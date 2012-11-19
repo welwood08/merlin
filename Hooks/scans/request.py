@@ -80,7 +80,7 @@ class request(loadable):
                 if scan and request.tick - scan.tick < PA.getint(scan.scantype,"expire"):
                     message.reply("%s Scan of %s:%s:%s is already available from %s ticks ago: %s. !request cancel %s if this is suitable." % (
                                   scan.scantype, planet.x, planet.y, planet.z, request.tick - scan.tick, scan.link, request.id,))
-                reqs -= 1                
+                reqs += 1
 #                sleep(1)
     
     @robohci
