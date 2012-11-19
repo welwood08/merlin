@@ -28,7 +28,6 @@ from Core.db import session
 from Core.maps import Updates, Planet, Galaxy, User, Request, Intel
 from Core.chanusertracker import CUT
 from Core.loadable import loadable, route, require_user, robohci
-#from time import sleep
 
 class request(loadable):
     """Request a scan"""
@@ -39,49 +38,75 @@ class request(loadable):
     @require_user
     def execute(self, message, user, params):
         tick = Updates.current_tick()
-        reqs = session.query(Request.id).filter(Request.requester_id == user.id).filter(Request.tick == tick).count()
-
+        # Scan Quota
+        opts = Config.options("ScanQuota") if Config.has_section("ScanQuota") else []
+        q = []
+        for o in opts:
+            if int(o) >= user.access:
+                q.append(int(o))
+        if q:
+            ScanQuota = Config.getint("ScanQuota", str(min(q))) if q else -1
+            reqs = session.query(Request.id).filter(Request.requester_id == user.id).filter(Request.tick == tick).count()
+        # Galaxy Scan
         if params.group(5) is None:
             galaxy = Galaxy.load(*params.group(1,3))
             if galaxy is None:
                 message.alert("No galaxy with coords %s:%s" % params.group(1,3))
                 return
             planets = galaxy.planets
+            galscan = Config.has_option("Misc", "galscans") and Config.getboolean("Misc", "galscans")
         else:
             planet = Planet.load(*params.group(1,3,5))
             if planet is None:
                 message.alert("No planet with coords %s:%s:%s" % params.group(1,3,5))
                 return
             planets = [planet]
-        
-        for planet in planets:
-            dists = int(params.group(7) or 0)
-            
-            for scan in params.group(6).upper():
-                # Scan Quota
-                opts = Config.options("ScanQuota") if Config.has_section("ScanQuota") else []
-                q = []
-                for o in opts:
-                    if int(o) >= user.access:
-                        q.append(int(o))
-                if q and reqs >= Config.getint("ScanQuota", str(min(q))):
-                    message.reply("You've reached your scan quota for this tick. Try searching with !planet, !dev, !unit, !news, !jgp, !au.")
-                    return
 
-                if scan == "I":
+        dists = int(params.group(7) or 0)
+        galdists = []
+        for planet in planets:
+            if galscan:
+                galdists.append(planet.intel.dists if planet.intel else 0)
+                if len(galdists) < len(planets):
+                    continue
+            for scantype in params.group(6).upper():
+                if q:
+                    reqs += (galscan and len(planets) or 1)
+                    if reqs > ScanQuota:
+                        message.reply("This request will exceed your scan quota for this tick. Try searching with !planet, !dev, !unit, !news, !jgp, !au.")
+                        return
+
+                # Reject requests for incoming scans
+                if scantype == "I":
                     message.alert("Incoming scans can only be performed by the planet under attack.")
                     continue
             
-                request = self.request(message, user, planet, scan, dists)
-                if message.get_chan() != self.scanchan():
-                    message.reply("Requested a %s Scan of %s:%s:%s. !request cancel %s to cancel the request." % (request.type, planet.x, planet.y, planet.z, request.id,))
-            
-                scan = planet.scan(scan)
-                if scan and request.tick - scan.tick < PA.getint(scan.scantype,"expire"):
-                    message.reply("%s Scan of %s:%s:%s is already available from %s ticks ago: %s. !request cancel %s if this is suitable." % (
-                                  scan.scantype, planet.x, planet.y, planet.z, request.tick - scan.tick, scan.link, request.id,))
-                reqs -= 1                
-#                sleep(1)
+                if galscan:
+                    # Request the scans
+                    for i in range(len(planets)):
+                        request = self.request(message, user, planets[i], scantype, galdists[i], galscan)
+                    # Inform the requester    
+                    if message.get_chan() != self.scanchan():
+                        message.reply("Requested a Galaxy %s Scan of %s:%s. !request cancel %s:%s to cancel the request." % (request.type, planet.x, planet.y, 
+                                                                                                                             request.id-len(planets)+1, request.id))
+                    ## Check existing scans
+                    scan = planet.scan(scantype)
+                    if scan and request.tick - scan.tick < PA.getint(scantype,"expire"):
+                        message.reply("%s Scan of %s:%s:%s is already available from %s ticks ago: %s. !request cancel %s if this is suitable." % (
+                                                                        scantype, planet.x, planet.y, planet.z, request.tick - scan.tick, scan.link, request.id,))
+                    # Tell the scanners
+                    requester = user.name if not Config.getboolean("Misc", "anonscans") else "Anon"
+                    message.privmsg("[%s] %s requested a Galaxy %s Scan of %s:%s Max Dists(i:%s/r:%s) " % (request.id, requester, request.type, planet.x, planet.y,
+                                                 max(galdists), dists) + Config.get("URL", "reqgscan") % (planet.x, planet.y) , self.scanchan())
+                else:
+                    request = self.request(message, user, planet, scantype, dists)
+                    if message.get_chan() != self.scanchan():
+                        message.reply("Requested a %s Scan of %s:%s:%s. !request cancel %s to cancel the request." % (request.type, planet.x, planet.y, planet.z, request.id,))
+                    
+                    scan = planet.scan(scantype)
+                    if scan and request.tick - scan.tick < PA.getint(scan.scantype,"expire"):
+                        message.reply("%s Scan of %s:%s:%s is already available from %s ticks ago: %s. !request cancel %s if this is suitable." % (
+                                                                        scantype, planet.x, planet.y, planet.z, request.tick - scan.tick, scan.link, request.id,))
     
     @robohci
     def robocop(self, message, request_id, mode):
@@ -110,16 +135,19 @@ class request(loadable):
         
         requester = user.name if not Config.getboolean("Misc", "anonscans") else "Anon"
         dists_intel = planet.intel.dists if planet.intel else 0
-        message.privmsg("[%s] %s requested a %s Scan of %s:%s:%s Dists(i:%s/r:%s) " % (request.id, requester, request.type, planet.x,planet.y,planet.z, dists_intel, request.dists,) + request.link, self.scanchan())
+        message.privmsg("[%s] %s requested a %s Scan of %s:%s:%s Dists(i:%s/r:%s) " % (request.id, requester, request.type, planet.x,planet.y,planet.z, 
+                                                                                       dists_intel, request.dists,) + request.link, self.scanchan())
     
-    def request(self, message, user, planet, scan, dists):
+    def request(self, message, user, planet, scan, dists, gal=False):
         request = Request(target=planet, scantype=scan, dists=dists)
         user.requests.append(request)
         session.commit()
         
-        requester = user.name if not Config.getboolean("Misc", "anonscans") else "Anon"
-        dists_intel = planet.intel.dists if planet.intel else 0
-        message.privmsg("[%s] %s requested a %s Scan of %s:%s:%s Dists(i:%s/r:%s) " % (request.id, requester, request.type, planet.x,planet.y,planet.z, dists_intel, request.dists,) + request.link, self.scanchan())
+        if not gal:
+            requester = user.name if not Config.getboolean("Misc", "anonscans") else "Anon"
+            dists_intel = planet.intel.dists if planet.intel else 0
+            message.privmsg("[%s] %s requested a %s Scan of %s:%s:%s Dists(i:%s/r:%s) " % (request.id, requester, request.type, planet.x,planet.y,planet.z, 
+                                                                                           dists_intel, request.dists,) + request.link, self.scanchan())
         
         return request
     
@@ -164,10 +192,8 @@ class request(loadable):
 
         if len(noexist) > 0:
             message.reply("No open request number %s exists (idiot)."%(", ".join(noexist),))
-            sleep(2)
         if len(noaccess) > 0:
             message.reply("Scan requests: %s aren't yours and you're not a scanner!"%(", ".join(noaccess),))
-            sleep(2)
         if len(reply_ids) > 0:
             reply = "Cancelled scan request %s" % (", ".join(reply_ids))
             message.reply(reply)
