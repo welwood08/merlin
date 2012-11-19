@@ -29,11 +29,13 @@ from Core.config import Config
 class Action(Message):
     # This object holds the parse, and will enable users to send messages to the server on a higher level
     
-    def write(self, text):
+    def write(self, text, color=False):
         # Write something to the server, the message will be split up by newlines and at 450chars max
         params = text.split(":")[0] + ":"
         text = ":".join(text.split(":")[1:])
         if text:            
+            if color:
+                params += "\x03"+Config.get("Connection", "color")
             for line in text.split("\n"):
                 while line:
                     Connection.write((params + line)[:450])
@@ -44,7 +46,7 @@ class Action(Message):
     def privmsg(self, text, target=None):
         # Privmsg someone. Target defaults to the person who triggered this line
         if (Config.has_option("Connection", "color") and not Config.has_option("NoColor", target) and not (target[0] in ['#','&'] and Config.has_option("NoColorChan", target[1:]))):
-            self.write("PRIVMSG %s :%s" % (target or self.get_nick(), "\x03"+Config.get("Connection", "color")+text+"\x0F"))
+            self.write("PRIVMSG %s :%s" % (target or self.get_nick(), "\x03"+Config.get("Connection", "color")+text+"\x0F"), True)
         else:
             self.write("PRIVMSG %s :%s" % (target or self.get_nick(), text))
     
