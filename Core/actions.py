@@ -42,6 +42,10 @@ class Action(Message):
                     i = len(line)
                     while len(line[:i]) > (450 - len(params)):
                         i = line.rfind(" ", 0, i)
+                        if i == -1:
+                            Connection.write((params + line)[:450])
+                            line = line[450 - len(params):]
+                            continue
                     Connection.write(params + line[:i])
                     line = line[i+1:]
         else:
