@@ -47,6 +47,7 @@ class request(loadable):
                 message.alert("No galaxy with coords %s:%s" % params.group(1,3))
                 return
             planets = galaxy.planets
+            galscan = True
         else:
             planet = Planet.load(*params.group(1,3,5))
             if planet is None:
@@ -54,8 +55,13 @@ class request(loadable):
                 return
             planets = [planet]
         
+        galdists = []
         for planet in planets:
             dists = int(params.group(7) or 0)
+            if galscan:
+                galdists.append(dists)
+                if len(dists) < len(planets):
+                    continue
             
             for scan in params.group(6).upper():
                 # Scan Quota
@@ -64,23 +70,31 @@ class request(loadable):
                 for o in opts:
                     if int(o) >= user.access:
                         q.append(int(o))
-                if q and reqs >= Config.getint("ScanQuota", str(min(q))):
-                    message.reply("You've reached your scan quota for this tick. Try searching with !planet, !dev, !unit, !news, !jgp, !au.")
+                if q and (galscan and len(planets) or reqs) >= Config.getint("ScanQuota", str(min(q))):
+                    message.reply("This request will exceed your scan quota for this tick. Try searching with !planet, !dev, !unit, !news, !jgp, !au.")
                     return
 
                 if scan == "I":
                     message.alert("Incoming scans can only be performed by the planet under attack.")
                     continue
             
-                request = self.request(message, user, planet, scan, dists)
-                if message.get_chan() != self.scanchan():
-                    message.reply("Requested a %s Scan of %s:%s:%s. !request cancel %s to cancel the request." % (request.type, planet.x, planet.y, planet.z, request.id,))
-            
-                scan = planet.scan(scan)
-                if scan and request.tick - scan.tick < PA.getint(scan.scantype,"expire"):
-                    message.reply("%s Scan of %s:%s:%s is already available from %s ticks ago: %s. !request cancel %s if this is suitable." % (
-                                  scan.scantype, planet.x, planet.y, planet.z, request.tick - scan.tick, scan.link, request.id,))
-                reqs += 1
+                if galscan:
+                    for i in range(len(planets)):
+                        request = self.request(message, user, planets[i], scan, dists[i])
+                    if message.get_chan() != self.scanchan():
+                        message.reply("Requested a galaxy %s Scan of %s:%s. !request cancel %s:%s to cancel the request." % (request.type, planet.x, planet.y, 
+                                                                                                                             request.id-len(planets)+1, request.id))
+                    ## Check existing scans. Check request code in self.request() doesn't spam the scan channel, or fix that.
+                else:
+                    request = self.request(message, user, planet, scan, dists)
+                    if message.get_chan() != self.scanchan():
+                        message.reply("Requested a %s Scan of %s:%s:%s. !request cancel %s to cancel the request." % (request.type, planet.x, planet.y, planet.z, request.id,))
+                
+                    scan = planet.scan(scan)
+                    if scan and request.tick - scan.tick < PA.getint(scan.scantype,"expire"):
+                        message.reply("%s Scan of %s:%s:%s is already available from %s ticks ago: %s. !request cancel %s if this is suitable." % (
+                                      scan.scantype, planet.x, planet.y, planet.z, request.tick - scan.tick, scan.link, request.id,))
+                    reqs += 1
 #                sleep(1)
     
     @robohci
