@@ -54,7 +54,7 @@ class request(loadable):
                 message.alert("No galaxy with coords %s:%s" % params.group(1,3))
                 return
             planets = galaxy.planets
-            galscan = True
+            galscan = Config.has_option("Misc", "galscans") and Config.getboolean("Misc", "galscans")
         else:
             planet = Planet.load(*params.group(1,3,5))
             if planet is None:
