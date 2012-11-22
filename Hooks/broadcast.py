@@ -19,30 +19,25 @@
 # along with this program; if not, write to the Free Software
 # Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA 02110-1301 USA
  
-# List of package modules
-__all__ = ["system",
-           "chanusertracker",
-           "auth",
-           "commandlog",
-           "help",
-           "user",
-           "propsandcookies",
-           "sms",
-           "fuckthatnameusethis",
-           "lookup",
-           "details",
-           "intel",
-           "growth",
-           "newb",
-           "target",
-           "mydef",
-           "victim",
-           "calcs",
-           "scans",
-           "ships",
-           "quotes",
-           "links",
-           "galstatus",
-           "newb",
-           "broadcast",
-           ]
+# Module by Martin Stone
+
+from Core.config import Config
+from Core.loadable import loadable, route, robohci
+
+class broadcast(loadable):
+    """Make a broadcast to all alliance channels. Append "HIDEME" if you do not want your username included."""
+    usage = " <message> [HIDEME]"
+    
+    @route(r"(.+)", access = "admin")
+    def execute(self, message, user, params):
+        if params.group(1)[-6:].lower() == "hideme":
+            notice = "%s" % (params.group(1)[:-6])
+        else:
+            notice = "(%s) %s" % (user.name, params.group(1))
+        for chan in Config.items("Channels"):
+            message.notice(notice, chan[1])
+    
+    @robohci
+    def robocop(self, message, notice):
+        for chan in Config.items("Channels"):
+            message.notice(notice, chan[1])
