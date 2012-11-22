@@ -61,6 +61,7 @@ class request(loadable):
                 message.alert("No planet with coords %s:%s:%s" % params.group(1,3,5))
                 return
             planets = [planet]
+            galscan = False
 
         dists = int(params.group(7) or 0)
         galdists = []
