@@ -97,8 +97,8 @@ class request(loadable):
                                                                         scantype, planet.x, planet.y, planet.z, request.tick - scan.tick, scan.link, request.id,))
                     # Tell the scanners
                     requester = user.name if not Config.getboolean("Misc", "anonscans") else "Anon"
-                    message.privmsg("[%s] %s requested a Galaxy %s Scan of %s:%s Max Dists(i:%s/r:%s) " % (request.id, requester, request.type, planet.x, planet.y,
-                                                 max(galdists), dists) + Config.get("URL", "reqgscan") % (planet.x, planet.y) , self.scanchan())
+                    message.privmsg("[%s] %s requested a Galaxy %s Scan of %s:%s Max Dists(i:%s%s) " % (request.id, requester, request.type, planet.x, planet.y,
+                                    max(galdists), "/r:%s" % dists if dists > 0 else "") + Config.get("URL", "reqgscan") % (planet.x, planet.y) , self.scanchan())
                 else:
                     request = self.request(message, user, planet, scantype, dists)
                     if message.get_chan() != self.scanchan():
@@ -136,8 +136,8 @@ class request(loadable):
         
         requester = user.name if not Config.getboolean("Misc", "anonscans") else "Anon"
         dists_intel = planet.intel.dists if planet.intel else 0
-        message.privmsg("[%s] %s requested a %s Scan of %s:%s:%s Dists(i:%s/r:%s) " % (request.id, requester, request.type, planet.x,planet.y,planet.z, 
-                                                                                       dists_intel, request.dists,) + request.link, self.scanchan())
+        message.privmsg("[%s] %s requested a %s Scan of %s:%s:%s Dists(i:%s%s) " % (request.id, requester, request.type, planet.x,planet.y,planet.z, 
+                                                        dists_intel, "/r:%s" % request.dists if request.dists > 0 else "") + request.link, self.scanchan())
     
     def request(self, message, user, planet, scan, dists, gal=False):
         request = Request(target=planet, scantype=scan, dists=dists)
@@ -147,8 +147,8 @@ class request(loadable):
         if not gal:
             requester = user.name if not Config.getboolean("Misc", "anonscans") else "Anon"
             dists_intel = planet.intel.dists if planet.intel else 0
-            message.privmsg("[%s] %s requested a %s Scan of %s:%s:%s Dists(i:%s/r:%s) " % (request.id, requester, request.type, planet.x,planet.y,planet.z, 
-                                                                                           dists_intel, request.dists,) + request.link, self.scanchan())
+            message.privmsg("[%s] %s requested a %s Scan of %s:%s:%s Dists(i:%s%s) " % (request.id, requester, request.type, planet.x,planet.y,planet.z, 
+                                                            dists_intel, "/r:%s" % request.dists if request.dists > 0 else "") + request.link, self.scanchan())
         
         return request
     
@@ -244,8 +244,8 @@ class request(loadable):
             message.reply("There are no open scan requests")
             return
         
-        message.reply(" ".join(map(lambda request: "[%s: (%s/%s) %s %s:%s:%s]" % (request.id, request.target.intel.dists if request.target.intel else "0",
-                request.dists, request.scantype, request.target.x, request.target.y, request.target.z,), Q.all())))
+        message.reply(" ".join(map(lambda request: "[%s: (%s%s) %s %s:%s:%s]" % (request.id, request.target.intel.dists if request.target.intel else "0",
+                "/%s" % request.dists if request.dists > 0 else "", request.scantype, request.target.x, request.target.y, request.target.z,), Q.all())))
     
     @route(r"links? ?(.*)", access = "member")
     def links(self, message, user, params):
@@ -266,8 +266,8 @@ class request(loadable):
             message.reply("There are no open scan requests")
             return
 
-        message.reply(self.url(" ".join(map(lambda request: "[%s (%s/%s): %s]" % (request.id, request.target.intel.dists if request.target.intel else "0", 
-                    request.dists, request.link), Q[:i] if i>0 else Q.all())), user))
+        message.reply(self.url(" ".join(map(lambda request: "[%s (%s%s): %s]" % (request.id, request.target.intel.dists if request.target.intel else "0", 
+                    "/%s" % request.dists if request.dists > 0 else "", request.link), Q[:i] if i>0 else Q.all())), user))
     
     def scanchan(self):
         return Config.get("Channels", "scans") if "scans" in Config.options("Channels") else Config.get("Channels", "home")
