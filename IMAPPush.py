@@ -116,6 +116,14 @@ class Idler(threading.Thread):
     def robonotify(self, header, body):
         # Check for correct "From" address?
         uname = re.findall("(.+)@.+", header['To'])[0].split()[1]
+        dsuff = Config.get("imap", "defsuffix")
+        if dsuff:
+            if uname[-len(dsuff):] == dsuff:
+                uname = uname[:-len(dsuff)]
+            else:
+                self.forwardMail(uname, header, body)
+                return
+
         tick = re.findall("events in tick (\d+)", body)[0]
         newfleets = re.findall("We have detected an open jumpgate from (.+), located at (\d{1,2}):(\d{1,2}):(\d{1,2}). " +\
                                "The fleet will approach our system in tick (\d+) and appears to have (\d+) visible ships.", body)
