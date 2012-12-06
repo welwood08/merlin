@@ -57,7 +57,7 @@ class defcall(loadable):
             uname = "%s (whoever that is??)" % (uname)
             ucoords = "x:x:x"
             addr = Config.get("imap", "bounce")
-            email = "Bad username in notifications: %s\n\nOriginal notification:\n\n\n"
+            email = "Bad username in notifications: %s\n\nOriginal notification:\n\n\n" % (uname)
         else:
             uname = "%s%s" % (user.name, ("(%s)" % (user.alias)) if user.alias else "")
             ucoords = "%d:%d:%d" % (user.planet.x, user.planet.y, user.planet.z)
