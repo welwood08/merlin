@@ -24,7 +24,7 @@ These issues can be addressed by implementing Access Control Lists (ACLs) in
 the following fashion.
 
 1) Make sure ACLs are enabled for your system. Usually, this requires mounting
-   the filesystem in question with the "acl" option. See /ets/fstab. Also make
+   the filesystem in question with the "acl" option. See /etc/fstab. Also make
    sure ACL utilities are installed (e.g. "aptitude install acl" on Debian).
 
 2) In the following, we will assume that excalibur.py and merlin.py are running
