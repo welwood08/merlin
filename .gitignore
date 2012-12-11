@@ -14,3 +14,4 @@ dumplog.old.txt
 *_test/*
 messy_merlin/*
 tablenames
+PG_setup.txt
