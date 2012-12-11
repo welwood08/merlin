@@ -2,23 +2,23 @@ Merlin
 ========
 
 Merlin is the Copyright &copy; 2012 of Robin K. Hansen, Elliot Rosemarine, Andreas Jacobsen.
+This version was modified and added to by Martin Stone.
 Please read the included LICENSE.
 
 Installation Requirements
 ----------------------------
 
-Requirements: 
+Requirements (tested on):
 
 + Git 
-+ Python 2*
-+ PostgreSQL 8*
-+ psycopg2 2.2.1
-+ SQLAlchemy 0.6.3
++ Python 2.7.*
++ PostgreSQL 9.1
++ psycopg2 2.4.5
++ SQLAlchemy 0.7.8
 
 Additional Arthur requirements: 
 
-+ Apache 2.2
-+ mod_wsgi
++ Apache 2.2 + mod_wsgi (also tested with nginx)
 + Django 
 + Jinja2 2.6
 
@@ -47,7 +47,7 @@ Installation Instructions
 
 Use Git to download the code and create a branch to track your changes:
 
-	git clone git://github.com/ellonweb/merlin.git
+	git clone git://github.com/d7415/merlin.git
 	cd merlin
 	git checkout -b <your_branch_name>
 	
@@ -60,7 +60,7 @@ To update the code to the latest available source:
 
 	git checkout master
 	git pull
-    git checkout <your_branch_name>
+	git checkout <your_branch_name>
 	git rebase master
 	
 This will re-apply your changes on top of the latest source. If you made some incompatible changes you might need to modify your change!
@@ -85,6 +85,8 @@ Preparing merlin
 ----------------------------
 
 Inspect and modify merlin.cfg in an editor as required. You should only need to change the Connection, Admin, Alliance, Channel and DB settings. If you're using the SMS features you'll need to add your details in the clickatell and googlevoice section and check the sms setting in Misc.
+
+Additionally, excalibur.sh will need updating for the relevant DB and the relevant excalibur.*.py will need updating if you change the prefix.
 
 >Note Graphing can be completely disabled in the config, look for - graphing  : and append "cached", "enabled", or "disabled" depending on which you want!
        
