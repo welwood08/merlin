@@ -43,6 +43,5 @@ __all__ = ["system",
            "quotes",
            "links",
            "galstatus",
-           "newb",
            "broadcast",
            ]
