@@ -1,3 +1,4 @@
+<pre>This branch has been integrated into master and is obsolete.</pre>
 Merlin
 ========
 
