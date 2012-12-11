@@ -34,6 +34,11 @@ from Core.config import Config
 from Core.robocop import push
 from time import sleep
 
+from Core.maps import User
+from smtplib import SMTP, SMTPException, SMTPSenderRefused, SMTPRecipientsRefused
+from ssl import SSLError
+from Core.exceptions_ import SMSError
+
 ServerTimeout = 29 # Mins (leave if you're not sure)
 
 DEBUG = False # debugMsg() prints the parameter passed if DEBUG is True
@@ -111,6 +116,14 @@ class Idler(threading.Thread):
     def robonotify(self, header, body):
         # Check for correct "From" address?
         uname = re.findall("(.+)@.+", header['To'])[0].split()[1]
+        dsuff = Config.get("imap", "defsuffix")
+        if dsuff:
+            if uname[-len(dsuff):] == dsuff:
+                uname = uname[:-len(dsuff)]
+            else:
+                self.forwardMail(uname, header, body)
+                return
+
         tick = re.findall("events in tick (\d+)", body)[0]
         newfleets = re.findall("We have detected an open jumpgate from (.+), located at (\d{1,2}):(\d{1,2}):(\d{1,2}). " +\
                                "The fleet will approach our system in tick (\d+) and appears to have (\d+) visible ships.", body)
@@ -126,6 +139,61 @@ class Idler(threading.Thread):
             push("defcall", etype="rec", uname=uname, tick=tick, name=line[0], x=line[1], y=line[2], z=line[3])
         if res + cons > 0:
             push("defcall", etype="fin", uname=uname, tick=tick, res=(1 if res else 0))
+
+        if len(newfleets) + len(recalls) + len(cons) + len(res) == 0:
+            self.forwardMail(uname, header, body)
+
+
+    """
+    Decide whether to forward mail.
+    """
+    def forwardMail(self, uname, header, body):
+        if not Config.getboolean("imap", "forwarding"):
+            return
+        body = "Original Message from %s\n\n" % (header['From']) + body
+        user = User.load(uname)
+        if user:
+            addr = user.email
+        else:
+            addr = Config.get("imap", "bounce")
+            body = "Bad username: %s\n\n" % (uname) + body
+        if addr:
+            self.send_email(header['Subject'], body, addr)
+
+
+    """
+    Send an email using smtplib.
+    """
+    def send_email(self, subject, message, addr):
+        try:
+            if (Config.get("smtp", "port") == "0"):
+                smtp = SMTP("localhost")
+            else:
+                smtp = SMTP(Config.get("smtp", "host"), Config.get("smtp", "port"))
+
+            if not ((Config.get("smtp", "host") == "localhost") or (Config.get("smtp", "host") == "127.0.0.1")):
+                try:
+                    smtp.starttls()
+                except SMTPException as e:
+                    raise SMSError("unable to shift connection into TLS: %s" % (str(e),))
+
+                try:
+                    smtp.login(Config.get("smtp", "user"), Config.get("smtp", "pass"))
+                except SMTPException as e:
+                    raise SMSError("unable to authenticate: %s" % (str(e),))
+
+            try:
+                 smtp.sendmail(Config.get("smtp", "frommail"), addr, "To:%s\nFrom:%s\nSubject:%s\n%s\n" % (addr, "\"%s\" <%s>" % (
+                                                               Config.get("Alliance", "name"), Config.get("smtp", "frommail")), subject, message))
+            except SMTPSenderRefused as e:
+                raise SMSError("sender refused: %s" % (str(e),))
+            except SMTPRecipientsRefused as e:
+                raise SMSError("unable to send: %s" % (str(e),))
+
+            smtp.quit()
+
+        except (socket.error, SSLError, SMTPException, SMSError) as e:
+            return "Error sending message: %s" % (str(e),)
 
         
     """
