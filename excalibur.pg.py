@@ -25,8 +25,8 @@ from Core.config import Config
 from Core.paconf import PA
 from Core.string import decode, excaliburlog
 from Core.db import true, false, session
-from Core.maps import Updates, Cluster, Galaxy, Planet, Alliance, epenis, galpenis, apenis
-from Core.maps import galaxy_temp, planet_temp, alliance_temp, planet_new_id_search, planet_old_id_search
+from Core.maps import Updates, Cluster, Galaxy, Planet, epenis, galpenis
+from Core.maps import galaxy_temp, planet_temp, planet_new_id_search, planet_old_id_search
 
 prefixes = ['ally_']
 
@@ -57,7 +57,6 @@ while True:
         try:
             planets = urllib2.urlopen(Config.get("URL", "planets"))
             galaxies = urllib2.urlopen(Config.get("URL", "galaxies"))
-            alliances = urllib2.urlopen(Config.get("URL", "alliances"))
         except Exception, e:
             excaliburlog("Failed gathering dump files.\n%s" % (str(e),))
             time.sleep(300)
@@ -89,22 +88,10 @@ while True:
         excaliburlog("Galaxy dump for tick %s" % (galaxy_tick,))
         galaxies.readline();galaxies.readline();galaxies.readline();
 
-        # As above
-        alliances.readline();alliances.readline();alliances.readline();
-        tick=alliances.readline()
-        m=re.search(r"tick:\s+(\d+)",tick,re.I)
-        if not m:
-            excaliburlog("Invalid tick: '%s'" % (tick,))
-            time.sleep(120)
-            continue
-        alliance_tick=int(m.group(1))
-        excaliburlog("Alliance dump for tick %s" % (alliance_tick,))
-        alliances.readline();alliances.readline();alliances.readline();
-
         # Check the ticks of the dumps are all the same and that it's
         #  greater than the previous tick, i.e. a new tick
-        if not (planet_tick == galaxy_tick  == alliance_tick):
-            excaliburlog("Varying ticks found, sleeping\nPlanet: %s, Galaxy: %s, Alliance: %s" % (planet_tick,galaxy_tick,alliance_tick))
+        if not (planet_tick == galaxy_tick):
+            excaliburlog("Varying ticks found, sleeping\nPlanet: %s, Galaxy: %s, Alliance: %s" % (planet_tick,galaxy_tick))
             time.sleep(30)
             continue
         if not planet_tick > last_tick:
@@ -126,7 +113,6 @@ while True:
         # Empty out the temp tables
         session.execute(galaxy_temp.delete())
         session.execute(planet_temp.delete())
-        session.execute(alliance_temp.delete())
 
         # If the new tick is below the shuffle tick, empty out all the data
         #  and don't store anything from the dumps other than the tick itself
@@ -134,7 +120,6 @@ while True:
             excaliburlog("Pre-shuffle dumps detected, emptying out the data")
             planets = None
             galaxies = None
-            alliances = None
 
         # Insert the data to the temporary tables
         # Planets
@@ -161,18 +146,6 @@ while True:
                                                 "value": int(g[5] or 0),
                                                 "xp": int(g[6] or 0),
                                                } for g in [decode(line).strip().split("\t") for line in galaxies]]) if galaxies else None
-        # Alliances
-        session.execute(alliance_temp.insert(), [{
-                                                "score_rank": int(a[0]),
-                                                "name": a[1].strip("\""),
-                                                "size": int(a[2] or 0),
-                                                "members": int(a[3] or 1),
-                                                "score": int(a[4] or 0),
-                                                "points": int(a[5] or 0),
-                                                "size_avg": int(a[2] or 0) / int(a[3] or 1),
-                                                "score_avg": int(a[4] or 0) / min(int(a[3] or 1), PA.getint("numbers", "tag_count")),
-                                                "points_avg": int(a[5] or 0) / int(a[3] or 1),
-                                               } for a in [decode(line).strip().split("\t") for line in alliances]]) if alliances else None
 
         t2=time.time()-t1
         excaliburlog("Inserted dumps in %.3f seconds" % (t2,))
@@ -784,158 +757,6 @@ while True:
         excaliburlog("Planet stats in in %.3f seconds" % (t2,))
         t1=time.time()
 
-# ########################################################################### #
-# #############################    ALLIANCES    ############################# #
-# ########################################################################### #
-
-        # Update the newly dumped data with IDs from the current data
-        #  based on a name match in the two tables (and active=True)
-        session.execute(text("""UPDATE alliance_temp AS t SET
-                                  id = a.id
-                                FROM (SELECT id, name FROM alliance) AS a
-                                  WHERE t.name = a.name
-                            ;"""))
-
-        # Make sure all the alliances are active,
-        #  some might have been deactivated previously
-        session.execute(text("UPDATE alliance SET active = :true;", bindparams=[true]))
-
-        t2=time.time()-t1
-        excaliburlog("Copy alliance ids to temp and activate in %.3f seconds" % (t2,))
-        t1=time.time()
-
-        # Any alliances in the temp table without an id are new
-        # Insert them to the current table and the id(serial/auto_increment)
-        #  will be generated, and we can then copy it back to the temp table
-        session.execute(text("INSERT INTO alliance (name, active) SELECT name, :true FROM alliance_temp WHERE id IS NULL;", bindparams=[true]))
-        session.execute(text("UPDATE alliance_temp SET id = (SELECT id FROM alliance WHERE alliance.name = alliance_temp.name AND alliance.active = :true ORDER BY alliance.id DESC) WHERE id IS NULL;", bindparams=[true]))
-
-        # For alliances that are no longer present in the new dump, we will
-        #  NULL all the data, leaving only the name and id for FKs
-        session.execute(text("UPDATE alliance SET active = :false WHERE id NOT IN (SELECT id FROM alliance_temp WHERE id IS NOT NULL);", bindparams=[false]))
-
-        t2=time.time()-t1
-        excaliburlog("Deactivate old alliances and generate new alliance ids in %.3f seconds" % (t2,))
-        t1=time.time()
-
-        # Update everything from the temp table and generate ranks
-        # Deactivated items are untouched but NULLed earlier
-        session.execute(text("""UPDATE alliance AS a SET
-                                  age = COALESCE(a.age, 0) + 1,
-                                  size = t.size, members = t.members, score = t.score, points = t.points,
-                                  size_avg = t.size_avg, score_avg = t.score_avg, points_avg = t.points_avg,
-                                  ratio = CASE WHEN (t.score != 0) THEN 10000.0 * t.size / t.score ELSE 0 END,
-                             """ + (
-                             """
-                                  size_growth = t.size - COALESCE(a.size - a.size_growth, 0),
-                                  score_growth = t.score - COALESCE(a.score - a.score_growth, 0),
-                                  points_growth = t.points - COALESCE(a.points - a.points_growth, 0),
-                                  member_growth = t.members - COALESCE(a.members - a.member_growth, 0),
-                                  size_growth_pc = CASE WHEN (a.size - a.size_growth != 0) THEN COALESCE((t.size - (a.size - a.size_growth)) * 100.0 / (a.size - a.size_growth), 0) ELSE 0 END,
-                                  score_growth_pc = CASE WHEN (a.score - a.score_growth != 0) THEN COALESCE((t.score - (a.score - a.score_growth)) * 100.0 / (a.score - a.score_growth), 0) ELSE 0 END,
-                                  points_growth_pc = CASE WHEN (a.points - a.points_growth != 0) THEN COALESCE((t.points - (a.points - a.points_growth)) * 100.0 / (a.points - a.points_growth), 0) ELSE 0 END,
-                                  size_avg_growth = t.size_avg - COALESCE(a.size_avg - a.size_avg_growth, 0),
-                                  score_avg_growth = t.score_avg - COALESCE(a.score_avg - a.score_avg_growth, 0),
-                                  points_avg_growth = t.points_avg - COALESCE(a.points_avg - a.points_avg_growth, 0),
-                                  size_avg_growth_pc = CASE WHEN (a.size_avg - a.size_avg_growth != 0) THEN COALESCE((t.size_avg - (a.size_avg - a.size_avg_growth)) * 100.0 / (a.size_avg - a.size_avg_growth), 0) ELSE 0 END,
-                                  score_avg_growth_pc = CASE WHEN (a.score_avg - a.score_avg_growth != 0) THEN COALESCE((t.score_avg - (a.score_avg - a.score_avg_growth)) * 100.0 / (a.score_avg - a.score_avg_growth), 0) ELSE 0 END,
-                                  points_avg_growth_pc = CASE WHEN (a.points_avg - a.points_avg_growth != 0) THEN COALESCE((t.points_avg - (a.points_avg - a.points_avg_growth)) * 100.0 / (a.points_avg - a.points_avg_growth), 0) ELSE 0 END,
-                                  size_rank_change = t.size_rank - COALESCE(a.size_rank - a.size_rank_change, 0),
-                                  members_rank_change = t.members_rank - COALESCE(a.members_rank - a.members_rank_change, 0),
-                                  score_rank_change = t.score_rank - COALESCE(a.score_rank - a.score_rank_change, 0),
-                                  points_rank_change = t.points_rank - COALESCE(a.points_rank - a.points_rank_change, 0),
-                                  size_avg_rank_change = t.size_avg_rank - COALESCE(a.size_avg_rank - a.size_avg_rank_change, 0),
-                                  score_avg_rank_change = t.score_avg_rank - COALESCE(a.score_avg_rank - a.score_avg_rank_change, 0),
-                                  points_avg_rank_change = t.points_avg_rank - COALESCE(a.points_avg_rank - a.points_avg_rank_change, 0),
-                                  totalroundroids_rank_change = t.totalroundroids_rank - COALESCE(a.totalroundroids_rank - a.totalroundroids_rank_change, 0),
-                                  totallostroids_rank_change = t.totallostroids_rank - COALESCE(a.totallostroids_rank - a.totallostroids_rank_change, 0),
-                                  totalroundroids_growth = t.totalroundroids - COALESCE(a.totalroundroids - a.totalroundroids_growth, 0),
-                                  totalroundroids_growth_pc = CASE WHEN (a.totalroundroids - a.totalroundroids_growth != 0) THEN COALESCE((t.totalroundroids - (a.totalroundroids - a.totalroundroids_growth)) * 100.0 / (a.totalroundroids - a.totalroundroids_growth), 0) ELSE 0 END,
-                                  totallostroids_growth = t.totallostroids - COALESCE(a.totallostroids - a.totallostroids_growth, 0),
-                                  totallostroids_growth_pc = CASE WHEN (a.totallostroids - a.totallostroids_growth != 0) THEN COALESCE((t.totallostroids - (a.totallostroids - a.totallostroids_growth)) * 100.0 / (a.totallostroids - a.totallostroids_growth), 0) ELSE 0 END,
-                             """ if not midnight
-                                 else
-                             """
-                                  size_growth = t.size - COALESCE(a.size, 0),
-                                  score_growth = t.score - COALESCE(a.score, 0),
-                                  points_growth = t.points - COALESCE(a.points, 0),
-                                  member_growth = t.members - COALESCE(a.members, 0),
-                                  size_growth_pc = CASE WHEN (a.size != 0) THEN COALESCE((t.size - a.size) * 100.0 / a.size, 0) ELSE 0 END,
-                                  score_growth_pc = CASE WHEN (a.score != 0) THEN COALESCE((t.score - a.score) * 100.0 / a.score, 0) ELSE 0 END,
-                                  points_growth_pc = CASE WHEN (a.points != 0) THEN COALESCE((t.points - a.points) * 100.0 / a.points, 0) ELSE 0 END,
-                                  size_avg_growth = t.size_avg - COALESCE(a.size_avg, 0),
-                                  score_avg_growth = t.score_avg - COALESCE(a.score_avg, 0),
-                                  points_avg_growth = t.points_avg - COALESCE(a.points_avg, 0),
-                                  size_avg_growth_pc = CASE WHEN (a.size_avg != 0) THEN COALESCE((t.size_avg - a.size_avg) * 100.0 / a.size_avg, 0) ELSE 0 END,
-                                  score_avg_growth_pc = CASE WHEN (a.score_avg != 0) THEN COALESCE((t.score_avg - a.score_avg) * 100.0 / a.score_avg, 0) ELSE 0 END,
-                                  points_avg_growth_pc = CASE WHEN (a.points_avg != 0) THEN COALESCE((t.points_avg - a.points_avg) * 100.0 / a.points_avg, 0) ELSE 0 END,
-                                  size_rank_change = t.size_rank - COALESCE(a.size_rank, 0),
-                                  members_rank_change = t.members_rank - COALESCE(a.members_rank, 0),
-                                  score_rank_change = t.score_rank - COALESCE(a.score_rank, 0),
-                                  points_rank_change = t.points_rank - COALESCE(a.points_rank, 0),
-                                  size_avg_rank_change = t.size_avg_rank - COALESCE(a.size_avg_rank, 0),
-                                  score_avg_rank_change = t.score_avg_rank - COALESCE(a.score_avg_rank, 0),
-                                  points_avg_rank_change = t.points_avg_rank - COALESCE(a.points_avg_rank, 0),
-                                  totalroundroids_rank_change = t.totalroundroids_rank - COALESCE(a.totalroundroids_rank, 0),
-                                  totallostroids_rank_change = t.totallostroids_rank - COALESCE(a.totallostroids_rank, 0),
-                                  totalroundroids_growth = t.totalroundroids - COALESCE(a.totalroundroids, 0),
-                                  totalroundroids_growth_pc = CASE WHEN (a.totalroundroids != 0) THEN COALESCE((t.totalroundroids - a.totalroundroids) * 100.0 / a.totalroundroids, 0) ELSE 0 END,
-                                  totallostroids_growth = t.totallostroids - COALESCE(a.totallostroids, 0),
-                                  totallostroids_growth_pc = CASE WHEN (a.totallostroids != 0) THEN COALESCE((t.totallostroids - a.totallostroids) * 100.0 / a.totallostroids, 0) ELSE 0 END,
-                             """ ) +
-                             """
-                                  ticksroiding = COALESCE(a.ticksroiding, 0) + CASE WHEN (t.size > a.size) THEN 1 ELSE 0 END,
-                                  ticksroided = COALESCE(a.ticksroided, 0) + CASE WHEN (t.size < a.size) THEN 1 ELSE 0 END,
-                                  tickroids = COALESCE(a.tickroids, 0) + t.size,
-                                  avroids = COALESCE((a.tickroids + t.size) / (a.age + 1.0), t.size),
-                             """ + ((
-                             """
-                                  %s_highest_rank = CASE WHEN (t.%s_rank <= COALESCE(a.%s_highest_rank, t.%s_rank)) THEN t.%s_rank ELSE a.%s_highest_rank END,
-                                  %s_highest_rank_tick = CASE WHEN (t.%s_rank <= COALESCE(a.%s_highest_rank, t.%s_rank)) THEN :tick ELSE a.%s_highest_rank_tick END,
-                                  %s_lowest_rank = CASE WHEN (t.%s_rank >= COALESCE(a.%s_lowest_rank, t.%s_rank)) THEN t.%s_rank ELSE a.%s_lowest_rank END,
-                                  %s_lowest_rank_tick = CASE WHEN (t.%s_rank >= COALESCE(a.%s_lowest_rank, t.%s_rank)) THEN :tick ELSE a.%s_lowest_rank_tick END,
-                             """ * 7) % (("size",)*22 + ("members",)*22 + ("score",)*22 + ("points",)*22 + ("size_avg",)*22 + ("score_avg",)*22 + ("points_avg",)*22)) +
-                             """
-                                  totalroundroids = t.totalroundroids, totallostroids = t.totallostroids,
-                                  totalroundroids_rank = t.totalroundroids_rank, totallostroids_rank = t.totallostroids_rank,
-                                  size_rank = t.size_rank, members_rank = t.members_rank, score_rank = t.score_rank, points_rank = t.points_rank,
-                                  size_avg_rank = t.size_avg_rank, score_avg_rank = t.score_avg_rank, points_avg_rank = t.points_avg_rank,
-                                  sdiff = COALESCE(t.score - a.score, 0),
-                                  pdiff = COALESCE(t.points - a.points, 0),
-                                  rdiff = COALESCE(t.size - a.size, 0),
-                                  mdiff = COALESCE(t.members - a.members, 0),
-                                  srankdiff = COALESCE(t.score_rank - a.score_rank, 0),
-                                  prankdiff = COALESCE(t.points_rank - a.points_rank, 0),
-                                  rrankdiff = COALESCE(t.size_rank - a.size_rank, 0),
-                                  mrankdiff = COALESCE(t.members_rank - a.members_rank, 0),
-                                  savgdiff = COALESCE(t.score_avg - a.score_avg, 0),
-                                  pavgdiff = COALESCE(t.points_avg - a.points_avg, 0),
-                                  ravgdiff = COALESCE(t.size_avg - a.size_avg, 0),
-                                  savgrankdiff = COALESCE(t.score_avg_rank - a.score_avg_rank, 0),
-                                  pavgrankdiff = COALESCE(t.points_avg_rank - a.points_avg_rank, 0),
-                                  ravgrankdiff = COALESCE(t.size_avg_rank - a.size_avg_rank, 0),
-                                  idle = CASE WHEN ((t.score-a.score) BETWEEN (a.sdiff-1) AND (a.sdiff+1)) THEN 1 + COALESCE(a.idle, 0) ELSE 0 END
-                                FROM (SELECT *,
-                                  rank() OVER (ORDER BY totalroundroids DESC) AS totalroundroids_rank,
-                                  rank() OVER (ORDER BY totallostroids DESC) AS totallostroids_rank,
-                                  rank() OVER (ORDER BY size DESC) AS size_rank,
-                                  rank() OVER (ORDER BY points DESC) AS points_rank,
-                                  rank() OVER (ORDER BY members DESC) AS members_rank,
-                                  rank() OVER (ORDER BY size_avg DESC) AS size_avg_rank,
-                                  rank() OVER (ORDER BY score_avg DESC) AS score_avg_rank,
-                                  rank() OVER (ORDER BY points_avg DESC) AS points_avg_rank
-                                FROM (SELECT t.*,
-                                  COALESCE(a.totalroundroids + (GREATEST(t.size - a.size, 0)), t.size) AS totalroundroids,
-                                  COALESCE(a.totallostroids + (GREATEST(a.size - t.size, 0)), 0) AS totallostroids
-                                FROM alliance AS a, alliance_temp AS t
-                                  WHERE a.id = t.id AND a.active = :true) AS t) AS t
-                                  WHERE a.id = t.id
-                                AND a.active = :true
-                            ;""", bindparams=[tick, true]))
-
-        t2=time.time()-t1
-        excaliburlog("Update alliances from temp and generate ranks in %.3f seconds" % (t2,))
-        t1=time.time()
 
 # ########################################################################### #
 # ##################   HISTORY: EVERYTHING BECOMES FINAL   ################## #
@@ -946,7 +767,6 @@ while True:
                                   clusters  = (SELECT count(*) FROM cluster  WHERE cluster.active  = :true),
                                   galaxies  = (SELECT count(*) FROM galaxy   WHERE galaxy.active   = :true),
                                   planets   = (SELECT count(*) FROM planet   WHERE planet.active   = :true),
-                                  alliances = (SELECT count(*) FROM alliance WHERE alliance.active = :true),
                                   c200     = (SELECT count(*) FROM planet WHERE planet.active = :true AND x = 200),
                                   ter      = (SELECT count(*) FROM planet WHERE planet.active = :true AND race ILIKE 'ter%'),
                                   cat      = (SELECT count(*) FROM planet WHERE planet.active = :true AND race ILIKE 'cat%'),
@@ -964,7 +784,6 @@ while True:
         session.execute(text("INSERT INTO cluster_history SELECT :tick, :hour, :timestamp, * FROM cluster ORDER BY x ASC;", bindparams=[tick, hour, timestamp]))
         session.execute(text("INSERT INTO galaxy_history SELECT :tick, :hour, :timestamp, * FROM galaxy ORDER BY id ASC;", bindparams=[tick, hour, timestamp]))
         session.execute(text("INSERT INTO planet_history SELECT :tick, :hour, :timestamp, * FROM planet ORDER BY id ASC;", bindparams=[tick, hour, timestamp]))
-        session.execute(text("INSERT INTO alliance_history SELECT :tick, :hour, :timestamp, * FROM alliance ORDER BY id ASC;", bindparams=[tick, hour, timestamp]))
 
         t2=time.time()-t1
         excaliburlog("History in %.3f seconds" % (t2,))
@@ -999,12 +818,6 @@ session.execute(text("SELECT setval('galpenis_rank_seq', 1, :false);", bindparam
 session.execute(text("INSERT INTO galpenis (galaxy_id, penis) SELECT galaxy.id, galaxy.score - galaxy_history.score FROM galaxy, galaxy_history WHERE galaxy.active = :true AND galaxy.x != 200 AND galaxy.id = galaxy_history.id AND galaxy_history.tick = :tick ORDER BY galaxy.score - galaxy_history.score DESC;", bindparams=[history_tick, true]))
 t2=time.time()-t1
 excaliburlog("galpenis in %.3f seconds" % (t2,))
-t1=time.time()
-session.execute(apenis.__table__.delete())
-session.execute(text("SELECT setval('apenis_rank_seq', 1, :false);", bindparams=[false]))
-session.execute(text("INSERT INTO apenis (alliance_id, penis) SELECT alliance.id, alliance.score - alliance_history.score FROM alliance, alliance_history WHERE alliance.active = :true AND alliance.id = alliance_history.id AND alliance_history.tick = :tick ORDER BY alliance.score - alliance_history.score DESC;", bindparams=[history_tick, true,]))
-t2=time.time()-t1
-excaliburlog("apenis in %.3f seconds" % (t2,))
 t1=time.time()
 for prefix in prefixes:
     t2=time.time()
