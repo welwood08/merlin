@@ -42,22 +42,35 @@ class tick(loadable):
             message.reply(str(tick))
         else:
             diff = int(params.group(1)) - tick
+            diffh = diff/2
             now = datetime.utcnow()
             seconds = 0
             retstr = ""
             if diff > 0:
-                
-                if diff > 24:
-                    days = (diff-1)/24
+                mins = 60 - now.minute
+                if not bool(diff%2):
+                    mins += 30 if diff%2 else -30
+                    if diff == 1 and mins > 60:
+                        mins -= 60
+                if now.minute <= 30:
+                    mins -= 30
+
+                if diffh > 23:
+                    days = (diffh)/24
                     seconds += days*24*60*60
                     retstr += "%sd " % (days,)
                 
                 if diff > 1:
-                    hours = (diff-1)%24
+                    hours = (diffh)%24
+                    if mins < 0:
+                        mins += 60
+                        hours -= 1
+                    elif mins >= 60:
+                        mins -= 60
+                        hours += 1
                     seconds += hours*60*60
                     retstr += "%sh " % (hours,)
                 
-                mins = 60 - now.minute
                 seconds += mins *60
                 retstr += "%sm" % (mins,)
                 
