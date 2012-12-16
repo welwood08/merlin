@@ -52,8 +52,9 @@ class launch(loadable):
 
         current_time = datetime.datetime.utcnow()
         launch_tick = land_tick - eta
-        launch_time = current_time + datetime.timedelta(hours=(launch_tick-current_tick))
+        launch_time = current_time + datetime.timedelta(minutes=30*(launch_tick-current_tick))
+        launch_time_str = launch_time.strftime("%m-%d %H:55") if launch_time.minute > 30 else launch_time.strftime("%m-%d %H:25")
         prelaunch_tick = land_tick - eta + 1
         prelaunch_mod = launch_tick - current_tick
 
-        message.reply("eta %d landing pt %d (currently %d) must launch at pt %d (%s), or with prelaunch tick %d (currently %+d)" % (eta, land_tick, current_tick, launch_tick, (launch_time.strftime("%m-%d %H:55")), prelaunch_tick, prelaunch_mod))
+        message.reply("eta %d landing pt %d (currently %d) must launch at pt %d (%s), or with prelaunch tick %d (currently %+d)" % (eta, land_tick, current_tick, launch_tick, launch_time_str, prelaunch_tick, prelaunch_mod))
