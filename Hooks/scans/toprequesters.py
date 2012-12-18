@@ -40,10 +40,11 @@ class toprequesters(loadable):
         tick=Updates.current_tick()
         age = int(params.group(1))
         num = int(params.group(2))
-        totals = session.query(Request.requester_id, count('*').label('req_count')).filter(Request.tick >= (tick-age) if age > 0 else 0).group_by(Request.requester_id).subquery()
+        totals = session.query(Request.requester_id, count('*').label('req_count')).filter(Request.tick >= ((tick-age) if age > 0 else 0)).group_by(Request.requester_id).subquery()
 
         Q = session.query(User.name, User.alias, totals.c.req_count)
         Q = Q.outerjoin((totals, User.id == totals.c.requester_id))
+        Q = Q.filter(totals.c.req_count > 0)
         Q = Q.order_by(desc(totals.c.req_count))
         result = Q.all()
         if len(result) < 1:
