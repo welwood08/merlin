@@ -44,7 +44,7 @@ class topscanners(loadable):
         totals = session.query(Scan.scanner_id, count('*').label('s_count'))
         if params.group(3) is None:
             totals = totals.join((Request, Scan.id == Request.scan_id))
-        totals = totals.filter(Scan.tick >= (tick-age) if age > 0 else 0).group_by(Scan.scanner_id).subquery()
+        totals = totals.filter(Scan.tick >= ((tick-age) if age > 0 else 0)).group_by(Scan.scanner_id).subquery()
 
         Q = session.query(User.name, User.alias, totals.c.s_count)
         Q = Q.outerjoin((totals, User.id == totals.c.scanner_id))
