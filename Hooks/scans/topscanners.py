@@ -48,6 +48,7 @@ class topscanners(loadable):
 
         Q = session.query(User.name, User.alias, totals.c.s_count)
         Q = Q.outerjoin((totals, User.id == totals.c.scanner_id))
+        Q = Q.filter(totals.c.s_count > 0)
         Q = Q.order_by(desc(totals.c.s_count))
         result = Q.all()
         if len(result) < 1:
