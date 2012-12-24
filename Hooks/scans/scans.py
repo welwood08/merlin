@@ -59,7 +59,7 @@ class scans(loadable):
         nicks = []
         reply = "%s on %s:%s:%s " % (PA.get(scantype,"name"),x,y,z,)
         if ("showscanner" in Config.options("Misc") and Config.getboolean("Misc", "showscanner")):
-            reply+= "from %s " % (User.load(id=scanner).name) if User.load(id=scanner) is not None else ""
+            reply+= "from %s " % (User.load(id=scanner).name) if User.load(id=scanner) not in (None, 'None') else ""
         reply+= Config.get("URL","viewscan") % (pa_id,)
         
         for name in names.split(","):
