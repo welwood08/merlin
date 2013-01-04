@@ -78,8 +78,8 @@ class request(loadable):
                         return
 
                 # Reject requests for incoming scans
-                if scantype == "I":
-                    message.alert("Incoming scans can only be performed by the planet under attack.")
+                if not PA.getboolean(scantype, "request"):
+                    message.alert("%s scans cannot be requested." % (PA.get(scantype, "name")))
                     continue
             
                 if galscan:
