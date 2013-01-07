@@ -86,7 +86,7 @@ class Idler(threading.Thread):
             
         except: #Uh Oh, something went wrong
             print 'ERROR: IMAP Issue. It could be one (or more) of the following:'
-            print '- The impalib2.py file needs to be in the same directory as this file'
+            print '- The imaplib2.py file needs to be in the same directory as this file'
             print '- You\'re not connected to the internet'
             print '- Google\'s mail server(s) is/are down'
             print '- Your username and/or password is incorrect'
