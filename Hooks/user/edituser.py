@@ -66,7 +66,7 @@ class edituser(loadable):
         
         if type(access) == int:
             if member.active == True and member.access < mbraxx and access >= mbraxx:
-                message.privmsg("adduser %s %s 399" %(home, member.name,), Config.get("Services", "nick"))
+                message.privmsg("adduser %s %s 24" %(home, member.name,), Config.get("Services", "nick"))
                 message.reply("%s has been added to %s"%(member.name, home,))
             if member.active == True and member.access >= mbraxx and access < mbraxx:
                 message.privmsg("remuser %s %s"%(home, member.name,), Config.get("Services", "nick"))
@@ -74,7 +74,7 @@ class edituser(loadable):
             member.access = access
         else:
             if member.active != access and access == True and member.access >= mbraxx:
-                message.privmsg("adduser %s %s 399" %(home, member.name,), Config.get("Services", "nick"))
+                message.privmsg("adduser %s %s 24" %(home, member.name,), Config.get("Services", "nick"))
                 message.reply("%s has been added to %s"%(member.name, home,))
             if member.active != access and access == False and member.access >= mbraxx:
                 message.privmsg("remuser %s %s"%(home, member.name,), Config.get("Services", "nick"))
