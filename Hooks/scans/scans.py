@@ -58,7 +58,7 @@ class scans(loadable):
     def robocop(self, message, scantype, pa_id, x, y, z, names, scanner, reqs):
         nicks = []
         reply = "%s on %s:%s:%s " % (PA.get(scantype,"name"),x,y,z,)
-        if ("showscanner" in Config.options("Misc") and Config.getboolean("Misc", "showscanner")):
+        if ("showscanner" in Config.options("Misc") and Config.getboolean("Misc", "showscanner") and scanner != 'None'):
             reply+= "from %s " % (User.load(id=scanner).name) if User.load(id=scanner) not in (None, 'None') else ""
         reply+= Config.get("URL","viewscan") % (pa_id,)
         
