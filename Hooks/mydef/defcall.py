@@ -95,9 +95,9 @@ class defcall(loadable):
             # Nothing to see here. Move along.
             notice = ""
             what = ""
-            if res:
+            if int(res):
                 what = "research"
-                if cons:
+                if int(cons):
                     what += " and construction"
             else:
                 what = "construction"
