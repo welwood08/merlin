@@ -138,7 +138,7 @@ class Idler(threading.Thread):
         for line in recalls:
             push("defcall", etype="rec", uname=uname, tick=tick, name=line[0], x=line[1], y=line[2], z=line[3])
         if res + cons > 0:
-            push("defcall", etype="fin", uname=uname, tick=tick, res=(1 if res else 0))
+            push("defcall", etype="fin", uname=uname, tick=tick, res=res, cons=cons)
 
         if len(newfleets) + len(recalls) + cons + res == 0:
             self.forwardMail(uname, header, body)

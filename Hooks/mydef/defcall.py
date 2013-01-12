@@ -47,7 +47,7 @@ class defcall(loadable):
         message.notice(notice, Config.get("Channels", "home"))
     
     @robohci
-    def robocop(self, message, etype, uname="Unknown", tick=0, x=0, y=0, z=0, name="", eta=0, size=0, res=0):
+    def robocop(self, message, etype, uname="Unknown", tick=0, x=0, y=0, z=0, name="", eta=0, size=0, res=0, cons=0):
         notice = ""
         email = ""
 
@@ -94,7 +94,14 @@ class defcall(loadable):
         elif etype == "fin":
             # Nothing to see here. Move along.
             notice = ""
-            email += "Notification from Planetarion in tick %s\n\nAll %s has finished and none is queued." % (tick, "research" if res else "construction")
+            what = ""
+            if res:
+                what = "research"
+                if cons:
+                    what += " and construction"
+            else:
+                what = "construction"
+            email += "Notification from Planetarion in tick %s\n\nAll %s has finished and none is queued." % (tick, what)
         else:
             return
         # Send email - pref?
