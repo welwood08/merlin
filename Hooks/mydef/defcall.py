@@ -60,7 +60,10 @@ class defcall(loadable):
             email = "Bad username in notifications: %s\n\nOriginal notification:\n\n\n" % (uname)
         else:
             uname = "%s%s" % (user.name, ("(%s)" % (user.alias)) if user.alias else "")
-            ucoords = "%d:%d:%d" % (user.planet.x, user.planet.y, user.planet.z)
+            if user.planet:
+                ucoords = "%d:%d:%d" % (user.planet.x, user.planet.y, user.planet.z)
+            else:
+                ucoords = "idiot"
             addr = user.email
 
         p = Planet.load(x,y,z)
