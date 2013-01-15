@@ -300,7 +300,12 @@ class Idler(threading.Thread):
         
         if not self.killNow: # skips a chunk of code to sys.exit() more quickly.
             
-            if self.IDLEArgs[0][1][0] == ('IDLE terminated (Success)'):
+            try:
+                b = bool(self.IDLEArgs[0][1][0] == ('IDLE terminated (Success)'))
+            except TypeError:
+                b = False
+                self.timeout = True
+            if b:
             # This (above) is sent when either: there has been a timeout (server sends); or, there
             # is new mail. We have to check manually to see if there is new mail. 
                 
