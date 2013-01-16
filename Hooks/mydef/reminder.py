@@ -19,15 +19,27 @@
 # along with this program; if not, write to the Free Software
 # Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA 02110-1301 USA
  
-# List of package modules
-__all__ = [
-           "mydef",
-           "showdef",
-           "searchdef",
-           "usedef",
-           "logdef",
-           "finddef",
-           "theirdef",
-           "defcall",
-           "reminder",
-           ]
+# Module by Martin Stone
+
+import re
+from Core import Merlin
+from Core.exceptions_ import PNickParseError
+from Core.config import Config
+from Core.chanusertracker import CUT
+from Core.loadable import system
+from Core.maps import User, Updates
+
+@system('JOIN')
+def join(message):
+    # Someone is joining a channel
+    if message.get_nick() != Merlin.nick:
+        # Someone is joining a channel we're in
+        try:
+            u = User.load(name=message.get_pnick())
+            if u is None:
+                return
+            defage = Updates.current_tick() - (u.fleetupdated or 0)
+            if defage > (Config.getint("Misc", "defage") if Config.has_option("Misc", "defage") else 25):
+                message.notice("Your mydef is %d ticks old. Update it now!" % (defage), message.get_nick())
+        except PNickParseError:
+            return
