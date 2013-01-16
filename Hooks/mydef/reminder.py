@@ -25,7 +25,6 @@ import re
 from Core import Merlin
 from Core.exceptions_ import PNickParseError
 from Core.config import Config
-from Core.chanusertracker import CUT
 from Core.loadable import system
 from Core.maps import User, Updates
 
