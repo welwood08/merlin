@@ -4,6 +4,7 @@
 Released under the MIT/X11 License
 
 Copyright (c) 2010 -- Chris Kirkham
+Modified 2012-3 by Martin Stone
 
  Permission is hereby granted, free of charge, to any person
  obtaining a copy of this software and associated documentation
