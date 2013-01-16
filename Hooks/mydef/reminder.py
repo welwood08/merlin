@@ -39,7 +39,7 @@ def join(message):
             if u is None:
                 return
             defage = Updates.current_tick() - (u.fleetupdated or 0)
-            if defage > (Config.getint("Misc", "defage") if Config.has_option("Misc", "defage") else 25):
+            if defage > (Config.getint("Misc", "defage") if Config.has_option("Misc", "defage") else 24):
                 message.notice("Your mydef is %d ticks old. Update it now!" % (defage), message.get_nick())
         except PNickParseError:
             return
