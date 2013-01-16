@@ -23,7 +23,7 @@
 
 from Core.config import Config
 from Core.db import session
-from Core.maps import Planet, User, Scan
+from Core.maps import Planet, User, Request
 from Core.loadable import loadable, route, robohci
 from Core.string import errorlog
 from smtplib import SMTP, SMTPException, SMTPSenderRefused, SMTPRecipientsRefused
@@ -116,7 +116,16 @@ class defcall(loadable):
         
         if email and addr:
             self.send_email("Relayed PA Notifications from tick %s" % (tick), email, addr)
-
+        
+        # Check for scans
+	if etype == "new" and p:
+           scan = p.scan("A")
+           if scan and (tick - scan.tick < 3):
+               return
+           else:
+               req = Request(target=p, scantype="A", dists=0)
+               session.commit()
+               push("request", request_id=req.id, mode="request")
 
     def send_email(self, subject, message, addr):
         try:
