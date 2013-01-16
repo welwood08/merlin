@@ -90,7 +90,7 @@ class defcall(loadable):
                     "\n\nThis has been reported to the %s DCs." % (Config.get("Alliance", "name"))
         elif etype == "rec":
             # Message to DC channel *and* main channel
-            notice = "RECALL: %s (%s) has had a recall: Fleet: %s eta %s(%s) from %s:%s:%s" % (uname, ucoords, name, eta, int(eta)-int(tick), x, y, z)
+            notice = "RECALL: %s (%s) has had a recall: Fleet: %s from %s:%s:%s" % (uname, ucoords, name, x, y, z)
             email += "Notification from Planetarion in tick %s\n\n" % (tick) +\
                      "Incoming Fleet %s from %s:%s:%s with eta %s(%s) has recalled." % (name, x, y, z, eta, int(eta)-int(tick)) +\
                     "\n\nThis has been reported to %s." % (Config.get("Alliance", "name"))
