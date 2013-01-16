@@ -29,6 +29,7 @@ from Core.string import errorlog
 from smtplib import SMTP, SMTPException, SMTPSenderRefused, SMTPRecipientsRefused
 from ssl import SSLError
 from Core.exceptions_ import SMSError
+from Core.robocop import push
 
 class defcall(loadable):
     """Make a broadcast to the channel requesting defence"""
