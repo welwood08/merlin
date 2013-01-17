@@ -120,12 +120,13 @@ class defcall(loadable):
             self.send_email("Relayed PA Notifications from tick %s" % (tick), email, addr)
         
         # Check for scans
-	if etype == "new" and p:
+	if etype == "new" and p and user:
            scan = p.scan("A")
            if scan and (tick - scan.tick < 3):
                return
            else:
                req = Request(target=p, scantype="A", dists=0)
+               user.requests.append(req)
                session.commit()
                push("request", request_id=req.id, mode="request")
 
