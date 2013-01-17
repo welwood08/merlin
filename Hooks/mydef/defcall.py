@@ -66,9 +66,10 @@ class defcall(loadable):
                 ucoords = "idiot"
             addr = user.email
 
-        p = Planet.load(x,y,z)
-        if p is None:
-            errorlog("Defcall: Invalid planet in email. Probably an exile.")
+        if etype != "fin":
+            p = Planet.load(x,y,z)
+            if p is None:
+                errorlog("Defcall: Invalid planet in email. Probably an exile.")
 
         if etype == "new":
             # Message to DC channel / main channel. Request scans.
