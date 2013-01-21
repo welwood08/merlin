@@ -122,7 +122,7 @@ class defcall(loadable):
         # Check for scans
 	if etype == "new" and p and user:
            scan = p.scan("A")
-           if scan and (tick - scan.tick < 3):
+           if scan and (int(tick) - scan.tick < 3):
                return
            else:
                req = Request(target=p, scantype="A", dists=0)
