@@ -136,7 +136,6 @@ class Idler(threading.Thread):
         res = len(re.findall("Our scientists report that .+ has been finished", body))
 
         # Wrap it up in a bow
-        lines = []
         for line in newfleets:
             push("defcall", etype="new", uname=uname, tick=tick, name=line[0], x=line[1], y=line[2], z=line[3], eta=line[4], size=line[5])
         for line in recalls:
