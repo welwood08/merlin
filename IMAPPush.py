@@ -51,7 +51,10 @@ main thread (if that's what you call it??) to be used for other stuff -- waiting
 """
 class Idler(threading.Thread):
         
-    imap = imaplib2.IMAP4_SSL("imap.gmail.com") # can be changed to another server if needed
+    if Config.getboolean("imap", "ssl"):
+        imap = imaplib2.IMAP4_SSL(Config.get("imap", "host"))
+    else:
+        imap = imaplib2.IMAP4(Config.get("imap", "host"))
     
     stopWaitingEvent = threading.Event()
     #Now, this stopWaitingEvent thing -- it really does make the whole thing work. Basically, 
