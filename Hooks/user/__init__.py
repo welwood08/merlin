@@ -39,4 +39,5 @@ __all__ = [
            "forcepref",
            "members",
            "paranoidcunts",
+           "tell",
            ]

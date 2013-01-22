@@ -1283,6 +1283,17 @@ for lvl, num in Config.items("Access"):
     # Bind user access functions
     setattr(User, "is_"+lvl, user_access_function(int(num)))
 
+class Tell(Base):
+    __tablename__ = Config.get('DB', 'prefix') + 'tell'
+    id = Column(Integer, primary_key=True)
+    user_id = Column(Integer, ForeignKey(User.id, ondelete='cascade'))
+    sender_id = Column(Integer, ForeignKey(User.id, ondelete='cascade'))
+    read = Column(Boolean, default=False)
+    message = Column(String(255))
+Tell.user = relation(User, primaryjoin=(Tell.user_id==User.id), backref=backref("tells", order_by=desc(Tell.id)))
+Tell.sender = relation(User, primaryjoin=(Tell.sender_id==User.id))
+User.newtells = relation(Tell, primaryjoin=and_(User.id==Tell.user_id, Tell.read==False), order_by=asc(Tell.id))
+
 class Arthur(Base):
     __tablename__ = Config.get('DB', 'prefix') + 'session'
     key = Column(String(255), primary_key=True)
