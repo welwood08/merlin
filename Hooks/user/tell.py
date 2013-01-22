@@ -21,9 +21,11 @@
 #
 # Module by Martin Stone
  
+from Core import Merlin
+from Core.exceptions_ import PNickParseError
 from Core.db import session
 from Core.maps import User, Tell
-from Core.loadable import loadable, route, require_user
+from Core.loadable import loadable, route, require_user, system
 
 class tell(loadable):
     """Sends a message to a user when they next join a channel with me."""
@@ -44,13 +46,6 @@ class tell(loadable):
         session.commit()
 
         message.reply("Successfully stored message for %s. Message: %s" % (receiver.name, text))
-
-
-from Core import Merlin
-from Core.exceptions_ import PNickParseError
-from Core.config import Config
-from Core.loadable import system
-from Core.maps import User, Updates
 
 @system('JOIN')
 def join(message):
