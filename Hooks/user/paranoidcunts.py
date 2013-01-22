@@ -28,35 +28,54 @@ from Core.loadable import loadable, route
 
 class paranoidcunts(loadable):
     """List members who are have not set their phone number properly. Optionally sanity-checks phone numbers."""
-    usage = " [galmates] [check]"
+    usage = " [galmates] [check] [noemail]"
     
     @route(r"(.*)", access = "admin")
     def execute(self, message, user, params):
         reply = ""
         opts = params.group(1).split()
 
+        # pubphone=F
         Q = session.query(User.name, User.alias)
         if ("galmates" not in opts):
             Q = Q.filter(User.access > 0)
         Q = Q.filter(User.pubphone == False)
         Q = Q.order_by(asc(User.name))
         result = Q.all()
+
         if len(result) > 0:
             printable=map(lambda (u, a): "%s%s" % (u,' ('+a+')' if a else ''),result)
         reply += "pubphone=F:    "
         reply += ', '.join(printable)
         reply += '\n'
 
+        # No phone number
         Q = session.query(User.name, User.alias)
         if ("galmates" not in opts):
             Q = Q.filter(User.access > 0)
         Q = Q.filter(User.phone == None)
+        if ("noemail" not in opts):
+            Q = Q.filter(User._smsmode != 'E')
         Q = Q.order_by(asc(User.name))
         result = Q.all()
 
         if len(result) > 0:
             printable=map(lambda (u, a): "%s%s" % (u,' ('+a+')' if a else ''),result)
         reply += "No phone set:  "
+        reply += ', '.join(printable)
+
+        # smsmode=email and no email set
+        Q = session.query(User.name, User.alias)
+        if ("galmates" not in opts):
+            Q = Q.filter(User.access > 0)
+        Q = Q.filter(User._smsmode == 'E')
+        Q = Q.filter(User.email == None)
+        Q = Q.order_by(asc(User.name))
+        result = Q.all()
+
+        if len(result) > 0:
+            printable=map(lambda (u, a): "%s%s" % (u,' ('+a+')' if a else ''),result)
+        reply += "\nNo email set (and smsmode=Email):  "
         reply += ', '.join(printable)
 
         if ("check" in opts):
