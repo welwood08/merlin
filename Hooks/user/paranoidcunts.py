@@ -21,11 +21,10 @@
 #
 # Module by Martin Stone
  
-from sqlalchemy.sql import asc, desc
+from sqlalchemy.sql import asc
 from Core.db import session
 from Core.maps import User
 from Core.loadable import loadable, route
-from Core.config import Config
 
 class paranoidcunts(loadable):
     """List members who are have not set their phone number properly. Optionally sanity-checks phone numbers."""
