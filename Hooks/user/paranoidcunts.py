@@ -50,7 +50,7 @@ class paranoidcunts(loadable):
         Q = session.query(User.name, User.alias)
         if ("galmates" not in opts):
             Q = Q.filter(User.access > 0)
-        Q = Q.filter(User.phone == '')
+        Q = Q.filter(User.phone == None)
         Q = Q.order_by(asc(User.name))
         result = Q.all()
 
