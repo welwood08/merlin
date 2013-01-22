@@ -122,14 +122,21 @@ class defcall(loadable):
         
         # Check for scans
 	if etype == "new" and p and user:
-           scan = p.scan("A")
-           if scan and (int(tick) - scan.tick < 3):
-               return
+           if Config.has_option("Misc", "autoscans"):
+               scantypes = Config.get("Misc", "autoscans")
            else:
-               req = Request(target=p, scantype="A", dists=0)
-               user.requests.append(req)
-               session.commit()
-               push("request", request_id=req.id, mode="request")
+               scantypes = "A"
+           scanage = (Config.getint("Misc", "scanage") or 2)
+
+           for stype in scantypes:
+               scan = p.scan(stype)
+               if scan and (int(tick) - scan.tick <= scanage):
+                   return
+               else:
+                   req = Request(target=p, scantype=stype, dists=0)
+                   user.requests.append(req)
+                   session.commit()
+                   push("request", request_id=req.id, mode="request")
 
     def send_email(self, subject, message, addr):
         try:
