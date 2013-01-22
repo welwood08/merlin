@@ -45,10 +45,8 @@ class paranoidcunts(loadable):
 
         if len(result) > 0:
             printable=map(lambda (u, a): "%s%s" % (u,' ('+a+')' if a else ''),result)
-        else:
-            printable=[]
-        reply += "pubphone=F:    "
-        reply += ', '.join(printable)
+            reply += "pubphone=F:    "
+            reply += ', '.join(printable)
 
         # No phone number
         Q = session.query(User.name, User.alias)
@@ -62,10 +60,8 @@ class paranoidcunts(loadable):
 
         if len(result) > 0:
             printable=map(lambda (u, a): "%s%s" % (u,' ('+a+')' if a else ''),result)
-        else:
-            printable=[]
-        reply += "\nNo phone set:  "
-        reply += ', '.join(printable)
+            reply += "\nNo phone set:  "
+            reply += ', '.join(printable)
 
         # smsmode=email and no email set
         Q = session.query(User.name, User.alias)
@@ -78,10 +74,8 @@ class paranoidcunts(loadable):
 
         if len(result) > 0:
             printable=map(lambda (u, a): "%s%s" % (u,' ('+a+')' if a else ''),result)
-        else:
-            printable=[]
-        reply += "\nNo email set (and smsmode=Email):  "
-        reply += ', '.join(printable)
+            reply += "\nNo email set (and smsmode=Email):  "
+            reply += ', '.join(printable)
 
         if ("check" in opts):
             Q = session.query(User.name, User.alias, User.phone)
@@ -96,8 +90,8 @@ class paranoidcunts(loadable):
                     res.append([u,a,n])
             if len(res) > 0:
                 printable=map(lambda (u, a, n): "%s%s: %s" % (u,' ('+a+')' if a else '',n),res)
-            else:
-                printable=[]
-            reply += "\nBad number:    %s" % (', '.join(printable))
+                reply += "\nBad number:    %s" % (', '.join(printable))
 
+        if reply == "":
+            reply = "No paranoid cunts found. Congratulations!"
         message.reply(reply)
