@@ -244,7 +244,7 @@ class request(loadable):
             message.reply("There are no open scan requests")
             return
         
-        message.reply(" ".join(map(lambda request: "[%s: (%s%s) %s %s:%s:%s]" % (request.id, request.target.intel.dists if request.target.intel else "0",
+        message.reply(" ".join(map(lambda request: Config.get("Misc", "reqlist").decode("string_escape") % (request.id, request.target.intel.dists if request.target.intel else "0",
                 "/%s" % request.dists if request.dists > 0 else "", request.scantype, request.target.x, request.target.y, request.target.z,), Q.all())))
     
     @route(r"links? ?(.*)", access = "member")
@@ -266,7 +266,7 @@ class request(loadable):
             message.reply("There are no open scan requests")
             return
 
-        message.reply(self.url(" ".join(map(lambda request: "[%s (%s%s): %s]" % (request.id, request.target.intel.dists if request.target.intel else "0", 
+        message.reply(self.url(" ".join(map(lambda request: Config.get("Misc", "reqlinks").decode("string_escape") % (request.id, request.target.intel.dists if request.target.intel else "0", 
                     "/%s" % request.dists if request.dists > 0 else "", request.link), Q[:i] if i>0 else Q.all())), user))
     
     def scanchan(self):
