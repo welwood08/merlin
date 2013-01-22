@@ -33,8 +33,9 @@ class aumydef(loadable):
     @require_user
     def execute(self, message, user, params):
         
-        fleetcount=int(params.group(1))
-        comment=params.group(2)
+        fleetcount = int(params.group(1))
+        comment = params.group(2)
+        reply = ""
 
         if user.planet:
             scan = user.planet.scan("A")
@@ -45,6 +46,10 @@ class aumydef(loadable):
             message.reply("Planet not set. Use !pref planet=x:y:z")
             return
 
+        scanage = Updates.current_tick() - scan.tick
+        if scanage > 12:
+            reply += "Warning: Scan is %d ticks old.\n" % scanage
+
         self.update_comment_and_fleetcount(user, fleetcount, comment)
         user.fleets.delete()
         for uscan in scan.units:
@@ -53,16 +58,16 @@ class aumydef(loadable):
 
         ships = user.fleets.all()
         
-        reply = "Updated your def info to: fleetcount %s, updated: pt%s ships: " %(user.fleetcount,user.fleetupdated)
-        reply+= ", ".join(map(lambda x:"%s %s" %(self.num2short(x.ship_count),x.ship.name),ships))
-        reply+= " and comment: %s" %(user.fleetcomment)
+        reply += "Updated your def info to: fleetcount %s, updated: pt%s ships: " % (user.fleetcount, user. fleetupdated)
+        reply += ", ".join(map(lambda x:"%s %s" % (self.num2short(x.ship_count), x.ship.name), ships))
+        reply += " and comment: %s" %(user.fleetcomment)
         message.reply(reply)
     
-    def update_comment_and_fleetcount(self,user,fleetcount,comment):
+    def update_comment_and_fleetcount(self, user, fleetcount, comment):
         user.fleetcount = fleetcount
         if comment != "":
             if comment in self.nulls:
-                comment=""
+                comment = ""
             user.fleetcomment = comment
         user.fleetupdated = Updates.current_tick()
 
