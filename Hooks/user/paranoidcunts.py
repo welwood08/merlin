@@ -58,7 +58,6 @@ class paranoidcunts(loadable):
             printable=map(lambda (u, a): "%s%s" % (u,' ('+a+')' if a else ''),result)
         reply += "No phone set:  "
         reply += ', '.join(printable)
-        reply += '\n'
 
         if ("check" in opts):
             Q = session.query(User.name, User.alias, User.phone)
@@ -73,6 +72,6 @@ class paranoidcunts(loadable):
                     res.append([u,a,n])
             if len(res) > 0:
                 printable=map(lambda (u, a, n): "%s%s: %s" % (u,' ('+a+')' if a else '',n),res)
-            reply += "Bad number:    %s\n" % (', '.join(printable))
+            reply += "\nBad number:    %s" % (', '.join(printable))
 
         message.reply(reply)
