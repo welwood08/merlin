@@ -54,7 +54,7 @@ class paranoidcunts(loadable):
             Q = Q.filter(User.access > 0)
         Q = Q.filter(User.phone == None)
         if ("noemail" not in opts):
-            Q = Q.filter(User._smsmode != 'E')
+            Q = Q.filter(User._smsmode.op("IS DISTINCT FROM")('E'))
         Q = Q.order_by(asc(User.name))
         result = Q.all()
 
