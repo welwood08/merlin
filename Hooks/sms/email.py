@@ -100,6 +100,6 @@ class email(loadable):
         except (socket.error, SSLError, SMTPException, SMSError) as e:
             return "Error sending message: %s" % (str(e),)
     
-    def log_message(self,sender,receiver,mail,text,mode):
-        session.add(SMS(sender=sender,receiver=receiver,phone=email,sms_text=text,mode="email"))
+    def log_message(self,sender,receiver,email,text,mode):
+        session.add(SMS(sender=sender,receiver=receiver,phone=email,sms_text=text,mode=mode))
         session.commit()
