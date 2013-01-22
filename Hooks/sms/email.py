@@ -21,14 +21,11 @@
 #
 # Module by Martin Stone
  
-import json
 import re
 import socket
 import time
 from smtplib import SMTP, SMTPException, SMTPSenderRefused, SMTPRecipientsRefused
 from ssl import SSLError
-from urllib import urlencode
-from urllib2 import urlopen, Request, URLError
 from Core.exceptions_ import SMSError
 from Core.config import Config
 from Core.string import decode, encode
