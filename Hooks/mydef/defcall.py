@@ -26,6 +26,7 @@ from Core.db import session
 from Core.maps import Planet, User, Request
 from Core.loadable import loadable, route, robohci
 from Core.string import errorlog
+import socket
 from smtplib import SMTP, SMTPException, SMTPSenderRefused, SMTPRecipientsRefused
 from ssl import SSLError
 from Core.exceptions_ import SMSError
