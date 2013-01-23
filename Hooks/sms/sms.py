@@ -53,7 +53,7 @@ class sms(loadable):
             message.reply("I refuse to talk to that incompetent retard. Check %s's mydef comment and use !phone show to try sending it using your own phone." %(receiver.name,))
             return 
 
-        if not receiver.pubphone and user not in receiver.phonefriends and user.access < (Config.getint("Access","SMSer") if "SMSer" in Config.options("Access") else 1000):
+        if not (receiver.pubphone or receiver.smsmode =="Email") and user not in receiver.phonefriends and user.access < (Config.getint("Access","SMSer") if "SMSer" in Config.options("Access") else 1000):
             message.reply("%s's phone number is private or they have not chosen to share their number with you. Supersecret message not sent." % (receiver.name,))
             return
 
