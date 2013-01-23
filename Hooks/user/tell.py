@@ -56,6 +56,9 @@ class tell(loadable):
         Q = Q.order_by(desc(Tell.id))
         Q = Q.limit(5)
         result = Q.all()
+        if len(result) == 0:
+            message.reply("No recent messages")
+            return
         reply = "Recent Messages:\n"
         for tell in result:
             reply += "Message from %s: %s\n" % (tell.sender.name, tell.message)
