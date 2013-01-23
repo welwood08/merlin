@@ -1160,7 +1160,7 @@ class User(Base):
     email = Column(String(255))
     emailre = re.compile(r"^([\w.-]+@[\w.-]+)")
     phone = Column(String(255))
-    pubphone = Column(Boolean, default=False) # Asc
+    pubphone = Column(Boolean, default=True) # Asc
     _smsmode = Column(Enum(*_sms_modes.keys(), name="smsmode"))
     sponsor = Column(String(255)) # Asc
     quits = Column(Integer, default=0) # Asc
