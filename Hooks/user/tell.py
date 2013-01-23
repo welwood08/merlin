@@ -24,6 +24,7 @@
 from Core import Merlin
 from Core.exceptions_ import PNickParseError
 from Core.db import session
+from sqlalchemy.sql import desc
 from Core.maps import User, Tell
 from Core.loadable import loadable, route, require_user, system
 
@@ -46,6 +47,19 @@ class tell(loadable):
         session.commit()
 
         message.reply("Successfully stored message for %s. Message: %s" % (receiver.name, text))
+
+    @route(r"", access = "member")
+    @require_user
+    def catchup(self, message, user, params):
+        Q = session.query(Tell)
+        Q = Q.filter(Tell.user_id==user.id)
+        Q = Q.order_by(desc(Tell.id))
+        Q = Q.limit(5)
+        result = Q.all()
+        reply = "Recent Messages:\n"
+        for tell in result:
+            reply += "Message from %s: %s\n" % (tell.sender.name, tell.message)
+        message.reply(reply[:-1])
 
 @system('JOIN')
 def join(message):
