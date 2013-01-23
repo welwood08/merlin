@@ -30,7 +30,7 @@ from Core.loadable import loadable, route, require_user, system
 class tell(loadable):
     """Sends a message to a user when they next join a channel with me."""
     usage = " <nick> <message>"
-    access = "admin"
+    access = "member"
     
     @route(r"(\S+)\s+(.+)", access = "member")
     @require_user
