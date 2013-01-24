@@ -661,7 +661,7 @@ class Planet(Base):
     def resources_per_agent(self, target):
         return min(10000,(target.value * 2000)/self.value)
 Planet._idx_x_y_z = Index('planet_x_y_z', Planet.x, Planet.y, Planet.z)
-Galaxy.planets = relation(Planet, order_by=asc(Planet.z), backref="galaxy")
+Galaxy.planets = relation(Planet, order_by=asc(Planet.z), backref=backref('galaxy', lazy='joined'), lazy='joined')
 Galaxy.planet_loader = dynamic_loader(Planet)
 class PlanetHistory(Base):
     __tablename__ = 'planet_history'
@@ -1400,7 +1400,7 @@ class Target(Base):
     user_id = Column(Integer, ForeignKey(User.id, ondelete='cascade'), index=True)
     planet_id = Column(Integer, ForeignKey(Planet.id, ondelete='cascade'), index=True)
     tick = Column(Integer)
-User.bookings = relation(Target, backref=backref('user', lazy='dynamic'))
+User.bookings = relation(Target, backref=backref('user', lazy='dynamic'), lazy='dynamic')
 Planet.bookings = relation(Target, backref=backref('planet'), lazy='dynamic', order_by=(asc(Target.tick)))
 Galaxy.bookings = relation(Target, Planet.__table__, lazy='dynamic')
 #Alliance.bookings = dynamic_loader(Target, Intel.__table__)
