@@ -54,7 +54,7 @@ class book(loadable):
             return self.attack(request, user, id, "%s:%s:%s is %s in %s. Quick, launch before they notice!" % (x,y,z, planet.intel.nick or 'someone', Config.get("Alliance","name"),))
         
         try:
-            planet.bookings.append(Target(user=user, tick=when))
+            planet.bookings.append(Target(user=[user], tick=when))
             session.commit()
         except IntegrityError:
             session.rollback()
