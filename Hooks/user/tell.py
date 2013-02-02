@@ -27,6 +27,7 @@ from Core.db import session
 from sqlalchemy.sql import desc
 from Core.maps import User, Tell
 from Core.loadable import loadable, route, require_user, system
+from Core.config import Config
 
 class tell(loadable):
     """Sends a message to a user when they next join a channel with me."""
@@ -75,7 +76,10 @@ def join(message):
                 return
             tells = u.newtells
             for tell in tells:
-                message.notice("Message from %s: %s" % (tell.sender.name, tell.message), message.get_nick())
+                if Config.getboolean("Misc", "tellmsg"):
+                    message.privmsg("Message from %s: %s" % (tell.sender.name, tell.message), message.get_nick())
+                else:
+                    message.notice("Message from %s: %s" % (tell.sender.name, tell.message), message.get_nick())
                 tell.read = True
             session.commit()
         except PNickParseError:
