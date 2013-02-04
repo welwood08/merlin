@@ -25,7 +25,7 @@ import re
 
 from Core.exceptions_ import LoadableError, UserError
 from Core.config import Config
-from Core.db import Session, session
+from Core.db import session
 from Core.maps import Planet, Alliance, User, Arthur, Intel, PageView
 from Core.loadable import _base, require_user, require_planet
 from Arthur.context import render
@@ -103,7 +103,6 @@ class loadable(_base):
             user, cookie, key, planet_id = self.router(request)
             response = self.execute(request, user, **kwargs)
             
-            session = Session()
             session.add(PageView(page = self.name,
                                  full_request = request.get_full_path(),
                                  username = user.name,

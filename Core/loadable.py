@@ -25,7 +25,7 @@ import re
 from Core.exceptions_ import MerlinSystemCall, LoadableError, PrefError, ParseError, ChanParseError, PNickParseError, UserError
 from Core.config import Config
 from Core.paconf import PA
-from Core.db import Session, session
+from Core.db import session
 from Core.maps import User, Channel, Command
 from Core.chanusertracker import CUT
 from Core.messages import PUBLIC_REPLY
@@ -182,7 +182,6 @@ class loadable(_base):
             
             route(message, user, params)
             
-            session = Session()
             session.add(Command(command_prefix = message.get_prefix(),
                                 command = self.name,
                                 subcommand = subcommand,
