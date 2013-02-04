@@ -46,8 +46,12 @@ def catcher(message):
         uid = None
     for m in scanre.finditer(message.get_msg()):
         parse(uid, "scan", m.group(1)).start()
+        if Config.has_option("Channels", "share"):
+            message.privmsg(m.group(0), Config.get("Channels", "share"))
     for m in scangrpre.finditer(message.get_msg()):
         parse(uid, "group", m.group(1)).start()
+        if Config.has_option("Channels", "share"):
+            message.privmsg(m.group(0), Config.get("Channels", "share"))
 
 class parse(Thread):
     def __init__(self, uid, type, id):
@@ -156,7 +160,7 @@ class parse(Thread):
         
         if len(users) > 0:
             push("scans", scantype=scantype, pa_id=pa_id, x=planet.x, y=planet.y, z=planet.z, names=",".join(users), scanner=uid, reqs=",".join(req_ids))
-    
+
     def parse_P(self, scan_id, scan, page):
         planetscan = scan.planetscan = PlanetScan()
 
