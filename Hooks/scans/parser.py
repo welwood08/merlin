@@ -136,17 +136,22 @@ class parse(Thread):
         Q = Q.filter(Request.target==planet)
         Q = Q.filter(Request.scan==None)
         Q = Q.filter(Request.active==True)
-        Q = Q.filter(Request.tick<=tick)
+        Q = Q.filter(Request.tick<=tick + PA.getint(scan.scantype,"expire"))
         result = Q.all()
         
         users = []
         req_ids = []
         for request in result:
-            scanlog("Scan %s matches request %s for %s" %(pa_id, request.id, request.user.name,))
-            request.scan_id = scan_id
-            request.active = False
-            users.append(request.user.name)
-            req_ids.append(str(request.id))
+            if tick >= request.tick:
+                scanlog("Scan %s matches request %s for %s" %(pa_id, request.id, request.user.name,))
+                request.scan_id = scan_id
+                request.active = False
+                users.append(request.user.name)
+                req_ids.append(str(request.id))
+            else:
+                scanlog("Scan %s matches request %s for %s but is old." %(pa_id, request.id, request.user.name,))
+                push("scans", scantype=scantype, pa_id=pa_id, x=planet.x, y=planet.y, z=planet.z, names=request.user.name, scanner=uid, reqs=request.id, old=True)
+                
         session.commit()
         
         if len(users) > 0:

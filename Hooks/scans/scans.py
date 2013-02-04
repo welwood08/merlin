@@ -55,12 +55,15 @@ class scans(loadable):
         message.reply(reply)
     
     @robohci
-    def robocop(self, message, scantype, pa_id, x, y, z, names, scanner, reqs):
+    def robocop(self, message, scantype, pa_id, x, y, z, names, scanner, reqs, old=False):
         nicks = []
-        reply = "%s on %s:%s:%s " % (PA.get(scantype,"name"),x,y,z,)
+        reply = "Old " if old else ""
+        reply += "%s on %s:%s:%s " % (PA.get(scantype,"name"),x,y,z,)
         if ("showscanner" in Config.options("Misc") and Config.getboolean("Misc", "showscanner") and scanner != 'None'):
             reply+= "from %s " % (User.load(id=scanner).name) if User.load(id=scanner) not in (None, 'None') else ""
-        reply+= Config.get("URL","viewscan") % (pa_id,)
+        reply += Config.get("URL","viewscan") % (pa_id,)
+        if old:
+            reply += " !request cancel %s if this is suitable." % (reqs)
         
         for name in names.split(","):
             user = User.load(name)
@@ -68,8 +71,9 @@ class scans(loadable):
                 nicks.append(nick)
                 message.privmsg(self.url(reply, user), nick)
         
-        reply = "[-%s] %s on %s:%s:%s " % (reqs,PA.get(scantype,"name"),x,y,z,)
-        reply+= "delivered to: "
-        reply+= ", ".join(nicks) if not Config.getboolean("Misc", "anonscans") else "Anon"
-        from Hooks.scans.request import request
-        message.privmsg(reply, request().scanchan())
+        if not old:
+            reply = "[-%s] %s on %s:%s:%s " % (reqs,PA.get(scantype,"name"),x,y,z,)
+            reply+= "delivered to: "
+            reply+= ", ".join(nicks) if not Config.getboolean("Misc", "anonscans") else "Anon"
+            from Hooks.scans.request import request
+            message.privmsg(reply, request().scanchan())
