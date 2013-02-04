@@ -26,6 +26,7 @@ from Core.db import session
 from Core.maps import Planet, User, Scan
 from Core.chanusertracker import CUT
 from Core.loadable import loadable, route, robohci
+from Core.config import Config
 
 class scans(loadable):
     usage = " <x:y:z>"
@@ -75,5 +76,7 @@ class scans(loadable):
             reply = "[-%s] %s on %s:%s:%s " % (reqs,PA.get(scantype,"name"),x,y,z,)
             reply+= "delivered to: "
             reply+= ", ".join(nicks) if not Config.getboolean("Misc", "anonscans") else "Anon"
+            if Config.getboolean("Misc", "showurls"):
+                reply += Config.get("URL","viewscan") % (pa_id,)
             from Hooks.scans.request import request
             message.privmsg(reply, request().scanchan())
