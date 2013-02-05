@@ -111,6 +111,7 @@ class loadable(_base):
                                  planet_id = user.planet.id if user.planet else None,
                                  hostname = request.META['REMOTE_ADDR'],))
             session2.commit()
+            session2.close()
             
             if cookie is not None:
                 response.set_cookie(SESSION_KEY, cookie, expires=request.session.expire)
