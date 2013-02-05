@@ -72,32 +72,28 @@ class request(loadable):
         dists = int(params.group(7) or 0)
         galdists = []
 
-        mergescans = (Config.has_option("Misc", "maxscans") and len(planets)*len(params.group(6)) > Config.getint("Misc", "maxscans"))
+        mergescans = (not galscan) and (Config.has_option("Misc", "maxscans") and len(planets)*len(params.group(6)) > Config.getint("Misc", "maxscans"))
 
         for planet in planets:
             if galscan or mergescans:
                 galdists.append(planet.intel.dists if planet.intel else 0)
                 if len(galdists) < len(planets):
                     continue
+            types = 0
             for scantype in params.group(6).upper():
-
                 # Reject requests for incoming scans
                 if not PA.getboolean(scantype, "request"):
                     message.alert("%s scans cannot be requested." % (PA.get(scantype, "name")))
                     continue
-            
+                types += 1
                 if galscan or mergescans:
                     # Request the scans
                     for i in range(len(planets)):
                         request = self.request(message, user, planets[i], scantype, galdists[i], galscan or mergescans)
                     # Inform the requester    
-                    if message.get_chan() != self.scanchan():
-                        if galscan:
-                            message.reply("Requested a Galaxy %s Scan of %s:%s. !request cancel %s:%s to cancel the request." % (request.type, planet.x, planet.y, 
-                                                                                                                                 request.id-len(planets)+1, request.id))
-                        else:
-                            message.reply("Requested %d %s Scans. !request cancel %s:%s to cancel the request." % (len(planets), request.type, 
-                                                                                                                                 request.id-len(planets)+1, request.id))
+                    if galscan and (message.get_chan() != self.scanchan()):
+                        message.reply("Requested a Galaxy %s Scan of %s:%s. !request cancel %s:%s to cancel the request." % (request.type, planet.x, planet.y, 
+                                                                                                                             request.id-len(planets)+1, request.id))
                     ## Check existing scans
                     scan = planet.scan(scantype)
                     if scan and request.tick - scan.tick < PA.getint(scantype,"expire"):
@@ -109,9 +105,6 @@ class request(loadable):
                         message.privmsg("[%s:%s] %s requested a Galaxy %s Scan of %s:%s Max Dists(i:%s%s) " % (request.id-len(planets)+1, request.id, requester, 
                                         request.type, planet.x, planet.y, max(galdists), 
                                         "/r:%s" % dists if dists > 0 else "") + Config.get("URL", "reqgscan") % (planet.x, planet.y) , self.scanchan())
-                    else:
-                        message.privmsg("[%s:%s] %s requested %d %s Scans Max Dists(i:%s%s). !request links for details " % (request.id-len(planets)+1, request.id, 
-                                        requester, len(planets), request.type, max(galdists), "/r:%s" % dists if dists > 0 else ""), self.scanchan())
                 else:
                     request = self.request(message, user, planet, scantype, dists)
                     if message.get_chan() != self.scanchan():
@@ -121,6 +114,10 @@ class request(loadable):
                     if scan and request.tick - scan.tick < PA.getint(scan.scantype,"expire"):
                         message.reply("%s Scan of %s:%s:%s is already available from %s ticks ago: %s. !request cancel %s if this is suitable." % (
                                                                         scantype, planet.x, planet.y, planet.z, request.tick - scan.tick, scan.link, request.id,))
+            if mergescans:
+                message.reply("Requested %d scans. !request cancel %s:%s to cancel the request." % (len(planets) * types, request.id-len(planets)*types+1, request.id))
+                message.privmsg("[%s:%s] %s requested %d scans (%s) Max Dists(i:%s%s). !request links for details " % (request.id-len(planets)*types+1, request.id, 
+                                requester, len(planets)*types, params.group(6).upper(), max(galdists), "/r:%s" % dists if dists > 0 else ""), self.scanchan())
     
     @robohci
     def robocop(self, message, request_id, mode):
