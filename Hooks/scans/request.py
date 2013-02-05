@@ -38,15 +38,6 @@ class request(loadable):
     @require_user
     def execute(self, message, user, params):
         tick = Updates.current_tick()
-        # Scan Quota
-        opts = Config.options("ScanQuota") if Config.has_section("ScanQuota") else []
-        q = []
-        for o in opts:
-            if int(o) >= user.access:
-                q.append(int(o))
-        if q:
-            ScanQuota = Config.getint("ScanQuota", str(min(q))) if q else -1
-            reqs = session.query(Request.id).filter(Request.requester_id == user.id).filter(Request.tick == tick).count()
         # Galaxy Scan
         if params.group(5) is None:
             galaxy = Galaxy.load(*params.group(1,3))
@@ -63,6 +54,21 @@ class request(loadable):
             planets = [planet]
             galscan = False
 
+        # Scan Quota
+        if Config.has_section("ScanQuota"):
+            opts = Config.options("ScanQuota") 
+            q = []
+            for o in opts:
+                if int(o) >= user.access:
+                    q.append(int(o))
+            if q:
+                ScanQuota = Config.getint("ScanQuota", str(min(q)))
+                reqs = session.query(Request.id).filter(Request.requester_id == user.id).filter(Request.tick == tick).count()
+                if (reqs + len(planets) * len(params.group(6).upper())) > ScanQuota:
+                    message.reply("This request will exceed your scan quota for this tick (%d scans remaining). " % (ScanQuota - reqs) +\
+                                  "Try searching with !planet, !dev, !unit, !news, !jgp, !au.")
+                    return
+
         dists = int(params.group(7) or 0)
         galdists = []
 
@@ -74,11 +80,6 @@ class request(loadable):
                 if len(galdists) < len(planets):
                     continue
             for scantype in params.group(6).upper():
-                if q:
-                    reqs += ((galscan or mergescans) and len(planets) or 1)
-                    if reqs > ScanQuota:
-                        message.reply("This request will exceed your scan quota for this tick. Try searching with !planet, !dev, !unit, !news, !jgp, !au.")
-                        return
 
                 # Reject requests for incoming scans
                 if not PA.getboolean(scantype, "request"):
