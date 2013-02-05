@@ -103,14 +103,14 @@ class loadable(_base):
             user, cookie, key, planet_id = self.router(request)
             response = self.execute(request, user, **kwargs)
             
-            session = Session()
-            session.add(PageView(page = self.name,
+            session2 = Session()
+            session2.add(PageView(page = self.name,
                                  full_request = request.get_full_path(),
                                  username = user.name,
                                  session = key,
                                  planet_id = user.planet.id if user.planet else None,
                                  hostname = request.META['REMOTE_ADDR'],))
-            session.commit()
+            session2.commit()
             
             if cookie is not None:
                 response.set_cookie(SESSION_KEY, cookie, expires=request.session.expire)

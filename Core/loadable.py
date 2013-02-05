@@ -25,7 +25,7 @@ import re
 from Core.exceptions_ import MerlinSystemCall, LoadableError, PrefError, ParseError, ChanParseError, PNickParseError, UserError
 from Core.config import Config
 from Core.paconf import PA
-from Core.db import Session, session
+from Core.db import Session
 from Core.maps import User, Channel, Command
 from Core.chanusertracker import CUT
 from Core.messages import PUBLIC_REPLY
@@ -182,8 +182,8 @@ class loadable(_base):
             
             route(message, user, params)
             
-            session = Session()
-            session.add(Command(command_prefix = message.get_prefix(),
+            session2 = Session()
+            session2.add(Command(command_prefix = message.get_prefix(),
                                 command = self.name,
                                 subcommand = subcommand,
                                 command_parameters = message.get_msg()[len(m.group(1))+1:].strip(),
@@ -191,8 +191,8 @@ class loadable(_base):
                                 username = "" if user is True else user.name,
                                 hostname = message.get_hostmask(),
                                 target = message.get_chan() if message.in_chan() else message.get_nick(),))
-            session.commit()
-            session.close()
+            session2.commit()
+            session2.close()
             
         except PNickParseError:
             message.alert(self.PParseError)
