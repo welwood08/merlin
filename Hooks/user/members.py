@@ -52,4 +52,4 @@ class members(loadable):
             reply += "%s:  " % (o)
             reply += ', '.join(printable)
             reply += '\n'
-        message.reply(reply)
+        message.reply(reply[:-1])
