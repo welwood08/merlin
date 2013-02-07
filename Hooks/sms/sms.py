@@ -33,6 +33,8 @@ from Core.string import decode, encode
 from Core.db import session
 from Core.maps import User, SMS
 from Core.loadable import loadable, route, require_user
+if Config.get("WhatsApp", "login"):
+    from yowsup.src.Examples.EchoClient import WhatsappEchoClient
 
 class sms(loadable):
     """Sends an SMS to the specified user. Your username will be appended to the end of each sms. The user must have their phone correctly added and you must have access to their number."""
@@ -74,16 +76,25 @@ class sms(loadable):
             message.reply("Max length for a text is 160 characters. Your text was %i characters long. Super secret message not sent." % (len(text),))
             return
 
-        mode = receiver.smsmode or mode if mode == "combined" else mode
-        mode = mode.lower()
+        if (receiver.smsmode == "WhatsApp") and Config.get("WhatsApp", "login"):
+            mode = "whatsapp"
+        else:
+            mode = receiver.smsmode or mode if mode == "combined" else mode
+            mode = mode.lower()
         error = ""
         
         if mode == "email":
             error = self.send_email(user, receiver, public_text, phone, text)
-        if mode == "googlevoice" or mode == "combined":
-            error = self.send_googlevoice(user, receiver, public_text, phone, text)
-        if mode == "clickatell" or (mode == "combined" and error is not None):
-            error = self.send_clickatell(user, receiver, public_text, phone, text)
+        elif mode == "whatsapp":
+            wa = WhatsappEchoClient(phone[1:], text, True)
+            wa.login(Config.get("WhatsApp", "login"), Config.get("WhatsApp", "password"))
+            if not wa.gotReceipt:
+                error = "No receipt received from the WhatsApp server."
+        else:
+            if mode == "googlevoice" or mode == "combined":
+                error = self.send_googlevoice(user, receiver, public_text, phone, text)
+            if mode == "clickatell" or (mode == "combined" and error is not None):
+                error = self.send_clickatell(user, receiver, public_text, phone, text)
         
         if error is None:
             message.reply("Successfully processed To: %s Message: %s" % (receiver.name, decode(text)))

@@ -1148,7 +1148,7 @@ planet_old_id_search = Table('planet_old_id_search', Base.metadata,
 
 class User(Base):
     __tablename__ = Config.get('DB', 'prefix') + 'users'
-    _sms_modes = {"C":"Clickatell", "G":"GoogleVoice", "R":"Retard", "E":"Email",}
+    _sms_modes = {"C":"Clickatell", "G":"GoogleVoice", "R":"Retard", "E":"Email", "W":"WhatsApp",}
     id = Column(Integer, primary_key=True)
     name = Column(String(255)) # pnick
     alias = Column(String(255))
