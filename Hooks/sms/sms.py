@@ -72,17 +72,17 @@ class sms(loadable):
                 message.reply("%s has no phone number or their phone number is too short to be valid (under 6 digits). Super secret message not sent." % (receiver.name,))
                 return
 
+            if (receiver.smsmode == "WhatsApp") and Config.get("WhatsApp", "login"):
+                mode = "whatsapp"
+            else:
+                mode = receiver.smsmode or mode if mode == "combined" else mode
+                mode = mode.lower()
+        error = ""
+        
         if len(text) >= 160:
             message.reply("Max length for a text is 160 characters. Your text was %i characters long. Super secret message not sent." % (len(text),))
             return
 
-        if (receiver.smsmode == "WhatsApp") and Config.get("WhatsApp", "login"):
-            mode = "whatsapp"
-        else:
-            mode = receiver.smsmode or mode if mode == "combined" else mode
-            mode = mode.lower()
-        error = ""
-        
         if mode == "email":
             error = self.send_email(user, receiver, public_text, phone, text)
         elif mode == "whatsapp":
