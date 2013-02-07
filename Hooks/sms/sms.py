@@ -88,7 +88,9 @@ class sms(loadable):
         elif mode == "whatsapp":
             wa = WhatsappEchoClient(phone[1:], text, True)
             wa.login(Config.get("WhatsApp", "login"), Config.get("WhatsApp", "password"))
-            if not wa.gotReceipt:
+            if wa.gotReceipt:
+                error = None
+            else:
                 error = "No receipt received from the WhatsApp server."
         else:
             if mode == "googlevoice" or mode == "combined":
