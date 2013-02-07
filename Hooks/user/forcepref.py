@@ -139,7 +139,7 @@ class forcepref(loadable):
                     user.pubphone = False
                     reply += " pubphone=%s"%(False)
             if opt == "smsmode":
-                if Config.get("Misc", "sms") != "combined":
+                if (val[:1] in ['C', 'G']) and (Config.get("Misc", "sms") != "combined"):
                     message.alert("Your alliance doesn't support SMS mode switching")
                     continue
                 if val[:1].upper() in User._sms_modes:
