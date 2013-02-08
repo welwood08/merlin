@@ -72,8 +72,9 @@ class sms(loadable):
                 message.reply("%s has no phone number or their phone number is too short to be valid (under 6 digits). Super secret message not sent." % (receiver.name,))
                 return
 
-            if (receiver.smsmode == "WhatsApp") and Config.get("WhatsApp", "login"):
-                mode = "whatsapp"
+            if (receiver.smsmode == "WhatsApp"):
+                if Config.get("WhatsApp", "login"):
+                    mode = "whatsapp"
             else:
                 mode = receiver.smsmode or mode if mode == "combined" else mode
                 mode = mode.lower()
