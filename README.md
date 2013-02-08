@@ -1,9 +1,16 @@
 Merlin
 ========
 
-Merlin is the Copyright &copy; 2012 of Robin K. Hansen, Elliot Rosemarine, Andreas Jacobsen.
-This version was modified and added to by Martin Stone.
+Merlin is the Copyright &copy; 2012 of Robin K. Hansen, Elliot Rosemarine, Andreas Jacobsen.  
+This version was modified and added to by Martin Stone 2012-2013.  
 Please read the included LICENSE.
+
+Here Be Dragons
+----------------------------
+
+This version of merlin breaks database and config compatibility with ellonweb's original branch, and pretty much anything not forked from here. Additionally, it breaks compatibility with itself occasionally (well, actually quite frequently...).
+
+For support, use github or (preferably) try #munin on netgamers IRC.
 
 Installation Requirements
 ----------------------------
@@ -84,9 +91,7 @@ with client encoding LATIN1
 Preparing merlin
 ----------------------------
 
-Inspect and modify merlin.cfg in an editor as required. You should only need to change the Connection, Admin, Alliance, Channel and DB settings. If you're using the SMS features you'll need to add your details in the clickatell and googlevoice section and check the sms setting in Misc.
-
-Additionally, excalibur.sh will need updating for the relevant DB and the relevant excalibur.*.py will need updating if you change the prefix.
+Inspect and modify merlin.cfg in an editor as required.
 
 >Note Graphing can be completely disabled in the config, look for - graphing  : and append "cached", "enabled", or "disabled" depending on which you want!
        
@@ -94,10 +99,8 @@ Run createdb.py. This will create all the neccessary tables for you, as well as 
 		
 	python createdb.py
 
-Inspect and modify /Hooks/\_\_init\_\_.py as needed. This controls which groups of commands will be enabled. The SMS package is disabled by default, if you have a clickatell account to use you will want to remove the # character. Many alliances will want to disable the prop/cookie package, use a # character at the beginning of the line.
+Inspect and modify /Hooks/\_\_init\_\_.py as needed. This controls which groups of commands will be enabled. Add a # character to the beginning of a line to disable a module. Many alliances will want to disable the prop/cookie package.
        
-You may also want to change the access levels for some of the commands, you should do that now. 
-   
 Merlin Access Settings
 ----------------------------
 
@@ -138,16 +141,12 @@ Any time you make changes to any of Merlin's code, you will need to use
 Configuring Excalibur
 ----------------------------
 
+excalibur.sh will need updating for the relevant DB and the relevant excalibur.*.py will need updating if you changed the prefix in merlin.cfg.
+
 You need to use a task scheduler to run excalibur.py one minute after every tick. If you're using crontab, you might use a command like this
 
 	1 * * * * /path/to/merlin/excalibur.sh >> /path/to/merlin/dumplog.txt 2>&1
 
-You'd then also need to create the excalibur.sh file with executable permission and insert the following commands
-            
-	cd /path/to/merlin/
-           python excalibur.py
-
-Make sure to sudo your crontab
 
 Configuring Apache and running Arthur
 ----------------------------
@@ -211,3 +210,44 @@ The migration tool will automatically pull the ship stats from PA. If the stats 
 Avoid running this midround, it will delete stored unit/au scans.
 Don't forget to enable your task scheduler again once ticks start!
 
+
+Extra Features and Requirements
+----------------------------
+Some features require extra configuration. Details below.
+
+### IMAP Support
+IMAP support allows the bot to parse notification emails from Planetarion. The bot can then announce incoming or recalled fleets, request scans for incoming fleets and forward the messages to the user's email address.
+
+To use this feature, the alliance will need a domain or subdomain to receive the emails. Users must then set their notification email address in-game to pnick-def@alliance.com. ("-def" is the default suffix for notification emails, which is configurable. If this is set, pnick@alliance.com will still forward emails but not trigger defcalls)
+
+To listen for new emails:
+
+    python IMAPPush.py
+
+If this proves unstable, these crontab lines will kill and restart the process every hour
+
+    39 *    * * *   root    kill `ps aux | grep IMAPPush.py | grep -v grep | sed -r 's/merlin[ tab]+([0-9]+).*/\1/g'`
+    40 *    * * *   merlin  /merlin/imappush.sh
+Where the bot is run as user "merlin" and stored in /merlin/. imappush.sh should contain
+
+    #!/bin/bash
+    cd /merlin/
+    python IMAPPush.py >> IMAPLog.txt
+
+
+### Importing "Last 1000 scans"
+Planetarion allows alliance members to "List scan ids of last 1000 scans". If this is saved to a file called "1000scans.txt", 1000scans.py will parse them into the bot using user ID #1. Be warned that this can use a lot of RAM and upset some slower, smaller servers.
+
+
+### WhatsApp Support
+WhatsApp support allows the use of WhatsApp with the !sms command.  
+It requires the yowsup library, by Tarek Galal.
+The git repository will already point to the latest known-good version of the library. To install:  
+
+    git submodule init
+    git submodule update
+
+The second of these can also be used to update to a newer version when the upstream repository (this one) updates. If you encounter a fatal "reference is not a tree" error, try
+
+    git submodule sync
+    git submodule update
