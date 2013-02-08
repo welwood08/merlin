@@ -250,3 +250,13 @@ The second of these can also be used to update to a newer version when the upstr
 
     git submodule sync
     git submodule update
+
+##### Config Items
+"login" is your full, international phone number, including the country code but without the leading + or 00.  
+For accounts set up from a phone, "password" is the IMEI reversed and MD5 hashed (for android) or the MAC address, uppercase, repeated twice and MD5 hashed. This can be achieved using
+
+    python yowsup/src/yowsup-cli --generatepassword your-IMEI-or-MAC-address-here
+
+For accounts set up using yowsup, "password" is the password given by yowsup, base64 decoded. In python:
+
+    "your password".decode("base64")
