@@ -67,8 +67,7 @@ To update the code to the latest available source:
 
 	git checkout master
 	git pull
-	git checkout <your_branch_name>
-	git rebase master
+	git rebase master <your_branch_name>
 	
 This will re-apply your changes on top of the latest source. If you made some incompatible changes you might need to modify your change!
 
