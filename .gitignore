@@ -16,3 +16,5 @@ messy_merlin/*
 tablenames
 PG_setup.txt
 1000scans.txt
+IMAPLog.txt
+imappush.sh
