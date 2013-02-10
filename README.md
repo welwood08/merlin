@@ -235,7 +235,7 @@ Where the bot is run as user "merlin" and stored in /merlin/. imappush.sh should
 
 
 ### Importing "Last 1000 scans"
-Planetarion allows alliance members to "List scan ids of last 1000 scans". If this is saved to a file called "1000scans.txt", 1000scans.py will parse them into the bot using user ID #1. Be warned that this can use a lot of RAM and upset some slower, smaller servers.
+Planetarion allows alliance members to "List scan ids of last 1000 scans". If this is saved to a file called "1000scans.txt", 1000scans.py will parse them into the bot using user ID #1. By default this loads at one scan every 2 seconds to minimise server RAM usage (~40mb in testing). If your server has lots of RAM, the time.sleep() can be changed to a lower number or removed entirely..
 
 
 ### WhatsApp Support
