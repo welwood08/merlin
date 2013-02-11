@@ -60,7 +60,7 @@ class sms(loadable):
             return
 
         if receiver.smsmode == "Email":
-            mode = receiver.smsmode
+            mode = "email"
             phone = receiver.email
             if not phone:
                 message.reply("That incompetent retard %s has set their sms mode to email but hasn't provided an address. Super secret message not sent." % (receiver.name,))
