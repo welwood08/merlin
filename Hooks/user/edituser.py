@@ -29,11 +29,11 @@ class edituser(loadable):
     """Used to change a user's access or (de)activate them"""
     usage = " <user> (<access>|true|false)"
     
-    @route(r"(\S+)\s+(\S+)", access = "admin")
+    @route(r"(.+)\s+(\S+)", access = "admin")
     @require_user
     def execute(self, message, user, params):
         
-        username = params.group(1)
+        usernames = params.group(1)
         access = params.group(2).lower()
         if access.isdigit():
             access = int(access)
@@ -47,40 +47,52 @@ class edituser(loadable):
             except Exception:
                 message.reply("Invalid access level '%s'" % (access,))
                 return
-        
-        member = User.load(name=username, active=False)
-        if member is None:
-            message.alert("No such user '%s'" % (username,))
-            return
-        
-        if type(access) is int and not member.active:
-            message.reply("You should first re-activate user %s" %(member.name,))
-            return
-        
-        if access > user.access or member.access > user.access:
-            message.reply("You may not change access higher than your own")
-            return
-        
+
+        addnicks = []
+        remnicks = []
+        changed = []
         mbraxx = Config.getint("Access","member")
         home = Config.get("Channels","home")
-        
-        if type(access) == int:
-            if member.active == True and member.access < mbraxx and access >= mbraxx:
-                message.privmsg("adduser %s %s 24" %(home, member.name,), Config.get("Services", "nick"))
-                message.reply("%s has been added to %s"%(member.name, home,))
-            if member.active == True and member.access >= mbraxx and access < mbraxx:
-                message.privmsg("remuser %s %s"%(home, member.name,), Config.get("Services", "nick"))
-#                message.privmsg("ban %s *!*@%s.%s GTFO, EAAD"%(home, member.name, Config.get("Services", "usermask"),), Config.get("Services", "nick"))
-            member.access = access
-        else:
-            if member.active != access and access == True and member.access >= mbraxx:
-                message.privmsg("adduser %s %s 24" %(home, member.name,), Config.get("Services", "nick"))
-                message.reply("%s has been added to %s"%(member.name, home,))
-            if member.active != access and access == False and member.access >= mbraxx:
-                message.privmsg("remuser %s %s"%(home, member.name,), Config.get("Services", "nick"))
- #               message.privmsg("ban %s *!*@%s.%s GTFO, EAAD"%(home, member.name, Config.get("Services", "usermask"),), Config.get("Services", "nick"))
-            member.active = access
+            
+        for username in usernames.split():
+            member = User.load(name=username, active=False)
+            if member is None:
+                message.alert("No such user '%s'" % (username,))
+                return
+            
+            if type(access) is int and not member.active:
+                message.reply("You should first re-activate user %s" %(member.name,))
+                return
+            
+            if access > user.access or member.access > user.access:
+                message.reply("You may not change access higher than your own")
+                return
+
+            changed.append(username)
+
+            if type(access) == int:
+                if member.active == True and member.access < mbraxx and access >= mbraxx:
+                    addnicks.append(member.name)
+                if member.active == True and member.access >= mbraxx and access < mbraxx:
+                    message.privmsg("remuser %s %s"%(home, member.name,), Config.get("Services", "nick"))
+                    remnicks.append(member.name)
+    #                message.privmsg("ban %s *!*@%s.%s GTFO, EAAD"%(home, member.name, Config.get("Services", "usermask"),), Config.get("Services", "nick"))
+                member.access = access
+            else:
+                if member.active != access and access == True and member.access >= mbraxx:
+                    addnicks.append(member.name)
+                if member.active != access and access == False and member.access >= mbraxx:
+                    message.privmsg("remuser %s %s"%(home, member.name,), Config.get("Services", "nick"))
+                    remnicks.append(member.name)
+     #               message.privmsg("ban %s *!*@%s.%s GTFO, EAAD"%(home, member.name, Config.get("Services", "usermask"),), Config.get("Services", "nick"))
+                member.active = access
+            if not member.active:
+                CUT.untrack_user(member.name)
         session.commit()
-        message.reply("Editted user %s access: %s" % (member.name, access,))
-        if not member.active:
-            CUT.untrack_user(member.name)
+        message.privmsg("adduser %s %s 24" %(home, ",".join(addnicks),), Config.get("Services", "nick"))
+        if addnicks:
+            message.reply("%s ha%s been added to %s"%(", ".join(addnicks), "ve" if len(addnicks) > 1 else "s", home,))
+        if remnicks:
+            message.reply("%s ha%s been removed from %s"%(", ".join(remnicks), "ve" if len(remnicks) > 1 else "s", home,))
+        if changed:
+            message.reply("Editted user%s %s access to %s" % ("s" if len(changed) > 1 else "", ", ".join(changed), access,))
