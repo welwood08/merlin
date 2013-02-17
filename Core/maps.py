@@ -1294,6 +1294,35 @@ Tell.user = relation(User, primaryjoin=(Tell.user_id==User.id), backref=backref(
 Tell.sender = relation(User, primaryjoin=(Tell.sender_id==User.id))
 User.newtells = relation(Tell, primaryjoin=and_(User.id==Tell.user_id, Tell.read==False), order_by=asc(Tell.id))
 
+class UserGroup(Base):
+    __tablename__ = Config.get('DB', 'prefix') + 'user_group'
+    group_id = Column(String(255), primary_key=True)
+    user_id = Column(Integer, ForeignKey(User.id, ondelete='cascade'), primary_key=True)
+#Tell.user = relation(User, primaryjoin=(Tell.user_id==User.id), backref=backref("tells", order_by=desc(Tell.id)))
+#Tell.sender = relation(User, primaryjoin=(Tell.sender_id==User.id))
+#User.newtells = relation(Tell, primaryjoin=and_(User.id==Tell.user_id, Tell.read==False), order_by=asc(Tell.id))
+
+class UserAccess(Base):
+    __tablename__ = Config.get('DB', 'prefix') + 'user_access'
+    access_id = Column(String(255), primary_key=True)
+    user_id = Column(Integer, ForeignKey(User.id, ondelete='cascade'), primary_key=True)
+#Tell.user = relation(User, primaryjoin=(Tell.user_id==User.id), backref=backref("tells", order_by=desc(Tell.id)))
+#Tell.sender = relation(User, primaryjoin=(Tell.sender_id==User.id))
+#User.newtells = relation(Tell, primaryjoin=and_(User.id==Tell.user_id, Tell.read==False), order_by=asc(Tell.id))
+
+class GroupAccess(Base):
+    __tablename__ = Config.get('DB', 'prefix') + 'group_access'
+    access_id = Column(String(255), primary_key=True)
+    group_id = Column(Integer, ForeignKey(Group.id, ondelete='cascade'), primary_key=True)
+#Tell.user = relation(User, primaryjoin=(Tell.user_id==User.id), backref=backref("tells", order_by=desc(Tell.id)))
+#Tell.sender = relation(User, primaryjoin=(Tell.sender_id==User.id))
+#User.newtells = relation(Tell, primaryjoin=and_(User.id==Tell.user_id, Tell.read==False), order_by=asc(Tell.id))
+
+class ChanAccess(Base):
+    __tablename__ = Config.get('DB', 'prefix') + 'channel_access'
+    access_id = Column(String(255), primary_key=True)
+    channel_id = Column(Integer, ForeignKey(Channel.id, ondelete='cascade'), primary_key=True)
+
 class Arthur(Base):
     __tablename__ = Config.get('DB', 'prefix') + 'session'
     key = Column(String(255), primary_key=True)

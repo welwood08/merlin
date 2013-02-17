@@ -29,6 +29,7 @@ from Core.db import Session, session
 from Core.maps import User, Channel, Command
 from Core.chanusertracker import CUT
 from Core.messages import PUBLIC_REPLY
+from Core.acl import has_access, chan_access
 
 # ########################################################################### #
 # ##############################    LOADABLE    ############################# #
@@ -206,7 +207,7 @@ class loadable(_base):
             message.alert(self.usage)
     
     def check_access(self, message, access=None, user=None, channel=None):
-        access = access or self.access
+        #access = access or self.access
         if message.in_chan():
             channel = channel or Channel.load(message.get_chan()) or Channel(maxlevel=0, userlevel=0)
             if channel.maxlevel < access and message.reply_type() == PUBLIC_REPLY:
@@ -216,12 +217,14 @@ class loadable(_base):
         chan = message.get_chan() if message.in_chan() else None
         user = user or CUT.get_user(message.get_nick(), chan, pnickf=message.get_pnick)
         if self.is_user(user):
-            if max(user.access, channel.userlevel) >= access:
+#            if max(user.access, channel.userlevel) >= access:
+            if has_access(user, self.name):
                 return user
             else:
                 raise UserError
         else:
-            if channel.userlevel >= access:
+#            if channel.userlevel >= access:
+            if chan_access(channel, self.name):
                 return User()
             elif message.get_pnick():
                 raise UserError
