@@ -208,11 +208,11 @@ class loadable(_base):
     def check_access(self, message, access=None, user=None, channel=None):
         #access = access or self.access
         if message.in_chan():
-            channel = channel or Channel.load(message.get_chan()) or Channel(maxlevel=0, userlevel=0)
+            channel = channel or Channel.load(message.get_chan()) or Channel()
             if channel.can_access(self.name) and message.reply_type() == PUBLIC_REPLY:
                 raise UserError
         else:
-            channel = Channel(userlevel=0)
+            channel = Channel()
         chan = message.get_chan() if message.in_chan() else None
         user = user or CUT.get_user(message.get_nick(), chan, pnickf=message.get_pnick)
         if self.is_user(user):

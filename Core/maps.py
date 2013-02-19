@@ -1350,8 +1350,8 @@ class Channel(Base):
     __tablename__ = Config.get('DB', 'prefix') + 'channels'
     id = Column(Integer, primary_key=True)
     name = Column(String(255), unique=True)
-    userlevel = Column(Integer)
-    maxlevel = Column(Integer)
+    userlevel = Column(Integer, default=1)
+    maxlevel = Column(Integer, default=1)
     
     @property
     def has_access(self, access_id):
