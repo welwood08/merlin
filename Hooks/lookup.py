@@ -20,7 +20,6 @@
 # Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA 02110-1301 USA
  
 from Core.exceptions_ import PNickParseError
-from Core.db import session
 from Core.maps import Galaxy, Planet, Alliance, User
 from Core.loadable import loadable, route, require_planet
 

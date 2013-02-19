@@ -25,8 +25,6 @@ from sqlalchemy.sql.functions import count
 from Core.db import session
 from Core.maps import Updates, Galaxy, Planet, Alliance, User, Intel, FleetScan
 from Core.loadable import loadable, route, require_planet
-from Core.config import Config
-from Core.paconf import PA
 
 class topcunts(loadable):
     """Top planets attacking the specified target"""
@@ -72,11 +70,9 @@ class topcunts(loadable):
         self.execute(message, planet=user.planet)
     
     def execute(self, message, planet=None, galaxy=None, alliance=None):
-        tick = Updates.current_tick()
         target = aliased(Planet)
         target_intel = aliased(Intel)
         owner = aliased(Planet)
-        owner_intel = aliased(Intel)
         
         Q = session.query(owner.x, owner.y, owner.z, count())
         Q = Q.join((FleetScan.owner, owner))

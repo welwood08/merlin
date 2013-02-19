@@ -21,7 +21,7 @@
  
 import re
 from Core.db import session
-from Core.maps import Updates, User, Ship, UserFleet, FleetLog
+from Core.maps import Updates, User, Ship, FleetLog
 from Core.loadable import loadable, route, require_user
 
 class usedef(loadable):

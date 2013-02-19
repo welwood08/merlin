@@ -21,12 +21,11 @@
 #
 # Module by Martin Stone
  
-from sqlalchemy.sql import asc, desc
+from sqlalchemy.sql import desc
 from sqlalchemy.sql.functions import count
 from Core.db import session
 from Core.maps import Request, User, Updates
 from Core.loadable import loadable, route
-from Core.config import Config
 
 class toprequesters(loadable):
     """List top scan requesters in the last x ticks."""
@@ -49,9 +48,6 @@ class toprequesters(loadable):
         result = Q.all()
         if len(result) < 1:
            message.reply("No scan requests found in the last %d ticks" % (age))
-#        printable=[]
-#        for n, a, c in result[:num]:
-#            printable.append("%s%s: %s" % (n,' ('+a+')' if a else '', c))
         printable=map(lambda (name, alias, c): "%s%s: %s" % (name,' ('+alias +')' if alias else '', c),result[:num])
         reply += ', '.join(printable)
         message.reply(reply)

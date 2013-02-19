@@ -22,12 +22,10 @@
 import re
 from sqlalchemy import cast, Float, func, Integer, or_
 from sqlalchemy.sql import desc
-from sqlalchemy.sql.functions import max, min
 from Core.paconf import PA
 from Core.db import session
 from Core.maps import Planet, Alliance, Intel
 from Core.loadable import loadable, route, require_planet
-from Core.paconf import PA
 
 class whore(loadable):
     """Target search, ordered by xp gain"""

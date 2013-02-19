@@ -27,6 +27,4 @@ __all__ = [
            "cookie",
            "gac",
            "yourmum"
-         #  "fucktard",
-         #  "gaf"
            ]

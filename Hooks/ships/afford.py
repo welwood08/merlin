@@ -20,8 +20,7 @@
 # Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA 02110-1301 USA
  
 from Core.paconf import PA
-from Core.db import session
-from Core.maps import Planet, Ship, Scan, PlanetScan, DevScan
+from Core.maps import Planet, Ship
 from Core.loadable import loadable, route
 
 class afford(loadable):

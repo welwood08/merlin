@@ -21,7 +21,6 @@
  
 # Module by Martin Stone
 
-import re
 from Core import Merlin
 from Core.exceptions_ import PNickParseError
 from Core.config import Config

@@ -21,12 +21,11 @@
 #
 # Module by Martin Stone
  
-from sqlalchemy.sql import asc, desc
+from sqlalchemy.sql import desc
 from sqlalchemy.sql.functions import count
 from Core.db import session
 from Core.maps import Request, User, Scan, Updates
 from Core.loadable import loadable, route
-from Core.config import Config
 
 class topscanners(loadable):
     """List top scanners in the last x ticks. Shows requested scans by default. Use the "all" option to show all parsed scans."""

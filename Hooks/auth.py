@@ -23,7 +23,6 @@
 
 import re
 from Core import Merlin
-from Core.exceptions_ import PNickParseError
 from Core.db import session
 from Core.maps import Channel
 from Core.config import Config

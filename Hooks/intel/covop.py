@@ -21,7 +21,6 @@
 #
 # Module by Martin Stone
  
-import math
 from Core.maps import Planet, Updates
 from Core.loadable import loadable, route, require_planet
 

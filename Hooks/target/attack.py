@@ -61,13 +61,10 @@ class attack(loadable):
         comment = params.group(3) or ""
         when = int(params.group(1))
         if when < PA.getint("numbers", "protection"):
-            eta = when
             when += tick
         elif when <= tick:
             message.alert("Can not create attacks in the past. You wanted tick %s, but current tick is %s." % (when, tick,))
             return
-        else:
-            eta = when - tick
         if when > 32767:
             when = 32767
         

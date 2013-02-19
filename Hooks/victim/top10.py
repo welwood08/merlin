@@ -23,12 +23,9 @@
  
 from sqlalchemy.orm import aliased
 from sqlalchemy.sql import desc
-from sqlalchemy.sql.functions import count
 from Core.db import session
-from Core.maps import Updates, Galaxy, Planet, Alliance, User, Intel
+from Core.maps import Planet, Alliance, Intel
 from Core.loadable import loadable, route
-from Core.config import Config
-from Core.paconf import PA
 
 class top10(loadable):
     """Top planets by specified criteria"""
@@ -82,7 +79,6 @@ class top10(loadable):
         self.execute(message, alliance=alliance, race=race, sortby=sortby)
 
     def execute(self, message, alliance=None, race=None, sortby="score"):
-        tick = Updates.current_tick()
         planet = aliased(Planet)
         planet_intel = aliased(Intel)
 

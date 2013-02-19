@@ -20,7 +20,6 @@
 # Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA 02110-1301 USA
  
 from Core.paconf import PA
-from Core.db import session
 from Core.maps import Updates, Planet, Target
 from Core.loadable import loadable, route
 
@@ -40,10 +39,6 @@ class details(loadable):
         if self.user_has_planet(user):
             attacker = user.planet
             reply="Target "
-            target_val = target.value
-            attacker_val = attacker.value
-            target_score = target.score
-            attacker_score = attacker.score
 
             reply+="%s:%s:%s (%s|%s) "%(target.x,target.y,target.z,
                                      self.num2short(target.value),self.num2short(target.score))

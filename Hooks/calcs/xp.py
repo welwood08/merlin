@@ -1,4 +1,4 @@
-# This file is part of Merlin.
+ This file is part of Merlin.
 # Merlin is the Copyright (C)2008,2009,2010 of Robin K. Hansen, Elliot Rosemarine, Andreas Jacobsen.
 
 # Individual portions may be copyright by individual contributors, and
@@ -52,10 +52,6 @@ class xp(loadable):
     
     def execute(self, message, target, attacker):
         reply="Target "
-        target_val = target.value
-        attacker_val = attacker.value
-        target_score = target.score
-        attacker_score = attacker.score
 
         reply+="%s:%s:%s (%s|%s) "%(target.x,target.y,target.z,
                                  self.num2short(target.value),self.num2short(target.score))

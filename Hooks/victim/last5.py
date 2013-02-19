@@ -23,12 +23,9 @@
  
 from sqlalchemy.orm import aliased
 from sqlalchemy.sql import asc
-from sqlalchemy.sql.functions import count
 from Core.db import session
-from Core.maps import Updates, Galaxy, Planet, Alliance, User, Intel
+from Core.maps import Updates, Planet, Alliance, Intel
 from Core.loadable import loadable, route
-from Core.config import Config
-from Core.paconf import PA
 
 class last5(loadable):
     """Bottom planets by specified criteria"""
@@ -82,9 +79,6 @@ class last5(loadable):
         self.execute(message, alliance=alliance, race=race, sortby=sortby)
 
     def execute(self, message, alliance=None, race=None, sortby="score"):
-        tick = Updates.current_tick()
-        target = aliased(Planet)
-        target_intel = aliased(Intel)
         planet = aliased(Planet)
         planet_intel = aliased(Intel)
         

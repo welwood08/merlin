@@ -25,7 +25,7 @@ from sqlalchemy.sql import asc
 from Core.config import Config
 from Core.paconf import PA
 from Core.db import session
-from Core.maps import Updates, Planet, Galaxy, User, Request, Intel
+from Core.maps import Updates, Planet, Galaxy, Request, Intel
 from Core.chanusertracker import CUT
 from Core.loadable import loadable, route, require_user, robohci
 

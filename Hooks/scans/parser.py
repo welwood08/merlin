@@ -181,13 +181,13 @@ class parse(Thread):
         planetscan.roid_eonium = m.group(5)
         planetscan.res_eonium = m.group(6)
 
-        m=re.search(r"""
-            <tr><th[^>]*>Value</th><th[^>]*>Score</th></tr>\s*
-            <tr><td[^>]*>(\d+)</td><td[^>]*>(\d+)</td></tr>\s*
-        """,page,re.VERBOSE)
-
-        value = m.group(1)
-        score = m.group(2)
+#        m=re.search(r"""
+#            <tr><th[^>]*>Value</th><th[^>]*>Score</th></tr>\s*
+#            <tr><td[^>]*>(\d+)</td><td[^>]*>(\d+)</td></tr>\s*
+#        """,page,re.VERBOSE)
+#
+#        value = m.group(1)
+#        score = m.group(2)
 
         m=re.search(r"""
             <tr><th[^>]*>Agents</th><th[^>]*>Security\s+Guards</th></tr>\s*

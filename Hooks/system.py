@@ -21,12 +21,7 @@
  
 # This module provides an entry point for system reboots or reloads
 
-from Core import Merlin
 from Core.exceptions_ import Quit, Reboot, Reload
-from Core.config import Config
-from Core.robocop import RoboCop
-from Core.chanusertracker import CUT
-from Core.callbacks import Callbacks
 from Core.loadable import system
 
 @system('PRIVMSG', admin=True, robocop=True)

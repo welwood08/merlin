@@ -19,7 +19,7 @@
 # along with this program; if not, write to the Free Software
 # Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA 02110-1301 USA
  
-from sqlalchemy.sql import desc, asc
+from sqlalchemy.sql import desc
 from Core.config import Config
 from Core.db import session
 from Core.maps import Updates, User, Ship, UserFleet
@@ -81,7 +81,6 @@ class finddef(loadable):
             Q = Q.filter(Ship.t1 == target)
             print "AAARGH"
         Q = Q.filter(User.fleetcount > 0)
-#        Q = Q.order_by(asc(User.name))
         Q = Q.order_by(desc(UserFleet.ship_count))
         return Q.all()
 

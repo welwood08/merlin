@@ -31,10 +31,6 @@ class showmethemoney(loadable):
     @route(access = "member")
     def execute(self, message, user, params):
         
-        username = Config.get("clickatell", "user")
-        password = Config.get("clickatell", "pass")
-        api_id = Config.get("clickatell", "api")
-
         get = urlencode({"user": Config.get("clickatell", "user"),
                          "password": Config.get("clickatell", "pass"),
                          "api_id": Config.get("clickatell", "api"),

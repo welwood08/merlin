@@ -23,7 +23,7 @@ import re
 import traceback
 from sqlalchemy.exc import IntegrityError
 from Core.db import session
-from Core.maps import Updates, Planet, User, FleetScan
+from Core.maps import Updates, Planet, FleetScan
 from Core.loadable import system
 
 statusre=re.compile(r"(\d+):(\d+):(\d+)\*?\s+(\d+):(\d+):(\d+)\s+(.*?)\s+((Xan|Ter|Cat|Zik|Etd)\s+)?(\d+)\s+(Return|Attack|Defend)\s+(\d+)")
@@ -54,7 +54,7 @@ class parse(object):
 
 
         fleetname=m.group(7)
-        race=m.group(9)
+#        race=m.group(9)
         fleetsize=m.group(10)
         mission=m.group(11)
         eta=m.group(12)

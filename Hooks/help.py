@@ -20,12 +20,9 @@
 # Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA 02110-1301 USA
  
 from Core.exceptions_ import PNickParseError, UserError
-from Core.maps import Channel, Command
-from Core.db import session
+from Core.maps import Channel
 from Core.loadable import loadable, route
 from Core.callbacks import Callbacks
-from sqlalchemy.sql import desc
-from datetime import datetime, timedelta
 
 class help(loadable):
     """Help"""

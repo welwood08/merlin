@@ -21,9 +21,7 @@
 #
 # Module by Martin Stone
  
-import re
 import socket
-import time
 from smtplib import SMTP, SMTPException, SMTPSenderRefused, SMTPRecipientsRefused
 from ssl import SSLError
 from Core.exceptions_ import SMSError

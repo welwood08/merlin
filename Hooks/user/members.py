@@ -21,7 +21,7 @@
 #
 # Module by Martin Stone
  
-from sqlalchemy.sql import asc, desc
+from sqlalchemy.sql import asc
 from Core.db import session
 from Core.maps import User, Updates
 from Core.loadable import loadable, route

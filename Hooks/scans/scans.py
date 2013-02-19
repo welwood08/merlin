@@ -26,7 +26,6 @@ from Core.db import session
 from Core.maps import Planet, User, Scan
 from Core.chanusertracker import CUT
 from Core.loadable import loadable, route, robohci
-from Core.config import Config
 
 class scans(loadable):
     usage = " <x:y:z>"

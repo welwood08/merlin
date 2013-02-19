@@ -22,7 +22,7 @@
 from sqlalchemy.sql import asc
 from Core.paconf import PA
 from Core.db import session
-from Core.maps import Updates, Planet, User, Target
+from Core.maps import Updates, Planet, Target
 from Core.loadable import loadable, route, require_user
 
 class unbook(loadable):
@@ -47,13 +47,10 @@ class unbook(loadable):
         tick = Updates.current_tick()
         when = int(params.group(6) or 0)
         if 0 < when < PA.getint("numbers", "protection"):
-            eta = when
             when += tick
         elif 0 < when <= tick:
             message.alert("Can not unbook targets in the past. You wanted tick %s, but current tick is %s." % (when, tick,))
             return
-        else:
-            eta = when - tick
         if when > 32767:
             when = 32767 
         

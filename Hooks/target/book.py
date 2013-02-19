@@ -24,7 +24,7 @@ from sqlalchemy.sql import asc
 from Core.config import Config
 from Core.paconf import PA
 from Core.db import session
-from Core.maps import Updates, Planet, User, Target
+from Core.maps import Updates, Planet, Target
 from Core.loadable import loadable, route, require_user
 
 class book(loadable):
