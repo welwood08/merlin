@@ -34,9 +34,9 @@ from Core.loadable import loadable, route, require_user
 class email(loadable):
     """Sends an email to the specified user. Your username will be included automatically."""
     usage = " <nick> <message>"
-    access = "admin"
+    access = 3 # Member
     
-    @route(r"(\S+)\s+(\+\+\+)?(.+)", access = "member")
+    @route(r"(\S+)\s+(\+\+\+)?(.+)", access = "email")
     @require_user
     def execute(self, message, user, params):
         
@@ -44,7 +44,7 @@ class email(loadable):
         shortmsg = params.group(2) is not None
         public_text = params.group(3) + (' - %s' % (user.name,) if not shortmsg else '')
         text = encode(public_text)
-        receiver=User.load(name=rec,exact=False,access="member") or User.load(name=rec)
+        receiver=User.load(name=rec,exact=False) or User.load(name=rec)
         if not receiver:
             message.reply("Who exactly is %s?" % (rec,))
             return

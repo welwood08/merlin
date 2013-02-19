@@ -29,7 +29,7 @@ from Core.loadable import loadable, route
 class status(loadable):
     """List of targets booked by user, or list of bookings for a given galaxy or planet"""
     usage = " [x:y[:z]|user|alliance] [tick]"
-    access = "half"
+    access = 3 # Member
     
     @route(loadable.coord+r"(?:\s+(\d+))?")
     def planet_galaxy(self, message, user, params):

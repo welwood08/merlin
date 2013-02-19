@@ -27,7 +27,7 @@ from Core.loadable import loadable, route
 
 class editattack(loadable):
     usage = " [<id> add|remove <coordlist>] | [<id> land <tick|eta>] | [<id> comment <comment>]"
-    access = "half"
+    access = 3 # Member
     
     @route(r"(\d+)\s+add\s+([. :\-\d,]+)")
     def add(self, message, user, params):

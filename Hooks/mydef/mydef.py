@@ -27,10 +27,11 @@ from Core.loadable import loadable, route, require_user
 class mydef(loadable):
     """Add your fleets for defense listing. For example: 2x 20k Barghest 30k Harpy Call me any time for hot shipsex."""
     usage = " [fleets] x <[ship count] [ship name]> [comment]"
+    access = 3 # Member
     countre = re.compile(r"^((?:\d+(?:\.\d+)?[mk]?)|(?:[\d,]+))$",re.I)
     shipre = re.compile(r"^([a-zA-Z]+),?$")
     
-    @route(r"(\d)\s*x\s*(.*)", access = "member")
+    @route(r"(\d)\s*x\s*(.*)", access="mydef")
     @require_user
     def execute(self, message, user, params):
         
@@ -54,7 +55,7 @@ class mydef(loadable):
         reply+= " and comment: %s" %(user.fleetcomment)
         message.reply(reply)
     
-    @route(r"", access = "member")
+    @route(r"", access="mydef")
     @require_user
     def showdef(self, message, user, params):
         from Hooks.mydef.showdef import showdef

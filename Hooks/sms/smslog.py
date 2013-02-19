@@ -27,7 +27,7 @@ from Core.loadable import loadable, route
 class smslog(loadable):
     """Show the last ten SMS sent, or the text of a specific SMS sender."""
     usage = " [id]"
-    access = "member"
+    access = 3 # Member
     
     @route(r"")
     def get_last_ten(self, message, user, params):

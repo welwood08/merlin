@@ -28,8 +28,9 @@ from Core.loadable import loadable, route, require_user
 class addchan(loadable):
     """Adds a channel with the given level with maxlevel equal to your own access level"""
     usage = " <chan> <level>"
+    access = 1 # Admin
     
-    @route(r"(#\S+)\s+(\S+)", access = "admin")
+    @route(r"(#\S+)\s+(\S+)", access = "addchan")
     @require_user
     def execute(self, message, user, params):
         

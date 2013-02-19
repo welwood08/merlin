@@ -28,20 +28,21 @@ from Core.loadable import loadable, route
 class finddef(loadable):
     """Search mydef for ships by target class and, optionally, ship class or target level."""
     usage = " [<class>] <target class> [t1|t2|t3]"
+    access = 3 # Member
     
-    @route(r"(\S+)\s+(\S+)\s+[tT]([1-3])", access = "member")
+    @route(r"(\S+)\s+(\S+)\s+[tT]([1-3])", access="finddef")
     def tclass(self, message, user, params):
         self.execute(message, params.group(2), params.group(1), [int(params.group(3))])
 
-    @route(r"(\S+)\s+[tT]([1-3])", access = "member")
+    @route(r"(\S+)\s+[tT]([1-3])", access="finddef")
     def tonly(self, message, user, params):
         self.execute(message, params.group(1), trange=[int(params.group(2))])
 
-    @route(r"(\S+)\s+([^tT]\S+)", access = "member")
+    @route(r"(\S+)\s+([^tT]\S+)", access="finddef")
     def shipclass(self, message, user, params):
         self.execute(message, params.group(2), params.group(1))
 
-    @route(r"(\S+)", access = "member")
+    @route(r"(\S+)", access="finddef")
     def anyclass(self, message, user, params):
         self.execute(message, params.group(1))
 

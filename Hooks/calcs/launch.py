@@ -26,6 +26,7 @@ from Core.loadable import loadable, route
 class launch(loadable):
     """Calculate launch tick, launch time, prelaunch tick and prelaunch modifier for a given ship class or eta, and land tick."""
     usage = " <class|eta> <land_tick>"
+    access = 2 # Public
     class_eta = {"fi": 8,
                  "co": 8,
                  "fr": 9,

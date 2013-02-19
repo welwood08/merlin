@@ -29,8 +29,9 @@ from Core.loadable import loadable, route, require_user
 class amps(loadable):
     """Show the amp counts of the top 10 alliance scanners. Optionally filter by amps or name."""
     usage = " [pnick|amps]"
+    access = 2 # Member
     
-    @route(r"(.*)", access = "member")
+    @route(r"(.*)", access="amps")
     def execute(self, message, user, params):
         if params.group(1):
             u = User.load(params.group(1))
@@ -62,8 +63,9 @@ class amps(loadable):
 class myamps(loadable):
     """Update your amp count."""
     usage = " [amps]"
+    access = 3 # Member
 
-    @route(r"(\d+)?", access = "member")
+    @route(r"(\d+)?", access="myamps")
     @require_user
     def execute(self, message, user, params):
         if params.group(1):

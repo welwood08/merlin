@@ -27,8 +27,9 @@ from Core.config import Config
 from Core.loadable import loadable, route
 
 class showmethemoney(loadable):
+    access = 3 # Member
     
-    @route(access = "member")
+    @route(access = "showmethemoney")
     def execute(self, message, user, params):
         
         get = urlencode({"user": Config.get("clickatell", "user"),

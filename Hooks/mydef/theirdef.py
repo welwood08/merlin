@@ -27,10 +27,11 @@ from Core.loadable import loadable, route, require_user
 class theirdef(loadable):
     """Update another user's fleets for defense listing. For example: 2x 20k Barghest 30k Harpy Call me any time for hot shipsex."""
     usage = " [user] [fleets] x <[ship count] [ship name]> [comment]"
+    access = 1 # Admin
     countre = re.compile(r"^((?:\d+(?:\.\d+)?[mk]?)|(?:[\d,]+))$",re.I)
     shipre = re.compile(r"^([a-zA-Z]+),?$")
     
-    @route(r"(\S*)\s(\d)\s*x\s*(.*)", access = "admin")
+    @route(r"(\S*)\s(\d)\s*x\s*(.*)", access="theirdef")
     @require_user
     def execute(self, message, user, params):
         name=params.group(1)

@@ -26,6 +26,7 @@ from Core.loadable import loadable, route
 class apenis(loadable):
     """Schlong"""
     usage = " [alliance]"
+    access = 2 # Public
     
     @route(r"(\S+)?")
     def execute(self, message, user, params):

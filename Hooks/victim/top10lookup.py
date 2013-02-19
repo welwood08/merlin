@@ -30,7 +30,7 @@ from Core.loadable import loadable, route
 class top10lookup(loadable):
     """Top planets by specified criteria. Results in !lookup format."""
     usage = " [alliance] [race] [score|value|size|xp]"
-    access = "member"
+    access = 3 # Member
     alias = "top10l"
 
     @route(r"")

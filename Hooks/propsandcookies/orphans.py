@@ -28,8 +28,9 @@ from Core.loadable import loadable, route
 
 class orphans(loadable):
     """Lists all members whose sponsors are no longer members. Use !adopt to someone."""
+    access = 3 # Member
     
-    @route(access = "member")
+    @route(access="orphans")
     def execute(self, message, user, params):
         
         user = aliased(User)

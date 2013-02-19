@@ -29,6 +29,7 @@ from Core.loadable import loadable, route
 class value(loadable):
     """Value of a planet over the last 15 ticks"""
     usage = " <x:y:z>"
+    access = 2 # Public
     
     @route(loadable.planet_coord+r"(?:\s+(\d+))?")
     def execute(self, message, user, params):

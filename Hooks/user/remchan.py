@@ -26,8 +26,11 @@ from Core.loadable import loadable, route, require_user
 
 class remchan(loadable):
     usage = " <chan>"
+    access = 3 # Member
+    subcommands = ["remchan_any"]
+    subaccess = [1]
     
-    @route(r"(#\S+)", access = "member")
+    @route(r"(#\S+)", access = "remchan")
     @require_user
     def execute(self, message, user, params):
         
@@ -35,13 +38,13 @@ class remchan(loadable):
         chan = Channel.load(channel)
         if chan is None:
             message.reply("Channel '%s' does not exist" % (channel,))
-            if user.is_admin():
+            if user.has_access("remchan_any"):
 #                message.privmsg("remuser %s %s" %(channel, Config.get('Connection', 'nick')),Config.get("Services", "nick"))
                 message.privmsg("set %s autoinvite off" % (channel),Config.get("Services", "nick"))
                 message.part(channel)
             return
         
-        if chan.userlevel >= user.access and not user.is_admin():
+        if chan.userlevel >= user.access and not user.has_access("remchan_any"):
             message.reply("You may not remove %s, the channel's access (%s) exceeds your own (%s)" % (chan.name, chan.userlevel, user.access,))
             return
         

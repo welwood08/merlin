@@ -29,8 +29,9 @@ from Core.loadable import loadable, route, robohci
 
 class scans(loadable):
     usage = " <x:y:z>"
+    access = 3 # Member
     
-    @route(loadable.planet_coord, access = "half")
+    @route(loadable.planet_coord, access = "scans")
     def execute(self, message, user, params):
         
         planet = Planet.load(*params.group(1,3,5))

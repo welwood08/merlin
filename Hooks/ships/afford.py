@@ -26,6 +26,7 @@ from Core.loadable import loadable, route
 class afford(loadable):
     """Calculates the number of a certain ship the planet can produce based on the most recent planet scan"""
     usage = " <x:y:z> <ship>"
+    access = 2 # Public
     
     @route(loadable.planet_coord+r"\s+(\w+)")
     def execute(self, message, user, params):

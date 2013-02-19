@@ -23,6 +23,7 @@ from Core.loadable import loadable, route
 from Core.config import Config
 
 class links(loadable):
+    access = 2 # Public
     
     @route()
     def execute(self, message, user, params):

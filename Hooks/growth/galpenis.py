@@ -25,6 +25,7 @@ from Core.loadable import loadable, route
 class galpenis(loadable):
     """Cock"""
     usage = " <x:y>"
+    access = 2 # Public
     
     @route(loadable.coord)
     def execute(self, message, user, params):

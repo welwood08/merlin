@@ -39,8 +39,9 @@ if Config.get("WhatsApp", "login"):
 class sms(loadable):
     """Sends an SMS to the specified user. Your username will be appended to the end of each sms. The user must have their phone correctly added and you must have access to their number."""
     usage = " <nick> <message>"
+    access = 3 # Member
     
-    @route(r"(\S+)\s+(.+)", access = "member")
+    @route(r"(\S+)\s+(.+)", access = "sms")
     @require_user
     def execute(self, message, user, params):
         

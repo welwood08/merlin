@@ -24,7 +24,7 @@ from Core.loadable import loadable, route, require_user
 
 class showdef(loadable):
     usage = " <pnick>"
-    access = "member"
+    access = 3 # Member
     
     @route(r"(\S+)")
     def user(self, message, user, params):

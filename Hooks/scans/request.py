@@ -33,8 +33,11 @@ class request(loadable):
     """Request a scan"""
     alias = "req"
     usage = " <x.y.z> <scantype(s)> [dists] | <id> blocks <amps> | cancel <id> | list | links"
+    access = 3 # Member
+    subcommands = ["req_cancel", "req_update", "req_list"]
+    subaccess = [3, 3, 3]
     
-    @route(loadable.coord+"\s+(["+"".join(PA.options("scans"))+r"]+)\w*(?:\s+(\d+))?", access = "member")
+    @route(loadable.coord+"\s+(["+"".join(PA.options("scans"))+r"]+)\w*(?:\s+(\d+))?", access="request")
     @require_user
     def execute(self, message, user, params):
         tick = Updates.current_tick()
@@ -169,7 +172,7 @@ class request(loadable):
         
         return request
     
-    @route(r"c(?:ancel)?\s+(\d+(?:[: -]\d+)*)", access = "member")
+    @route(r"c(?:ancel)?\s+(\d+(?:[: -]\d+)*)")
     @require_user
     def cancel(self, message, user, params):
         cancel_ids = []
@@ -193,7 +196,7 @@ class request(loadable):
             if request is None:
                 noexist.append(id)
                 continue
-            if request.user is not user and not user.is_member() and not self.is_chan(message, self.scanchan()):
+            if request.user is not user and not user.has_access("req_cancel") and not self.is_chan(message, self.scanchan()):
                 noaccess.append(id)
                 continue
             
@@ -219,7 +222,7 @@ class request(loadable):
                 message.privmsg(reply, self.scanchan())
         
     
-    @route(r"(\d+)\s+b(?:lock(?:s|ed)?)?\s+(\d+)", access = "member")
+    @route(r"(\d+)\s+b(?:lock(?:s|ed)?)?\s+(\d+)")
     def blocks(self, message, user, params):
         id = params.group(1)
         dists = int(params.group(2))+1
@@ -227,7 +230,7 @@ class request(loadable):
         if request is None:
             message.reply("No open request number %s exists (idiot)."%(id,))
             return
-        if request.user is not user and not user.is_member() and not self.is_chan(message, self.scanchan()):
+        if request.user is not user and not user.has_access("req_update") and not self.is_chan(message, self.scanchan()):
             message.reply("Scan request %s isn't yours and you're not a scanner!"%(id,))
             return
         
@@ -250,7 +253,7 @@ class request(loadable):
             for nick in nicks:
                 message.privmsg(reply, nick)
     
-    @route(r"l(?:ist)?", access = "member")
+    @route(r"l(?:ist)?")
     def list(self, message, user, params):
         Q = session.query(Request)
         Q = Q.filter(Request.tick > Updates.current_tick() - 5)
@@ -264,7 +267,7 @@ class request(loadable):
         message.reply(" ".join(map(lambda request: Config.get("Misc", "reqlist").decode("string_escape") % (request.id, request.target.intel.dists if request.target.intel else "0",
                 "/%s" % request.dists if request.dists > 0 else "", request.scantype, request.target.x, request.target.y, request.target.z,), Q.all())))
     
-    @route(r"links? ?(.*)", access = "member")
+    @route(r"links? ?(.*)")
     def links(self, message, user, params):
         try:
             if params.group(1) == "all":

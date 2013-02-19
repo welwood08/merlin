@@ -26,9 +26,10 @@ from Core.loadable import loadable, route, require_user
 
 class usedef(loadable):
     usage = " <pnick> [num] <ship>"
+    access = 3 # Member
     countre = re.compile(r"^((?:\d+(?:\.\d+)?[mk]?)|(?:[\d,]+))$",re.I)
     
-    @route(r"(\S+)\s+(.*)", access = "member")
+    @route(r"(\S+)\s+(.*)", access="usedef")
     @require_user
     def execute(self, message, user, params):
         

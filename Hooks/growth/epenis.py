@@ -26,8 +26,9 @@ from Core.loadable import loadable, route
 class epenis(loadable):
     """Penis"""
     usage = " [user]"
+    access = 3 # Member
     
-    @route(r"(\S+)?", access = "member")
+    @route(r"(\S+)?", access="epenis")
     def execute(self, message, user, params):
         
         if params.group(1) is not None:

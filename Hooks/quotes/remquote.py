@@ -25,8 +25,9 @@ from Core.loadable import loadable, route
 
 class remquote(loadable):
     usage = " <quote to remove>"
+    access = 3 # Member
     
-    @route(r"(.+)", access = "member")
+    @route(r"(.+)", access="remquote")
     def execute(self, message, user, params):
         
         params = params.group(1)

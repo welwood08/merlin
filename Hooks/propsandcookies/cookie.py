@@ -30,7 +30,7 @@ class cookie(loadable):
     """Cookies are used to give out carebears. Carebears are rewards for carefaces. Give cookies to people when you think they've done something beneficial for you or for the alliance in general."""
     alias = "cookies"
     usage = " [howmany] <receiver> <reason> | [stat]"
-    access = "member"
+    access = 3 # Member
     
     @route(r"(?:statu?s?)?")
     @require_user

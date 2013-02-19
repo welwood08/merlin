@@ -25,6 +25,7 @@ from Core.loadable import loadable, route, require_planet
 
 class xp(loadable):
     usage = " <x:y:z> [a:b:c]"
+    access = 2 # Public
     
     @route(r"%s\s+%s"%((loadable.planet_coord,)*2))
     def planet(self, message, user, params):

@@ -25,6 +25,7 @@ from Core.loadable import loadable, route, require_planet
 
 class lookup(loadable):
     usage = " [x:y[:z]|alliance|user]"
+    access = 2 # Public
     
     @route(loadable.coord)
     def planet_galaxy(self, message, user, params):

@@ -28,8 +28,9 @@ from Core.loadable import loadable, route, require_user
 class aumydef(loadable):
     """Add your fleets for defense listing using an Advanced Unit scan for your planet. Send the link to the bot, then use this command."""
     usage = " [fleets] x [comment]"
+    access = 3 # Member
     
-    @route(r"(\d)\s*x\s*(.*)", access = "member")
+    @route(r"(\d)\s*x\s*(.*)", access="aumydef")
     @require_user
     def execute(self, message, user, params):
         

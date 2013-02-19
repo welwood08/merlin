@@ -30,9 +30,10 @@ from Core.loadable import loadable, route
 class spamin(loadable):
     """Update intel on many planets at once. Accepts !spam format."""
     usage = " <alliance> [x.y.z]+"
+    access = 3 # Member
     planet_coordre = re.compile(loadable.planet_coord)
 
-    @route(r"(\S+)\s(.+)", access = "member")
+    @route(r"(\S+)\s(.+)", access="spamin")
     def execute(self, message, user, params):
         alliance = Alliance.load(params.group(1))
         if (alliance is None) and (params.group(1).lower() not in ["None", "<>", "?"]):

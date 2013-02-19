@@ -27,13 +27,14 @@ from Core.loadable import loadable, route, require_user
 
 class unbook(loadable):
     usage = " <x:y:z> [eta|landing tick]"
+    access = 3 # Member
     
-    @route(loadable.planet_coord+r"(?:\s+(\d+))?", access = "half")
+    @route(loadable.planet_coord+r"(?:\s+(\d+))?", access = "unbook")
     @require_user
     def normal(self, message, user, params):
         self.execute(message, user, params, False)
     
-    @route(loadable.planet_coord+r"(?:\s+(\d+))?\s+(y)\S*", access = "member")
+    @route(loadable.planet_coord+r"(?:\s+(\d+))?\s+(y)\S*", access = "unbook")
     @require_user
     def override(self, message, user, params):
         self.execute(message, user, params, True)

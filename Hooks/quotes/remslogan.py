@@ -25,8 +25,9 @@ from Core.loadable import loadable, route
 
 class remslogan(loadable):
     usage = " <slogan to remove>"
+    access = 3 # Member
     
-    @route(r"(.+)", access = "member")
+    @route(r"(.+)", access="remslogan")
     def execute(self, message, user, params):
         
         params = params.group(1)

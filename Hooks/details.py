@@ -26,8 +26,9 @@ from Core.loadable import loadable, route
 class details(loadable):
     """This command basically collates lookup, xp, intel and status into one simple to use command. Neat, huh?"""
     usage = " <x.y.z>"
+    access = 3 # Member
     
-    @route(loadable.planet_coord, access = "member")
+    @route(loadable.planet_coord, access="details")
     def execute(self, message, user, params):
         
         target = Planet.load(*params.group(1,3,5))

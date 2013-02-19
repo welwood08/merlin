@@ -23,6 +23,8 @@ from Core.maps import Slogan
 from Core.loadable import loadable, route
 
 class slogan(loadable):
+    access = 2 # Public
+
     @route(r"(.*)")
     def execute(self, message, user, params):
         

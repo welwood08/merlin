@@ -30,12 +30,13 @@ from Core.loadable import loadable, route, require_planet
 class whore(loadable):
     """Target search, ordered by xp gain"""
     usage = " [alliance] [race] [<|>][size] [<|>][value] [bash] (must include at least one search criteria, order doesn't matter)"
+    access = 3 # Member
     alliancere=re.compile(r"(\S+)")
     rangere=re.compile(r"(<|>)?(\d+)")
     bashre=re.compile(r"(bash)",re.I)
     clusterre=re.compile(r"c(\d+)",re.I)
     
-    @route(r"(.+)", access = "member")
+    @route(r"(.+)", access = "whore")
     @require_planet
     def execute(self, message, user, params):
         

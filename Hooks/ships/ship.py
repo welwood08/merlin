@@ -25,6 +25,7 @@ from Core.loadable import loadable, route
 class ship(loadable):
     """Returns the stats of the specified ship"""
     usage = " <ship>"
+    access = 2 # Public
     
     @route(r"(.+)")
     def execute(self, message, user, params):

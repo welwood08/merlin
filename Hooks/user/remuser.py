@@ -28,8 +28,9 @@ from Core.loadable import loadable, route, require_user
 class remuser(loadable):
     """Permenantly delete a user"""
     usage = " <user>"
+    access = 1 # Admin
     
-    @route(r"(\S+)", access = "admin")
+    @route(r"(\S+)", access = "remuser")
     @require_user
     def execute(self, message, user, params):
         

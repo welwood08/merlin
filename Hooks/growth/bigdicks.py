@@ -26,8 +26,9 @@ from Core.loadable import loadable, route
 
 class bigdicks(loadable):
     """BEEFCAKE!!!11onetwo"""
+    access = 3 # Member
     
-    @route(access = "member")
+    @route(access="bigdicks")
     def execute(self, message, user, params):
         
         Q = session.query(User, epenis)

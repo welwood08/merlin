@@ -27,8 +27,9 @@ from Core.loadable import loadable, route
 class galmate(loadable):
     """Add a user with galmate access"""
     usage = " <pnick>"
+    access = 3 # Member
     
-    @route(r"(\S+)", access = "half")
+    @route(r"(\S+)", access = "galmate")
     def execute(self, message, user, params):
         
         pnick = params.group(1)

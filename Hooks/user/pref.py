@@ -29,6 +29,7 @@ class pref(loadable):
     """Set your planet, password for the webby, URL preference and phone number and settings; order doesn't matter"""
     usage = " [planet=x.y.z] [password=pass] [url=ip] [phone=999] [pubphone=T|F] [smsmode=clickatell|google|both] [email=user@example.com]"
     planet_coordre = re.compile(loadable.planet_coord)
+    access = 2 # Public
     
     @route(r"")
     @require_user

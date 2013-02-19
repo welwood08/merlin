@@ -27,6 +27,7 @@ from Core.loadable import loadable, route
 class eff(loadable):
     """Calculates the efficiency of the specified number of ships"""
     usage = " <number> <ship> [t1|t2|t3]"
+    access = 2 # Public
     
     @route(r"(\d+(?:\.\d+)?[km]?)\s+(\w+)(?:\s+(t1|t2|t3))?")
     def execute(self, message, user, params):

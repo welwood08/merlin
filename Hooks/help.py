@@ -27,6 +27,7 @@ from Core.callbacks import Callbacks
 class help(loadable):
     """Help"""
     usage = " [command]"
+    access = 2 # Public
     
     @route(r"\S+")
     def command(self, message, user, params):

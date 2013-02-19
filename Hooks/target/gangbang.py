@@ -28,8 +28,9 @@ from Core.loadable import loadable, route
 class gangbang(loadable):
     """List of booked targets in an alliance"""
     usage = " <alliance> [tick]"
+    access = 3 # Member
     
-    @route(r"(\S+)(?:\s+(\d+))?", access = "half")
+    @route(r"(\S+)(?:\s+(\d+))?", access = "gangbang")
     def execute(self, message, user, params):
         
         alliance = Alliance(name="Unknown") if params.group(1).lower() == "unknown" else Alliance.load(params.group(1))

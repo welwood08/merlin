@@ -103,11 +103,18 @@ if not round:
     session.add(Group(id=3, name="member", desc="Normal alliance members"))
 
     for callback in Callbacks.callbacks['PRIVMSG']:
-        if callback.access == 2:
-            session.add(Access(id=callback.name, group_id=2))
-            session.add(Access(id=callback.name, group_id=3))
-        elif callback.access != 1:
-            session.add(Access(id=callback.name, group_id=callback.access))
+        addaccess(callback.name, callback.access)
+        if callback.subcommands:
+            i = 0
+            while i < len(callback.subcommands):
+                addaccess(callback.subcommands[i], callback.subaccess[i])
+
+def addaccess(name, access):
+    if access == 2:
+        session.add(Access(id=name, group_id=2))
+        session.add(Access(id=name, group_id=3))
+    elif access != 1:
+        session.add(Access(id=name, group_id=access))
 
 if round and not mysql:
     print "Migrating data:"

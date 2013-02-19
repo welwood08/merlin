@@ -28,8 +28,9 @@ from Core.loadable import loadable, route, require_user
 class adduser(loadable):
     """Used to add new users with the specified pnick and access level"""
     usage = " <pnick> <access>"
+    access = 1 # Admin
     
-    @route(r"(.+)\s+(\S+)", access = "admin")
+    @route(r"(.+)\s+(\S+)", access = "adduser")
     @require_user
     def execute(self, message, user, params):
         

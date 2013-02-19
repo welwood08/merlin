@@ -29,7 +29,7 @@ from Core.loadable import loadable, route, require_planet
 class surprisesex(loadable):
     """Top alliances attacking the specified target"""
     usage = " [x:y[:z]|alliance|user]"
-    access = "member"
+    access = 3 # Member
     
     @route(loadable.coord)
     def planet_galaxy(self, message, user, params):

@@ -27,6 +27,7 @@ from Core.loadable import loadable, route
 class prod(loadable):
     """Calculate ticks it takes to produce <number> <ships> with <factories>. Specify population and/or government for bonuses."""
     usage = " <number> <ship> <factories> [population] [government]"
+    access = 2 # Public
     
     @route(r"(\d+(?:\.\d+)?[km]?)\s+(\S+)\s+(\d+)(?:\s+(.*))?")
     def execute(self, message, user, params):

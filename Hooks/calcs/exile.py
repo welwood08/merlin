@@ -26,6 +26,8 @@ from Core.maps import Galaxy, Planet
 from Core.loadable import loadable, route
 
 class exile(loadable):
+    access = 2 # Public
+
     @route()
     def execute(self, message, user, params):
         

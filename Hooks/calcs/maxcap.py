@@ -24,6 +24,7 @@ from Core.loadable import loadable, route
 
 class maxcap(loadable):
     usage = " (<total roids>|<x:y:z> [a:b:c])"
+    access = 2 # Public
     
     @route(r"(\d+)\s*$")
     def size(self, message, user, params):

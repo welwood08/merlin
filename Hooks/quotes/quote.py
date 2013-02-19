@@ -23,6 +23,8 @@ from Core.maps import Quote
 from Core.loadable import loadable, route
 
 class quote(loadable):
+    access = 1 # Public
+
     @route(r"(.*)")
     def execute(self, message, user, params):
         

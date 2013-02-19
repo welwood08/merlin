@@ -25,8 +25,9 @@ from Core.maps import User, epenis
 from Core.loadable import loadable, route
 
 class loosecunts(loadable):
+    access = 3 # Member
     
-    @route(access = "member")
+    @route(access="loosecunts")
     def execute(self, message, user, params):
         
         Q = session.query(User, epenis)

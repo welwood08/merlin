@@ -25,6 +25,7 @@ from Core.loadable import loadable, route, require_planet
 
 class seagal(loadable):
     usage = " <x:y:z> [sum]"
+    access = 2 # Public
     
     @route(loadable.planet_coord+r"(?:\s+(\d+))?")
     @require_planet

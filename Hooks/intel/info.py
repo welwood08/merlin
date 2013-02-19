@@ -29,8 +29,9 @@ from Core.loadable import loadable, route
 class info(loadable):
     """Alliance information (All information taken from intel, for tag information use the lookup command)"""
     usage = " <alliance>"
+    access = 3 # Member
     
-    @route(r"(\S+)", access = "member")
+    @route(r"(\S+)", access="info")
     def execute(self, message, user, params):
         
         tag_count = PA.getint("numbers", "tag_count")

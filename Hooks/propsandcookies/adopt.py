@@ -27,8 +27,9 @@ from Core.loadable import loadable, route, require_user, channel
 class adopt(loadable):
     """Adopt an orphan"""
     usage = " <pnick>"
+    access = 3 # Member
     
-    @route(r"(\S+)", access = "member")
+    @route(r"(\S+)", access="adopt")
     @channel("home")
     @require_user
     def execute(self, message, user, params):

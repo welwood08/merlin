@@ -26,8 +26,9 @@ from Core.loadable import loadable, route
 class whois(loadable):
     """Lookup a user's details"""
     usage = " <pnick>"
+    access = 3 # Member
     
-    @route(r"(\S+)", access = "member")
+    @route(r"(\S+)", access = "whois")
     def execute(self, message, user, params):
 
         # assign param variables 

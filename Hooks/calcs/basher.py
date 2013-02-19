@@ -25,6 +25,7 @@ from Core.loadable import loadable, route, require_planet
 
 class basher(loadable):
     usage = " <x:y:z>"
+    access = 2 # Public
     
     @route(loadable.planet_coord)
     def planet(self, message, user, params):

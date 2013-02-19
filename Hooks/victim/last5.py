@@ -30,7 +30,7 @@ from Core.loadable import loadable, route
 class last5(loadable):
     """Bottom planets by specified criteria"""
     usage = " [alliance] [race] [score|value|size|xp]"
-    access = "member"
+    access = 3 # Member
 
     @route(r"")
     def nogroup(self, message, user, params):

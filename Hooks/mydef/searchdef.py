@@ -27,8 +27,9 @@ from Core.loadable import loadable, route
 
 class searchdef(loadable):
     usage = " [number] <ship>"
+    access = 3 # Member
     
-    @route(r"(\d+(?:\.\d+)?[mk]?)?\s+(\S+)", access = "member")
+    @route(r"(\d+(?:\.\d+)?[mk]?)?\s+(\S+)", access="searchdef")
     def execute(self, message, user, params):
         
         count = self.short2num(params.group(1) or "1")

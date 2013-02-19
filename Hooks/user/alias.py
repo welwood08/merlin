@@ -26,6 +26,7 @@ from Core.loadable import loadable, route, require_user
 class alias(loadable):
     """Set an alias that maps to your pnick, useful if you have a different nick than your pnick and people use autocomplete."""
     usage = " <alias> (at most 15 characters)"
+    access = 2 # Public
     
     @route(r"(\S{2,15})?")
     @require_user

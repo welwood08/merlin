@@ -26,8 +26,9 @@ from Core.loadable import loadable, route
 
 class logdef(loadable):
     usage = " [ship] | [user]"
+    access = 3 # Member
     
-    @route(r"(\S+)?", access = "member")
+    @route(r"(\S+)?", access="logdef")
     def execute(self, message, user, params):
         
         search=params.group(1)

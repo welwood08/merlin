@@ -27,6 +27,7 @@ from Core.loadable import loadable, route
 class rprod(loadable):
     """Calculate how many <ship> you can build in <ticks> with <factories>. Specify population and/or government for bonuses."""
     usage = " <ship> <ticks> <factories> [population] [government]"
+    access = 2 # Public
     dx = tolerance = 0.00001
     
     @route(r"(\S+)\s+(\d+)\s+(\d+)(?:\s+(.*))?")

@@ -27,8 +27,9 @@ from Core.loadable import loadable, route, robohci
 class broadcast(loadable):
     """Make a broadcast to all alliance channels. Append "HIDEME" if you do not want your username included."""
     usage = " <message> [HIDEME]"
+    access = 1 # Admin
     
-    @route(r"(.+)", access = "admin")
+    @route(r"(.+)", access="broadcast")
     def execute(self, message, user, params):
         if params.group(1)[-6:].lower() == "hideme":
             notice = "%s" % (params.group(1)[:-6])

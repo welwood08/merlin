@@ -30,8 +30,9 @@ from Core.loadable import loadable, route, require_user
 class book(loadable):
     """Book a target for attack. You should always book your targets, so someone doesn't inadvertedly piggy your attack."""
     usage = " <x:y:z> (eta|landing tick) [later]"
+    access = 3 # Member
     
-    @route(loadable.planet_coord+r"\s+(\d+)(?:\s+(y)\S*)?(?:\s+(l)\S*)?", access = "half")
+    @route(loadable.planet_coord+r"\s+(\d+)(?:\s+(y)\S*)?(?:\s+(l)\S*)?", access = "book")
     @require_user
     def execute(self, message, user, params):
         planet = Planet.load(*params.group(1,3,5))

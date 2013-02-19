@@ -26,7 +26,7 @@ from Core.loadable import loadable, route, require_user
 class aids(loadable):
     """See who a user has sexed"""
     usage = " <pnick>"
-    access = "member"
+    access = 3 # Member
     
     @route(r"(\S+)")
     def user(self, message, user, params):

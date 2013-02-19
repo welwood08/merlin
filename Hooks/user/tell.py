@@ -32,9 +32,9 @@ from Core.config import Config
 class tell(loadable):
     """Sends a message to a user when they next join a channel with me."""
     usage = " <nick> <message>"
-    access = "member"
+    access = 3 # Member
     
-    @route(r"(\S+)\s+(.+)", access = "member")
+    @route(r"(\S+)\s+(.+)", access = "tell")
     @require_user
     def execute(self, message, user, params):
         text = params.group(2)

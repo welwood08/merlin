@@ -27,6 +27,7 @@ from Core.loadable import loadable, route
 class cost(loadable):
     """Calculates the cost of producing the specified number of ships"""
     usage = " <number> <ship>"
+    access = 2 # Public
     
     @route(r"(\d+(?:\.\d+)?[km]?)\s+(\w+)")
     def execute(self, message, user, params):

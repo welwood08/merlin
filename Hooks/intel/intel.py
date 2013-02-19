@@ -30,8 +30,11 @@ class intel(loadable):
     """View or set intel for a planet. Valid options: """
     __doc__ += ", ".join(options)
     usage = " <x.y[.z]> [option=value]+"
+    access = 3 # Member
+    subcommands = ["intel_set"]
+    subaccess = [3]
     
-    @route(loadable.coord, access = "member")
+    @route(loadable.coord, access="intel")
     def view_intel(self, message, user, params):
         
         if params.group(5) is None:
@@ -75,8 +78,11 @@ class intel(loadable):
         else:
             message.reply("No information stored for %s:%s:%s"% (planet.x, planet.y, planet.z,))
     
-    @route(loadable.planet_coord+r"\s+(\S.*)", access = "member")
+    @route(loadable.planet_coord+r"\s+(\S.*)", access="intel_set")
     def set_intel(self, message, user, params):
+#        if (not user) or (not user.has_access("intel_set")):
+#            message.alert("Insufficient access to update intel" % params.group(1,3,5))
+#            return
         planet = Planet.load(*params.group(1,3,5))
         if planet is None:
             message.alert("No planet with coords %s:%s:%s" % params.group(1,3,5))

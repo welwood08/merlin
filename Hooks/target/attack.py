@@ -29,7 +29,7 @@ from Core.loadable import loadable, route
 class attack(loadable):
     """Create an attack page on the webby with automatic parsed scans"""
     usage = " [<eta|landingtick> <coordlist> [comment]] | [list] | [show <id>]"
-    access = "half"
+    access = 3 # Member
     
     @route(r"(?:list)?")
     def list(self,message,user,params):

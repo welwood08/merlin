@@ -30,9 +30,10 @@ from Core.loadable import loadable, route, require_user
 class forcepref(loadable):
     """Set a user's planet, password for the webby, URL preference and phone number and settings; order doesn't matter"""
     usage = " <user> [planet=x.y.z] [password=pass] [url=ip] [phone=999] [pubphone=T|F] [smsmode=clickatell|google|both]"
+    access = 1 # Admin
     planet_coordre = re.compile(loadable.planet_coord)
     
-    @route(r"(\S+)", access="admin")
+    @route(r"(\S+)", access="forcepref")
     @require_user
     def show_prefs(self, message, user, params):
 

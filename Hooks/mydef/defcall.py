@@ -35,8 +35,9 @@ from Core.robocop import push
 class defcall(loadable):
     """Make a broadcast to the channel requesting defence"""
     usage = " <x:y:z> <eta> <description>"
+    access = 3 # Member (was DC)
     
-    @route(loadable.planet_coord + r"\W+(\d+)\W+(.+)", access = "dc")
+    @route(loadable.planet_coord + r"\W+(\d+)\W+(.+)", access="defcall")
     def execute(self, message, user, params):
         
         planet = Planet.load(*params.group(1,3,5))

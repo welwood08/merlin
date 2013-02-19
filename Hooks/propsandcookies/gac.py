@@ -28,8 +28,9 @@ from Core.loadable import loadable, route
 
 class gac(loadable):
     """Displays stats about the Gross Alliance Cookies. Similar to the Gross Domestic Product, GAC covers how many cookies changed hands in a given week."""
+    access = 3 # Member
     
-    @route(access = "member")
+    @route(access="gac")
     def execute(self, message, user, params):
         
         last_5_gac=self.get_last_5_gac()

@@ -29,8 +29,9 @@ from Core.loadable import loadable, route
 class paranoidcunts(loadable):
     """List members who are have not set their phone number properly. Optionally sanity-checks phone numbers."""
     usage = " [galmates] [check] [noemail]"
+    access = 1 # Admin
     
-    @route(r"(.*)", access = "admin")
+    @route(r"(.*)", access = "paranoidcunts")
     def execute(self, message, user, params):
         reply = ""
         opts = params.group(1).split()

@@ -24,6 +24,7 @@ from Core.loadable import loadable, route
 from Core.maps import Updates
 
 class tick(loadable):
+    access = 2 # Public
     
     @route("")
     def current(self, message, user, params):

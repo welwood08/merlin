@@ -26,9 +26,10 @@ from Core.loadable import loadable, route
 
 class addslogan(loadable):
     usage = " <slogan goes here>"
+    access = 3 # Member
     timestampre=re.compile(r"\s*\[?\s*\d{2}:\d{2}(:\d{2})?\s*\]?\s*")
     
-    @route(r"(.+)", access = "member")
+    @route(r"(.+)", access="addslogan")
     def execute(self, message, user, params):
         
         params = params.group(1)

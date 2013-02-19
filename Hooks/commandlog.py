@@ -27,7 +27,7 @@ from Core.loadable import loadable, route
 class commandlog(loadable):
     """Search the bot's command log for use of specified command. Parameters is a % encapsulated list of arguments. For example, to search for someone setting the alliance on a planet in 1:1, do: !commandlog intel %1%1%alliance=%. You can also limit the search to a specific username using the optional user= argument."""
     usage = " <command> [user=<username>] <parameters> | <id>"
-    access = "admin"
+    access = 1 # Admin
     
     @route(r"(\w+)\s*(.*)")
     def search3_cmd(self, message, user, params):
