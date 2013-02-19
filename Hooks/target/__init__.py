@@ -25,7 +25,7 @@ __all__ = [
            "status",
            "book",
            "unbook",
-#           "gangbang",
+           "gangbang",
            "attack",
            "editattack",
            ]
