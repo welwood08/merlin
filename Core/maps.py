@@ -1146,6 +1146,20 @@ planet_old_id_search = Table('planet_old_id_search', Base.metadata,
 # #############################    USER TABLES    ########################### #
 # ########################################################################### #
 
+class Group(Base):
+    __tablename__ = Config.get('DB', 'prefix') + 'group'
+    id = Column(Integer, primary_key=True)
+    name = Column(String(255))
+    desc = Column(String(255))
+
+    @property
+    def has_access(self, access_id):
+        if self.id == 1:
+            return True
+        else:
+            access_id = access_id.lower()
+            return session.query(Access).filter(Access.group_id==self.id).filter(Access.id==access_id).count() > 0
+
 class User(Base):
     __tablename__ = Config.get('DB', 'prefix') + 'users'
     _sms_modes = {"C":"Clickatell", "G":"GoogleVoice", "R":"Retard", "E":"Email", "W":"WhatsApp",}
@@ -1154,7 +1168,7 @@ class User(Base):
     alias = Column(String(255))
     passwd = Column(String(255))
     active = Column(Boolean, default=True)
-    group_id = Column(Integer, ForeignKey(Group.id, ondelete='set null'), index=True)
+    group_id = Column(Integer, ForeignKey(Group.id, ondelete='set null'), default=2, index=True)
     planet_id = Column(Integer, ForeignKey(Planet.id, ondelete='set null'), index=True)
     url = Column(String(255))
     email = Column(String(255))
@@ -1193,8 +1207,11 @@ class User(Base):
 
     @property
     def has_access(self, access_id):
-        access_id = access_id.lower()
-        return session.query(Access).filter(Access.group_id==self.group_id).filter(Access.id==access_id).count() > 0
+        if self.group_id == 1:
+            return True
+        else:
+            access_id = access_id.lower()
+            return session.query(Access).filter(Access.group_id==self.group_id).filter(Access.id==access_id).count() > 0
     
     @property
     def smsmode(self):
@@ -1278,15 +1295,6 @@ class User(Base):
         else:
             return None
 Planet.user = relation(User, uselist=False, backref="planet")
-#def user_access_function(num):
-#    # Function generator for access check
-#    def func(self):
-#        if self.access >= num:
-#            return True
-#    return func
-#for lvl, num in Config.items("Access"):
-#    # Bind user access functions
-#    setattr(User, "is_"+lvl, user_access_function(int(num)))
 
 class Tell(Base):
     __tablename__ = Config.get('DB', 'prefix') + 'tell'
@@ -1299,18 +1307,8 @@ Tell.user = relation(User, primaryjoin=(Tell.user_id==User.id), backref=backref(
 Tell.sender = relation(User, primaryjoin=(Tell.sender_id==User.id))
 User.newtells = relation(Tell, primaryjoin=and_(User.id==Tell.user_id, Tell.read==False), order_by=asc(Tell.id))
 
-class Group(Base):
-    __tablename__ = Config.get('DB', 'prefix') + 'group'
-    id = Column(Integer, primary_key=True)
-    name = Column(String(255))
-    desc = Column(String(255))
-
-    @property
-    def has_access(self, access_id):
-        access_id = access_id.lower()
-        return session.query(Access).filter(Access.group_id==self.id).filter(Access.id==access_id).count() > 0
-#Group.users = relation(User, primaryjoin=(User.group==Group.id), order_by=asc(User.name))
 User.group = relation(Group, backref=backref('users', lazy='joined', order_by=asc(User.name)))
+Group.users = relation(User, primaryjoin=(User.group_id==Group.id), order_by=asc(User.name))
 
 class Access(Base):
     __tablename__ = Config.get('DB', 'prefix') + 'access'
@@ -1350,18 +1348,24 @@ class Channel(Base):
     __tablename__ = Config.get('DB', 'prefix') + 'channels'
     id = Column(Integer, primary_key=True)
     name = Column(String(255), unique=True)
-    userlevel = Column(Integer, default=1)
-    maxlevel = Column(Integer, default=1)
+    userlevel = Column(Integer, default=2)
+    maxlevel = Column(Integer, default=2)
     
     @property
     def has_access(self, access_id):
-        access_id = access_id.lower()
-        return session.query(Access).filter(Access.group_id==self.userlevel).filter(Access.id==access_id).count() > 0
+        if self.userlevel == 1:
+            return True
+        else:
+            access_id = access_id.lower()
+            return session.query(Access).filter(Access.group_id==self.userlevel).filter(Access.id==access_id).count() > 0
     
     @property
     def can_access(self, access_id):
-        access_id = access_id.lower()
-        return session.query(Access).filter(Access.group_id==self.maxlevel).filter(Access.id==access_id).count() > 0
+        if self.maxlevel == 1:
+            return True
+        else:
+            access_id = access_id.lower()
+            return session.query(Access).filter(Access.group_id==self.maxlevel).filter(Access.id==access_id).count() > 0
     
     @staticmethod
     def load(name):

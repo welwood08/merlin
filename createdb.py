@@ -25,6 +25,8 @@ from sqlalchemy.exc import DBAPIError, IntegrityError, ProgrammingError
 from sqlalchemy.sql import text, bindparam
 from Core.config import Config
 from Core.db import Base, session
+from Core.maps import Group, Access
+from Core.callbacks import Callbacks
 import shipstats
 
 mysql = Config.get("DB", "dbms") == "mysql"
@@ -75,18 +77,15 @@ if not mysql:
 Base.metadata.create_all()
 
 print "Setting up default channels"
-userlevel = Config.get("Access", "member")
-maxlevel = Config.get("Access", "admin")
-gallevel = Config.get("Access", "galmate")
 for chan, name in Config.items("Channels"):
     try:
         channel = Channel(name=name)
         if chan != "public":
-            channel.userlevel = userlevel
-            channel.maxlevel = maxlevel
+            channel.userlevel = 3
+            channel.maxlevel = 1
         else:
-            channel.userlevel = gallevel
-            channel.maxlevel = gallevel
+            channel.userlevel = 2
+            channel.maxlevel = 2
         session.add(channel)
         session.flush()
     except IntegrityError:
@@ -97,13 +96,28 @@ for chan, name in Config.items("Channels"):
         session.commit()
 session.close()
 
+if not round:
+    print "Setting up default access levels"
+    session.add(Group(id=1, name="admin", desc="Administrators"))
+    session.add(Group(id=2, name="public", desc="Public commands"))
+    session.add(Group(id=3, name="member", desc="Normal alliance members"))
+
+    for callback in Callbacks.callbacks['PRIVMSG']:
+        if callback.access == 2:
+            session.add(Access(id=callback.name, group_id=2))
+            session.add(Access(id=callback.name, group_id=3))
+        elif callback.access != 1:
+            session.add(Access(id=callback.name, group_id=callback.access))
+
 if round and not mysql:
     print "Migrating data:"
     try:
         print "  - users/friends"
-        session.execute(text("INSERT INTO %susers (id, name, alias, passwd, active, access, url, email, phone, pubphone, _smsmode, sponsor, quits, available_cookies, carebears, last_cookie_date, fleetcount) SELECT id, name, alias, passwd, active, access, url, email, phone, pubphone, _smsmode::varchar::smsmode, sponsor, quits, available_cookies, carebears, last_cookie_date, 0 FROM %s.%susers;" % (prefix, round, old_prefix)))
+        session.execute(text("INSERT INTO %susers (id, name, alias, passwd, active, group_id, url, email, phone, pubphone, _smsmode, sponsor, quits, available_cookies, carebears, last_cookie_date, fleetcount) SELECT id, name, alias, passwd, active, group_id, url, email, phone, pubphone, _smsmode::varchar::smsmode, sponsor, quits, available_cookies, carebears, last_cookie_date, 0 FROM %s.%susers;" % (prefix, round, old_prefix)))
         session.execute(text("SELECT setval('%susers_id_seq',(SELECT max(id) FROM %susers));" % (prefix, prefix)))
         session.execute(text("INSERT INTO %sphonefriends (user_id, friend_id) SELECT user_id, friend_id FROM %s.%sphonefriends;" % (prefix, round, old_prefix)))
+        session.execute(text("INSERT INTO %sgroup (id, name, desc) SELECT id, name, desc FROM %s.%sgroup;" % (prefix, round, old_prefix)))
+        session.execute(text("INSERT INTO %saccess (id, group_id) SELECT id, group_id FROM %s.%saccess;" % (prefix, round, old_prefix)))
         print "  - slogans/quotes"
         session.execute(text("INSERT INTO %sslogans (text) SELECT text FROM %s.%sslogans;" % (prefix, round, old_prefix)))
         session.execute(text("INSERT INTO %squotes (text) SELECT text FROM %s.%squotes;" % (prefix, round, old_prefix)))
