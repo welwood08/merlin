@@ -1154,7 +1154,7 @@ class User(Base):
     alias = Column(String(255))
     passwd = Column(String(255))
     active = Column(Boolean, default=True)
-    access = Column(Integer, default=(Config.getint("Access","galmate") if "galmate" in Config.options("Access") else 0))
+    group_id = Column(Integer, ForeignKey(Group.id, ondelete='set null'), index=True)
     planet_id = Column(Integer, ForeignKey(Planet.id, ondelete='set null'), index=True)
     url = Column(String(255))
     email = Column(String(255))
@@ -1175,21 +1175,26 @@ class User(Base):
     def is_user(self):
         return self in session
     
+#    @property
+#    def level(self):
+#        if not self.active:
+#            return None
+#        for level, access in self.levels:
+#            if self.access >= int(access):
+#                return level
+#        return "galmate"
+#    
+#    @level.setter
+#    def level(self, value):
+#        if value in (True, False,):
+#            self.active = bool(value)
+#        else:
+#            self.access = Config.getint("Access", value)
+
     @property
-    def level(self):
-        if not self.active:
-            return None
-        for level, access in self.levels:
-            if self.access >= int(access):
-                return level
-        return "galmate"
-    
-    @level.setter
-    def level(self, value):
-        if value in (True, False,):
-            self.active = bool(value)
-        else:
-            self.access = Config.getint("Access", value)
+    def has_access(self, access_id):
+        access_id = access_id.lower()
+        return session.query(Access).filter(Access.group_id==self.group_id).filter(Access.id==access_id).count() > 0
     
     @property
     def smsmode(self):
@@ -1273,15 +1278,15 @@ class User(Base):
         else:
             return None
 Planet.user = relation(User, uselist=False, backref="planet")
-def user_access_function(num):
-    # Function generator for access check
-    def func(self):
-        if self.access >= num:
-            return True
-    return func
-for lvl, num in Config.items("Access"):
-    # Bind user access functions
-    setattr(User, "is_"+lvl, user_access_function(int(num)))
+#def user_access_function(num):
+#    # Function generator for access check
+#    def func(self):
+#        if self.access >= num:
+#            return True
+#    return func
+#for lvl, num in Config.items("Access"):
+#    # Bind user access functions
+#    setattr(User, "is_"+lvl, user_access_function(int(num)))
 
 class Tell(Base):
     __tablename__ = Config.get('DB', 'prefix') + 'tell'
@@ -1294,34 +1299,24 @@ Tell.user = relation(User, primaryjoin=(Tell.user_id==User.id), backref=backref(
 Tell.sender = relation(User, primaryjoin=(Tell.sender_id==User.id))
 User.newtells = relation(Tell, primaryjoin=and_(User.id==Tell.user_id, Tell.read==False), order_by=asc(Tell.id))
 
-class UserGroup(Base):
-    __tablename__ = Config.get('DB', 'prefix') + 'user_group'
-    group_id = Column(String(255), primary_key=True)
-    user_id = Column(Integer, ForeignKey(User.id, ondelete='cascade'), primary_key=True)
-#Tell.user = relation(User, primaryjoin=(Tell.user_id==User.id), backref=backref("tells", order_by=desc(Tell.id)))
-#Tell.sender = relation(User, primaryjoin=(Tell.sender_id==User.id))
-#User.newtells = relation(Tell, primaryjoin=and_(User.id==Tell.user_id, Tell.read==False), order_by=asc(Tell.id))
+class Group(Base):
+    __tablename__ = Config.get('DB', 'prefix') + 'group'
+    id = Column(Integer, primary_key=True)
+    name = Column(String(255))
+    desc = Column(String(255))
 
-class UserAccess(Base):
-    __tablename__ = Config.get('DB', 'prefix') + 'user_access'
-    access_id = Column(String(255), primary_key=True)
-    user_id = Column(Integer, ForeignKey(User.id, ondelete='cascade'), primary_key=True)
-#Tell.user = relation(User, primaryjoin=(Tell.user_id==User.id), backref=backref("tells", order_by=desc(Tell.id)))
-#Tell.sender = relation(User, primaryjoin=(Tell.sender_id==User.id))
-#User.newtells = relation(Tell, primaryjoin=and_(User.id==Tell.user_id, Tell.read==False), order_by=asc(Tell.id))
+    @property
+    def has_access(self, access_id):
+        access_id = access_id.lower()
+        return session.query(Access).filter(Access.group_id==self.id).filter(Access.id==access_id).count() > 0
+#Group.users = relation(User, primaryjoin=(User.group==Group.id), order_by=asc(User.name))
+User.group = relation(Group, backref=backref('users', lazy='joined', order_by=asc(User.name)))
 
-class GroupAccess(Base):
-    __tablename__ = Config.get('DB', 'prefix') + 'group_access'
-    access_id = Column(String(255), primary_key=True)
+class Access(Base):
+    __tablename__ = Config.get('DB', 'prefix') + 'access'
+    id = Column(String(255), primary_key=True)
     group_id = Column(Integer, ForeignKey(Group.id, ondelete='cascade'), primary_key=True)
-#Tell.user = relation(User, primaryjoin=(Tell.user_id==User.id), backref=backref("tells", order_by=desc(Tell.id)))
-#Tell.sender = relation(User, primaryjoin=(Tell.sender_id==User.id))
-#User.newtells = relation(Tell, primaryjoin=and_(User.id==Tell.user_id, Tell.read==False), order_by=asc(Tell.id))
-
-class ChanAccess(Base):
-    __tablename__ = Config.get('DB', 'prefix') + 'channel_access'
-    access_id = Column(String(255), primary_key=True)
-    channel_id = Column(Integer, ForeignKey(Channel.id, ondelete='cascade'), primary_key=True)
+Group.commands = relation(Access, primaryjoin=(Access.group_id==Group.id), backref="group")
 
 class Arthur(Base):
     __tablename__ = Config.get('DB', 'prefix') + 'session'
@@ -1357,6 +1352,16 @@ class Channel(Base):
     name = Column(String(255), unique=True)
     userlevel = Column(Integer)
     maxlevel = Column(Integer)
+    
+    @property
+    def has_access(self, access_id):
+        access_id = access_id.lower()
+        return session.query(Access).filter(Access.group_id==self.userlevel).filter(Access.id==access_id).count() > 0
+    
+    @property
+    def can_access(self, access_id):
+        access_id = access_id.lower()
+        return session.query(Access).filter(Access.group_id==self.maxlevel).filter(Access.id==access_id).count() > 0
     
     @staticmethod
     def load(name):
