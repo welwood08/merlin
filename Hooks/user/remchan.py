@@ -37,6 +37,7 @@ class remchan(loadable):
             message.reply("Channel '%s' does not exist" % (channel,))
             if user.is_admin():
 #                message.privmsg("remuser %s %s" %(channel, Config.get('Connection', 'nick')),Config.get("Services", "nick"))
+                message.privmsg("set %s autoinvite off" % (channel),Config.get("Services", "nick"))
                 message.part(channel)
             return
         
@@ -48,5 +49,6 @@ class remchan(loadable):
         session.commit()
         
 #        message.privmsg("remuser %s %s" %(chan.name, Config.get('Connection', 'nick')),Config.get("Services", "nick"))
+        message.privmsg("set %s autoinvite off" % (channel),Config.get("Services", "nick"))
         message.part(chan.name)
         message.reply("Removed channel %s" % (chan.name,))
