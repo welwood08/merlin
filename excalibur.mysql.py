@@ -25,7 +25,7 @@ from Core.config import Config
 from Core.paconf import PA
 from Core.string import decode, excaliburlog
 from Core.db import true, false, session
-from Core.maps import Updates, Cluster, Galaxy, Planet, Alliance, epenis, galpenis, apenis
+from Core.maps import Updates, epenis, galpenis, apenis, Request
 from Core.maps import galaxy_temp, planet_temp, alliance_temp, planet_new_id_search, planet_old_id_search
 
 prefixes = ['ally_']
@@ -1196,6 +1196,11 @@ excaliburlog("epenis in %.3f seconds" % (t2,))
 session.commit()
 t1=time.time()-t_start
 excaliburlog("Total penis time: %.3f seconds" % (t1,))
+session.close()
+
+# Close old scan requests
+session.query(Request).filter(Request.active).filter(Request.tick < planet_tick - Config.get("Misc", "reqexpire")).update({"active":False}, synchronize_session=False)
+session.commit()
 session.close()
 
 # Clean tick dependant graph cache
