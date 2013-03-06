@@ -1021,9 +1021,7 @@ excaliburlog("Total penis time: %.3f seconds" % (t1,))
 session.close()
 
 # Close old scan requests
-old_reqs = session.query(Request).filter(Request.active).filter(Request.tick < planet_tick - Config.get("Misc", "reqexpire")).all()
-for req in old_reqs:
-  req.active = False
+session.query(Request).filter(Request.active).filter(Request.tick < planet_tick - Config.get("Misc", "reqexpire")).update({"active":False}, synchronize_session=False)
 session.commit()
 session.close()
 
