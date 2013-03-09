@@ -1,5 +1,10 @@
 # Django settings for Arthur project.
 
+from Core.config import Config
+import re
+
+hostre = re.compile("https?://([^/:]+).*")
+
 # Local time zone for this installation. Choices can be found here:
 # http://en.wikipedia.org/wiki/List_of_tz_zones_by_name
 # although not all choices may be available on all operating systems.
@@ -25,3 +30,11 @@ ROOT_URLCONF = 'Arthur'
 INSTALLED_APPS = (
     'Arthur',
 )
+
+ALLOWED_HOSTS = (
+    hostre.match(Config.get("URL", "arthur")).group(1),
+)
+# Get all alturls
+for url in Config.items("alturls"):
+    ALLOWED_HOSTS += ( hostre.match(url[1]).group(1), )
+
