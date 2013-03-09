@@ -26,7 +26,7 @@ Requirements (tested on):
 Additional Arthur requirements: 
 
 + Apache 2.2 + mod_wsgi (also tested with nginx)
-+ Django 
++ Django 1.4+
 + Jinja2 2.6
 
 Additional Graphing requirements: 
