@@ -26,6 +26,9 @@ from Core.loadable import loadable, route, require_user
 class phone(loadable):
     """Lookup someone's phone number or set permissions for who can view your number if you've not set public (pref)"""
     usage = " <list|allow|deny|show> [pnick]"
+    access = 2 # Public
+    subcommands = ["phone_list", "phone_show", "phone_override"]
+    subaccess = [3, 3, 1]
     
     @route(r"list")
     @require_user
@@ -33,7 +36,7 @@ class phone(loadable):
         # List of users than can see your phonenumber
         message.reply(self.list_reply(user, True))
     
-    @route(r"list\s+(\S+)", access = "member")
+    @route(r"list\s+(\S+)", access = "phone_list")
     def list_other(self, message, user, params):
         member = User.load(name=params.group(1), exact=False)
         if member is None:
@@ -108,7 +111,7 @@ class phone(loadable):
             message.alert(reply)
             return
         
-        if member.pubphone and user.is_member():
+        if user.has_access("phone_override") or member.pubphone and user.has_access("phone_show"):
             message.alert("%s says his phone number is %s"%(member.name,member.phone))
             return
         friends = member.phonefriends

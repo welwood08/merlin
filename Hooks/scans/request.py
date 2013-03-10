@@ -249,7 +249,7 @@ class request(loadable):
             for nick in nicks:
                 message.privmsg(reply, nick)
     
-    @route(r"l(?:ist)?")
+    @route(r"l(?:ist)?", access="req_list")
     def list(self, message, user, params):
         Q = session.query(Request)
         Q = Q.filter(Request.tick > Updates.current_tick() - 5)
@@ -263,7 +263,7 @@ class request(loadable):
         message.reply(" ".join(map(lambda request: Config.get("Misc", "reqlist").decode("string_escape") % (request.id, request.target.intel.dists if request.target.intel else "0",
                 "/%s" % request.dists if request.dists > 0 else "", request.scantype, request.target.x, request.target.y, request.target.z,), Q.all())))
     
-    @route(r"links? ?(.*)")
+    @route(r"links? ?(.*)", access="req_list")
     def links(self, message, user, params):
         try:
             if params.group(1) == "all":
