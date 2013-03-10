@@ -40,6 +40,13 @@ class request(loadable):
         tick = Updates.current_tick()
         # Galaxy Scan
         if params.group(5) is None:
+
+#            Access Control:
+#            Uncomment this and change "group" to the lowest group that can request galscans.
+#            if not user.is_group():
+#                message.alert("Insufficient access for galaxy scans.")
+#                return
+
             galaxy = Galaxy.load(*params.group(1,3))
             if galaxy is None:
                 message.alert("No galaxy with coords %s:%s" % params.group(1,3))
