@@ -96,6 +96,13 @@ for chan, name in Config.items("Channels"):
         session.commit()
 session.close()
 
+def addaccess(name, access):
+    if access == 2:
+        session.add(Access(id=name, group_id=2))
+        session.add(Access(id=name, group_id=3))
+    elif access != 1:
+        session.add(Access(id=name, group_id=access))
+
 if not round:
     print "Setting up default access levels"
     session.add(Group(id=1, name="admin", desc="Administrators"))
@@ -108,13 +115,6 @@ if not round:
             i = 0
             while i < len(callback.subcommands):
                 addaccess(callback.subcommands[i], callback.subaccess[i])
-
-def addaccess(name, access):
-    if access == 2:
-        session.add(Access(id=name, group_id=2))
-        session.add(Access(id=name, group_id=3))
-    elif access != 1:
-        session.add(Access(id=name, group_id=access))
 
 if round and not mysql:
     print "Migrating data:"
