@@ -34,8 +34,8 @@ class request(loadable):
     alias = "req"
     usage = " <x.y.z> <scantype(s)> [dists] | <id> blocks <amps> | cancel <id> | list | links"
     access = 3 # Member
-    subcommands = ["req_cancel", "req_update", "req_list"]
-    subaccess = [3, 3, 3]
+    subcommands = ["req_cancel", "req_update", "req_list", "req_gal"]
+    subaccess = [3, 3, 3, 3]
     
     @route(loadable.coord+"\s+(["+"".join(PA.options("scans"))+r"]+)\w*(?:\s+(\d+))?", access="request")
     @require_user
@@ -43,13 +43,9 @@ class request(loadable):
         tick = Updates.current_tick()
         # Galaxy Scan
         if params.group(5) is None:
-
-#            Access Control:
-#            Uncomment this and change "group" to the lowest group that can request galscans.
-#            if not user.is_group():
-#                message.alert("Insufficient access for galaxy scans.")
-#                return
-
+            if not user.has_access("req_gal"):
+                message.alert("Insufficient access for galaxy scans.")
+                return
             galaxy = Galaxy.load(*params.group(1,3))
             if galaxy is None:
                 message.alert("No galaxy with coords %s:%s" % params.group(1,3))
