@@ -35,7 +35,7 @@ class usedef(loadable):
         
         name=params.group(1)
         ships=params.group(2)
-        u=User.load(name, exact=False, access="member")
+        u=User.load(name, exact=False)
         if u is None:
             message.reply("No members matching %s found"%(name,))
             return

@@ -20,7 +20,6 @@
 # Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA 02110-1301 USA
  
 from sqlalchemy.sql import desc
-from Core.config import Config
 from Core.db import session
 from Core.maps import Updates, User, Ship, UserFleet
 from Core.loadable import loadable, route
@@ -71,7 +70,7 @@ class finddef(loadable):
         Q = Q.join(User.fleets)
         Q = Q.join(UserFleet.ship)
         Q = Q.filter(User.active == True)
-        Q = Q.filter(User.access >= Config.getint("Access", "member"))
+        Q = Q.filter(User.group_id != 2)
         if shipclass:
             Q = Q.filter(Ship.class_ == shipclass)
         if target_level == 3:

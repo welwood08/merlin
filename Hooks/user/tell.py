@@ -39,7 +39,7 @@ class tell(loadable):
     def execute(self, message, user, params):
         text = params.group(2)
         rec = params.group(1)
-        receiver=User.load(name=rec,exact=False,access="member") or User.load(name=rec)
+        receiver=User.load(name=rec,exact=False) or User.load(name=rec)
         if not receiver:
             message.reply("Who exactly is %s?" % (rec,))
             return
@@ -49,7 +49,7 @@ class tell(loadable):
 
         message.reply("Successfully stored message for %s. Message: %s" % (receiver.name, text))
 
-    @route(r"", access = "member")
+    @route(r"")
     @require_user
     def catchup(self, message, user, params):
         Q = session.query(Tell)

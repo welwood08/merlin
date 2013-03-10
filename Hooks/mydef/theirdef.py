@@ -35,7 +35,7 @@ class theirdef(loadable):
     @require_user
     def execute(self, message, user, params):
         name=params.group(1)
-	u = User.load(name=name, exact=False, access="member")
+	u = User.load(name=name, exact=False)
         if u is None:
             message.reply("No members matching %s found"%(name,))
             return

@@ -40,7 +40,7 @@ class logdef(loadable):
             if ship is not None:
                 Q = Q.filter(FleetLog.ship == ship)
             else:
-                u = User.load(search, exact=False, access="member")
+                u = User.load(search, exact=False)
                 if u is not None:
                     Q = Q.filter(FleetLog.user == u)
                 else:

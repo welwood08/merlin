@@ -21,7 +21,6 @@
  
 from sqlalchemy import and_, or_
 from sqlalchemy.orm import aliased
-from Core.config import Config
 from Core.db import session
 from Core.maps import User
 from Core.loadable import loadable, route
@@ -36,9 +35,9 @@ class orphans(loadable):
         user = aliased(User)
         sponsor = aliased(User)
         Q = session.query(user.name)
-        Q = Q.filter(and_(user.active == True, user.access >= Config.get("Access", "member")))
+        Q = Q.filter(and_(user.active == True, user.group_id != 2))
         Q = Q.filter(user.sponsor.ilike(sponsor.name))
-        Q = Q.filter(or_(sponsor.active == False, sponsor.access < Config.get("Access", "member")))
+        Q = Q.filter(or_(sponsor.active == False, sponsor.group_id != 2))
         result = Q.all()
         
         if len(result) < 1:

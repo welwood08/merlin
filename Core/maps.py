@@ -1284,7 +1284,7 @@ class User(Base):
         return user
     
     def has_ancestor(self, possible_ancestor):
-        ancestor = User.load(name=self.sponsor, access="member")
+        ancestor = User.load(name=self.sponsor)
         if ancestor is not None:
             if ancestor.name.lower() == possible_ancestor.lower():
                 return True

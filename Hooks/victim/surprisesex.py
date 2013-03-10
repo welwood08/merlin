@@ -23,7 +23,7 @@ from sqlalchemy.orm import aliased
 from sqlalchemy.sql import desc
 from sqlalchemy.sql.functions import count
 from Core.db import session
-from Core.maps import Updates, Galaxy, Planet, Alliance, User, Intel, FleetScan
+from Core.maps import Galaxy, Planet, Alliance, User, Intel, FleetScan
 from Core.loadable import loadable, route, require_planet
 
 class surprisesex(loadable):
@@ -53,7 +53,7 @@ class surprisesex(loadable):
     def user_alliance(self, message, user, params):
         alliance = Alliance.load(params.group(1))
         if alliance is None:
-            u = User.load(name=params.group(1), exact=False, access="member")
+            u = User.load(name=params.group(1), exact=False)
             if u is None:
                 message.reply("No alliance or user matching '%s' found" % (params.group(1),))
             elif u.planet is None:
