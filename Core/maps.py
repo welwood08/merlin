@@ -1318,7 +1318,7 @@ Tell.user = relation(User, primaryjoin=(Tell.user_id==User.id), backref=backref(
 Tell.sender = relation(User, primaryjoin=(Tell.sender_id==User.id))
 User.newtells = relation(Tell, primaryjoin=and_(User.id==Tell.user_id, Tell.read==False), order_by=asc(Tell.id))
 
-User.group = relation(Group, backref=backref('users', lazy='joined', order_by=asc(User.name)))
+User.group = relation(Group)
 Group.users = relation(User, primaryjoin=(User.group_id==Group.id), order_by=asc(User.name))
 
 class Access(Base):
