@@ -39,16 +39,13 @@ class remuser(loadable):
         if member is None:
             message.alert("No such user '%s'" % (username,))
             return
-        if member.access > user.access:
-            message.reply("You may not remove %s, his or her access (%s) exceeds your own (%s)" %(member.name, member.access, user.access,))
+        if member.group.admin_only and not user.is_admin():
+            message.reply("You may not remove %s; they are in the %s group." %(member.name, member.group.name,))
             return
         
-        mbraxx = Config.getint("Access","member")
-        home = Config.get("Channels","home")
-        
-        if member.active and member.access >= mbraxx:
-            message.privmsg("remuser %s %s"%(home, member.name,), Config.get("Services", "nick"))
-#            message.privmsg("ban %s *!*@%s.%s GTFO, EAAD"%(home, member.name, Config.get("Services", "usermask"),), Config.get("Services", "nick"))
+        for chan in member.group.channels:
+            message.privmsg("remuser %s %s" %(chan.channel.name, memner.name), Config.get("Services", "nick"))
+#            message.privmsg("ban %s *!*@%s.%s GTFO, EAAD"%(chan.channel.name, member.name, Config.get("Services", "usermask"),), Config.get("Services", "nick"))
         session.delete(member)
         session.commit()
         message.reply("Removed user %s" % (member.name,))
