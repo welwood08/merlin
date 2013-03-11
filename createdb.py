@@ -105,7 +105,7 @@ def addaccess(name, access):
 
 if not round:
     print "Setting up default access levels"
-    session.add(Group(id=1, name="admin", desc="Administrators"))
+    session.add(Group(id=1, name="admin", desc="Administrators", admin_only=True))
     session.add(Group(id=2, name="public", desc="Public commands"))
     session.add(Group(id=3, name="member", desc="Normal alliance members"))
 

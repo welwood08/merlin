@@ -1151,6 +1151,7 @@ class Group(Base):
     id = Column(Integer, primary_key=True)
     name = Column(String(255))
     desc = Column(String(255))
+    admin_only = Column(Boolean, default=False)
 
     @property
     def has_access(self, access_id):
@@ -1159,6 +1160,12 @@ class Group(Base):
         else:
             access_id = access_id.lower()
             return session.query(Access).filter(Access.group_id==self.id).filter(Access.id==access_id).count() > 0
+
+    @staticmethod
+    def load(name=None):
+        Q = session.query(Group)
+        group = Q.filter(Group.name == name).first()
+        return group
 
 class User(Base):
     __tablename__ = Config.get('DB', 'prefix') + 'users'
