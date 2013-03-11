@@ -1387,8 +1387,8 @@ class Channel(Base):
 
 class ChannelAdd(Base):
     __tablename__ = Config.get('DB', 'prefix') + 'channeladd'
-    channel_id = Column(Integer, ForeighKey(Channel.id, ondelete='cascade'), primary_key=True)
-    group_id = Column(Integer, ForeighKey(Group.id, ondelete='cascade'), primary_key=True)
+    channel_id = Column(Integer, ForeignKey(Channel.id, ondelete='cascade'), primary_key=True)
+    group_id = Column(Integer, ForeignKey(Group.id, ondelete='cascade'), primary_key=True)
     level = Column(Integer, default=24)
 ChannelAdd.channel = relation(Channel)
 ChannelAdd.group = relation(Group, backref="channels")
