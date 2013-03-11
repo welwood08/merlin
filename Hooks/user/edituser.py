@@ -21,14 +21,14 @@
  
 from Core.config import Config
 from Core.db import session
-from Core.maps import User
+from Core.maps import User, Group, Channel, ChannelAdd
 from Core.chanusertracker import CUT
 from Core.loadable import loadable, route, require_user
 
 class edituser(loadable):
     """Used to change a user's access or (de)activate them"""
     usage = " <user> (<access>|true|false)"
-    access = 3 # Member
+    access = 1 # Admin
     
     @route(r"(.+)\s+(\S+)", access = "edituser")
     @require_user
@@ -36,24 +36,28 @@ class edituser(loadable):
         
         usernames = params.group(1)
         access = params.group(2).lower()
-        if access.isdigit():
-            access = int(access)
-        elif access in self.true:
+
+        if access in self.true:
             access = True
         elif access in self.false:
             access = False
         else:
-            try:
-                access = Config.getint("Access",access)
-            except Exception:
-                message.reply("Invalid access level '%s'" % (access,))
+            g = Group.load(access)
+            if not g:
+                message.reply("Invalid access group '%s'" % (access,))
+                return
+    
+            if g.admin_only and not user.is_admin():
+                message.reply("You may not add a user to the %s group." % (g.name))
                 return
 
-        addnicks = []
+        addnicks = {}
         remnicks = []
+        remchans = []
         changed = []
-        mbraxx = Config.getint("Access","member")
-        home = Config.get("Channels","home")
+
+        if type(access) == str:
+            newchanQ = session.query(Channel).join(ChannelAdd).filter(ChannelAdd.group_id == g.id)
             
         for username in usernames.split():
             member = User.load(name=username, active=False)
@@ -61,39 +65,66 @@ class edituser(loadable):
                 message.alert("No such user '%s'" % (username,))
                 return
             
-            if type(access) is int and not member.active:
+            if type(access) is str and not member.active:
                 message.reply("You should first re-activate user %s" %(member.name,))
                 return
             
-            if access > user.access or member.access > user.access:
-                message.reply("You may not change access higher than your own")
-                return
+            if member.group.admin_only and not user.is_admin():
+                message.reply("You may not change %s's access; they are in the %s group." % (member.name, member.group.name))
+                continue
 
             changed.append(username)
 
-            if type(access) == int:
-                if member.active == True and member.access < mbraxx and access >= mbraxx:
-                    addnicks.append(member.name)
-                if member.active == True and member.access >= mbraxx and access < mbraxx:
-                    message.privmsg("remuser %s %s"%(home, member.name,), Config.get("Services", "nick"))
-                    remnicks.append(member.name)
-    #                message.privmsg("ban %s *!*@%s.%s GTFO, EAAD"%(home, member.name, Config.get("Services", "usermask"),), Config.get("Services", "nick"))
-                member.access = access
+            if type(access) == str:
+                if member.active == True:
+                    oldchanQ = session.query(Channel).join(ChannelAdd).filter(ChannelAdd.group_id == member.group_id)
+                    addQ = newchanQ.except_(oldchanQ)
+                    remQ = oldchanQ.except_(newchanQ)
+
+                    for chan in addQ.all():
+                        try:
+                            addnicks[chan.name] += "," + member.name
+                        except:
+                            addnicks[chan.name] = member.name
+                    if remQ.count():
+                        remnicks.append(member.name)
+                        for chan in remQ.all():
+                            message.privmsg("remuser %s %s" % (chan.name, member.name,), Config.get("Services", "nick"))
+                            if chan.name not in remchans:
+                                remchans.append(chan.name)
+#                            message.privmsg("ban %s *!*@%s.%s GTFO, EAAD"%(chan.name, member.name, Config.get("Services", "usermask"),), Config.get("Services", "nick"))
+                member.group_id = g.id
             else:
-                if member.active != access and access == True and member.access >= mbraxx:
-                    addnicks.append(member.name)
-                if member.active != access and access == False and member.access >= mbraxx:
-                    message.privmsg("remuser %s %s"%(home, member.name,), Config.get("Services", "nick"))
-                    remnicks.append(member.name)
-     #               message.privmsg("ban %s *!*@%s.%s GTFO, EAAD"%(home, member.name, Config.get("Services", "usermask"),), Config.get("Services", "nick"))
+                if member.active != access and access == True:
+                    for chan in member.group.channels:
+                        try:
+                            addnicks[chan.channel.name] += "," + member.name
+                        except:
+                            addnicks[chan.channel.name] = member.name
+                if member.active != access and access == False:
+                    for chan in member.group.channels:
+                        message.privmsg("remuser %s %s" % (chan.channel.name, member.name,), Config.get("Services", "nick"))
+                        if chan.channel.name not in remchans:
+                            remchans.append(chan.channel.name)
+#                        message.privmsg("ban %s *!*@%s.%s GTFO, EAAD"%(chan.channel.name, member.name, Config.get("Services", "usermask"),), Config.get("Services", "nick"))
                 member.active = access
             if not member.active:
                 CUT.untrack_user(member.name)
         session.commit()
-        message.privmsg("adduser %s %s 24" %(home, ",".join(addnicks),), Config.get("Services", "nick"))
+
         if addnicks:
-            message.reply("%s ha%s been added to %s"%(", ".join(addnicks), "ve" if len(addnicks) > 1 else "s", home,))
+            for chan in g.channels:
+                channel = chan.channel.name
+                if addnicks.has_key(channel):
+                    message.privmsg("adduser %s %s %s" %(channel, addnicks[channel], chan.level), Config.get("Services", "nick"))
+            nicks=[]
+            for n in addnicks.values():
+                nicks += n.split(",")
+            nicks = list(set(nicks))
+            nicks.sort()
+            message.reply("%s ha%s been added to %s"%(", ".join(nicks), "ve" if len(addnicks) > 1 else "s", ", ".join(addnicks.keys()),))
         if remnicks:
-            message.reply("%s ha%s been removed from %s"%(", ".join(remnicks), "ve" if len(remnicks) > 1 else "s", home,))
+            remchans.sort()
+            message.reply("%s ha%s been removed from %s"%(", ".join(remnicks), "ve" if len(remnicks) > 1 else "s", ", ".join(remchans),))
         if changed:
             message.reply("Editted user%s %s access to %s" % ("s" if len(changed) > 1 else "", ", ".join(changed), access,))
