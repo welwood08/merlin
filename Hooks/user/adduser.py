@@ -22,12 +22,12 @@
 from Core.exceptions_ import UserError
 from Core.config import Config
 from Core.db import session
-from Core.maps import User
+from Core.maps import User, Group
 from Core.loadable import loadable, route, require_user
 
 class adduser(loadable):
-    """Used to add new users with the specified pnick and access level"""
-    usage = " <pnick> <access>"
+    """Used to add new users with the specified pnick and access group"""
+    usage = " <pnick> <access group>"
     access = 1 # Admin
     
     @route(r"(.+)\s+(\S+)", access = "adduser")
@@ -36,17 +36,13 @@ class adduser(loadable):
         
         pnicks = params.group(1)
         access = params.group(2)
-        if not access.isdigit():
-            try:
-                access = Config.getint("Access",access)
-            except Exception:
-                message.reply("Invalid access level '%s'" % (access,))
-                return
-        else:
-            access = int(access)
+        g = Group.load(access)
+        if not g:
+            message.reply("Invalid access group '%s'" % (access,))
+            return
         
-        if access > user.access:
-            message.reply("You may not add a user with higher access to your own")
+        if g.admin_only and not user.is_admin():
+            message.reply("You may not add a user to the %s group." % (g.name))
             return
         
         added = []
@@ -57,16 +53,16 @@ class adduser(loadable):
                 continue
             member = User.load(name=pnick, active=False)
             if member is None:
-                member = User(name=pnick, access=access, sponsor=user.name)
+                member = User(name=pnick, group_id=g.id, sponsor=user.name)
                 session.add(member)
                 added.append(pnick)
             elif not member.active:
                 member.active = True
-                member.access = access
+                member.group_id = g.id
                 member.sponsor = user.name
                 added.append(pnick)
-            elif not member.is_member():
-                member.access = access
+            elif member.group_id == 2:
+                member.group_id = g.id
                 member.sponsor = user.name
                 added.append(pnick)
             else:
@@ -75,9 +71,11 @@ class adduser(loadable):
         if len(exists):
             message.reply("Users (%s) already exist" % (",".join(exists),))
         if len(added):
-            message.reply("Added users (%s) at level %s" % (",".join(added),access))
-        if len(added) and access >= Config.getint("Access","member"):
-            message.privmsg("adduser %s %s 24" %(Config.get("Channels","home"), ",".join(added),), Config.get("Services", "nick"))
+            message.reply("Added users (%s) at level %s" % (",".join(added),g.name))
+        if len(added) and len(g.channels):
+            for chan in g.channels:
+                chan.channel.name
+                message.privmsg("adduser %s %s %s" %(chan.channel.name, ",".join(added), chan.level), Config.get("Services", "nick"))
     
     def check_access(self, message, access=None, user=None, channel=None):
         try:
@@ -88,14 +86,14 @@ class adduser(loadable):
                 return user
         except UserError:
             if message.get_pnick() in Config.options("Admins"):
-                return User(name=Config.get("Connection", "nick"), access=Config.getint("Access", "admin"))
+                return User(name=Config.get("Connection", "nick"), group_id=1)
             else:
                 raise
     
     def is_user(self, user):
         if loadable.is_user(self, user):
             return True
-        elif isinstance(user, User) and user.name == Config.get("Connection", "nick") and user.access == Config.getint("Access", "admin"):
+        elif isinstance(user, User) and user.name == Config.get("Connection", "nick") and user.is_admin():
             return True
         else:
             return False
