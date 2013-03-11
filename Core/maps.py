@@ -1384,6 +1384,15 @@ class Channel(Base):
         channel = Q.filter(Channel.name.ilike(name)).first()
         return channel
 
+
+class ChannelAdd(Base):
+    __tablename__ = Config.get('DB', 'prefix') + 'channeladd'
+    channel_id = Column(Integer, ForeighKey(Channel.id, ondelete='cascade'), primary_key=True)
+    group_id = Column(Integer, ForeighKey(Group.id, ondelete='cascade'), primary_key=True)
+ChannelAdd.channel = relation(Channel)
+ChannelAdd.group = relation(Group)
+
+
 # ########################################################################### #
 # ############################    INTEL TABLE    ############################ #
 # ########################################################################### #

@@ -25,7 +25,7 @@ from sqlalchemy.exc import DBAPIError, IntegrityError, ProgrammingError
 from sqlalchemy.sql import text, bindparam
 from Core.config import Config
 from Core.db import Base, session
-from Core.maps import Group, Access
+from Core.maps import Group, Access, Channel, ChannelAdd
 from Core.callbacks import Callbacks
 import shipstats
 
@@ -61,7 +61,6 @@ if round and not mysql:
         session.close()
 
 print "Importing database models"
-from Core.maps import Channel
 if not mysql:
     print "Creating schema and tables"
     try:
@@ -76,26 +75,7 @@ if not mysql:
 
 Base.metadata.create_all()
 
-print "Setting up default channels"
-for chan, name in Config.items("Channels"):
-    try:
-        channel = Channel(name=name)
-        if chan != "public":
-            channel.userlevel = 3
-            channel.maxlevel = 1
-        else:
-            channel.userlevel = 2
-            channel.maxlevel = 2
-        session.add(channel)
-        session.flush()
-    except IntegrityError:
-        print "Channel '%s' already exists" % (channel.name,)
-        session.rollback()
-    else:
-        print "Created '%s' with access (%s|%s)" % (channel.name, channel.userlevel, channel.maxlevel,)
-        session.commit()
-session.close()
-
+print "Setting up default access groups"
 def addaccess(name, access):
     if access == 2:
         session.add(Access(id=name, group_id=2))
@@ -115,6 +95,29 @@ if not round:
             i = 0
             while i < len(callback.subcommands):
                 addaccess(callback.subcommands[i], callback.subaccess[i])
+
+
+print "Setting up default channels"
+for chan, name in Config.items("Channels"):
+    try:
+        channel = Channel(name=name)
+        if chan != "public":
+            channel.userlevel = 3
+            channel.maxlevel = 1
+        else:
+            channel.userlevel = 2
+            channel.maxlevel = 2
+        session.add(channel)
+        if chan == "home":
+            session.add(ChannelAdd(channel_id=channel.id, group_id=3))
+        session.flush()
+    except IntegrityError:
+        print "Channel '%s' already exists" % (channel.name,)
+        session.rollback()
+    else:
+        print "Created '%s' with access (%s|%s)" % (channel.name, channel.userlevel, channel.maxlevel,)
+        session.commit()
+session.close()
 
 if round and not mysql:
     print "Migrating data:"
