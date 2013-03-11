@@ -35,7 +35,7 @@ class adduser(loadable):
     def execute(self, message, user, params):
         
         pnicks = params.group(1)
-        access = params.group(2)
+        access = params.group(2).lower()
         g = Group.load(access)
         if not g:
             message.reply("Invalid access group '%s'" % (access,))
