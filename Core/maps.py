@@ -1265,13 +1265,7 @@ class User(Base):
         assert id or name
         Q = session.query(User)
         if active is True:
-            if access in Config.options("Access"):
-                access = Config.getint("Access",access)
-            elif type(access) is int:
-                pass
-            else:
-                raise LoadableError("Invalid access level")
-            Q = Q.filter(User.active == True).filter(User.access >= access)
+            Q = Q.filter(User.active == True)
         if id is not None:
             user = Q.filter(User.id == id).first()
         if name is not None:
