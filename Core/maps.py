@@ -1361,7 +1361,7 @@ class Channel(Base):
     name = Column(String(255), unique=True)
     userlevel = Column(Integer, ForeignKey(Group.id, ondelete='set null'), default=2)
     maxlevel = Column(Integer, ForeignKey(Group.id, ondelete='set null'), default=2)
-    owner_id = deferred(Column(Integer, ForeignKey(User.id, ondelete='set null')))
+    owner_id = Column(Integer, ForeignKey(User.id, ondelete='set null'))
     
     @property
     def has_access(self, access_id):
