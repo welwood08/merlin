@@ -22,37 +22,39 @@
 from sqlalchemy.exc import IntegrityError
 from Core.config import Config
 from Core.db import session
-from Core.maps import Channel
+from Core.maps import Channel, Group
 from Core.loadable import loadable, route, require_user
 
 class addchan(loadable):
     """Adds a channel with the given level with maxlevel equal to your own access level"""
-    usage = " <chan> <level>"
+    usage = " <chan> <level> [maxlevel]"
     access = 1 # Admin
     
-    @route(r"(#\S+)\s+(\S+)", access = "addchan")
+    @route(r"(#\S+)\s+(\S+)(?:\s+(\S+))?", access = "addchan")
     @require_user
     def execute(self, message, user, params):
         
         chan = params.group(1)
         access = params.group(2)
-        if not access.isdigit():
-            try:
-                access = Config.getint("Access",access)
-            except Exception:
-                message.reply("Invalid access level '%s'" % (access,))
+        maxaccess = params.group(3)
+        g = Group.load(access)
+        if g is None:
+            message.reply("Invalid access level '%s'" % (access,))
+            return
+        if maxaccess:
+            mg = Group.load(maxaccess)
+            if mg is None:
+                message.reply("Invalid access level '%s'" % (maxaccess,))
                 return
-        else:
-            access = int(access)
         
-        if access > user.access:
-            message.reply("You may not add a user with higher access to your own")
+        if (not user.is_admin()) and (g.admin_only or (maxaccess and mg.admin_only)):
+            message.reply("You may not add a channel with higher access than your own")
             return
         
         try:
-            session.add(Channel(name=chan, userlevel=access, maxlevel=user.access))
+            session.add(Channel(name=chan, userlevel=g.id, maxlevel=mg.id if maxaccess else g.id))
             session.commit()
-            message.reply("Added chan %s at level %s" % (chan,access,))
+            message.reply("Added chan %s with access %s (max: %s)" % (chan,access,))
             message.privmsg("set %s autoinvite on" %(chan,),Config.get("Services", "nick"));
             message.privmsg("invite %s" %(chan,),Config.get("Services", "nick"));
         except IntegrityError:

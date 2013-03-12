@@ -19,7 +19,7 @@
 # along with this program; if not, write to the Free Software
 # Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA 02110-1301 USA
  
-#from Core.config import Config
+from Core.config import Config
 from Core.db import session
 from Core.maps import Channel
 from Core.loadable import loadable, route, require_user
@@ -27,8 +27,8 @@ from Core.loadable import loadable, route, require_user
 class remchan(loadable):
     usage = " <chan>"
     access = 3 # Member
-    subcommands = ["remchan_any"]
-    subaccess = [1]
+    subcommands = ["remchan_gal", "remchan_any"]
+    subaccess = [1, 1]
     
     @route(r"(#\S+)", access = "remchan")
     @require_user
@@ -44,8 +44,12 @@ class remchan(loadable):
                 message.part(channel)
             return
         
-        if chan.userlevel >= user.access and not user.has_access("remchan_any"):
-            message.reply("You may not remove %s, the channel's access (%s) exceeds your own (%s)" % (chan.name, chan.userlevel, user.access,))
+        if chan.owner_id:
+            if chan.owner_id != user.id and not user.has_access("remchan_gal"):
+                message.reply("You may not remove %s. You may only remove your own channels." % (chan.name,))
+                return
+        elif not user.has_access("remchan_any"):
+            message.reply("Insufficient access to remove %s." % (chan.name,))
             return
         
         session.delete(chan)

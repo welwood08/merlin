@@ -1361,6 +1361,7 @@ class Channel(Base):
     name = Column(String(255), unique=True)
     userlevel = Column(Integer, ForeignKey(Group.id, ondelete='set null'), default=2)
     maxlevel = Column(Integer, ForeignKey(Group.id, ondelete='set null'), default=2)
+    owner_id = deferred(Column(Integer, ForeignKey(User.id, ondelete='set null')))
     
     @property
     def has_access(self, access_id):
@@ -1383,7 +1384,7 @@ class Channel(Base):
         Q = session.query(Channel)
         channel = Q.filter(Channel.name.ilike(name)).first()
         return channel
-
+Channel.owner = relation(User)
 
 class ChannelAdd(Base):
     __tablename__ = Config.get('DB', 'prefix') + 'channeladd'
