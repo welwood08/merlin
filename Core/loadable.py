@@ -310,12 +310,7 @@ def route(regex=None, access=0):
     else:
         raise LoadableError("Invalid route regex")
     
-    if access in Config.options("Access"):
-        access = Config.getint("Access",access)
-    elif type(access) is int:
-        access = access
-    else:
-        raise LoadableError("Invalid access level")
+    access = access
     
     def wrapper(execute):
         execute._ROUTE = param
