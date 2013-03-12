@@ -1153,7 +1153,6 @@ class Group(Base):
     desc = Column(String(255))
     admin_only = Column(Boolean, default=False)
 
-    @property
     def has_access(self, access_id):
         if self.id == 1:
             return True
@@ -1212,7 +1211,6 @@ class User(Base):
 #        else:
 #            self.access = Config.getint("Access", value)
 
-    @property
     def has_access(self, access_id):
         if self.group_id == 1:
             return True
@@ -1357,7 +1355,6 @@ class Channel(Base):
     maxlevel = Column(Integer, ForeignKey(Group.id, ondelete='set null'), default=2)
     owner_id = Column(Integer, ForeignKey(User.id, ondelete='set null'))
     
-    @property
     def has_access(self, access_id):
         if self.userlevel == 1:
             return True
@@ -1365,7 +1362,6 @@ class Channel(Base):
             access_id = access_id.lower()
             return session.query(Access).filter(Access.group_id==self.userlevel).filter(Access.id==access_id).count() > 0
     
-    @property
     def can_access(self, access_id):
         if self.maxlevel == 1:
             return True
