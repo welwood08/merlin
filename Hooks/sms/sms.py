@@ -40,6 +40,8 @@ class sms(loadable):
     """Sends an SMS to the specified user. Your username will be appended to the end of each sms. The user must have their phone correctly added and you must have access to their number."""
     usage = " <nick> <message>"
     access = 3 # Member
+    subcommands = ["sms_override"]
+    subaccess = [1]
     
     @route(r"(\S+)\s+(.+)", access = "sms")
     @require_user
@@ -48,7 +50,7 @@ class sms(loadable):
         rec = params.group(1)
         public_text = params.group(2) + ' - %s' % (user.name,)
         text = encode(public_text + '/%s' %(user.phone,))
-        receiver=User.load(name=rec,exact=False,access="member") or User.load(name=rec)
+        receiver=User.load(name=rec,exact=False) or User.load(name=rec)
         if not receiver:
             message.reply("Who exactly is %s?" % (rec,))
             return
@@ -56,7 +58,7 @@ class sms(loadable):
             message.reply("I refuse to talk to that incompetent retard. Check %s's mydef comment and use !phone show to try sending it using your own phone." %(receiver.name,))
             return 
 
-        if not (receiver.pubphone or receiver.smsmode =="Email") and user not in receiver.phonefriends and user.access < (Config.getint("Access","SMSer") if "SMSer" in Config.options("Access") else 1000):
+        if not (receiver.pubphone or receiver.smsmode =="Email" or user in receiver.phonefriends or user.has_access("sms_override")):
             message.reply("%s's phone number is private or they have not chosen to share their number with you. Supersecret message not sent." % (receiver.name,))
             return
 
