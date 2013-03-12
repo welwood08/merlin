@@ -90,15 +90,18 @@ if not round:
     session.add(Group(id=3, name="member", desc="Normal alliance members"))
 
     for callback in Callbacks.callbacks['PRIVMSG']:
+        if not callback.access:
+            continue
         addaccess(callback.name, callback.access)
         try:
            if callback.subcommands:
                i = 0
                while i < len(callback.subcommands):
                    addaccess(callback.subcommands[i], callback.subaccess[i])
+                   i += 1
         except:
             pass
-
+        session.flush()
 
 print "Setting up default channels"
 for chan, name in Config.items("Channels"):
