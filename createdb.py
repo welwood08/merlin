@@ -91,10 +91,13 @@ if not round:
 
     for callback in Callbacks.callbacks['PRIVMSG']:
         addaccess(callback.name, callback.access)
-        if callback.subcommands:
-            i = 0
-            while i < len(callback.subcommands):
-                addaccess(callback.subcommands[i], callback.subaccess[i])
+        try:
+           if callback.subcommands:
+               i = 0
+               while i < len(callback.subcommands):
+                   addaccess(callback.subcommands[i], callback.subaccess[i])
+        except:
+            pass
 
 
 print "Setting up default channels"
