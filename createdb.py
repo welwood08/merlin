@@ -101,7 +101,7 @@ if not round:
                    i += 1
         except:
             pass
-        session.flush()
+        session.commit()
 
 print "Setting up default channels"
 for chan, name in Config.items("Channels"):
@@ -114,6 +114,7 @@ for chan, name in Config.items("Channels"):
             channel.userlevel = 2
             channel.maxlevel = 2
         session.add(channel)
+        session.commit()
         if chan == "home":
             session.add(ChannelAdd(channel_id=channel.id, group_id=3))
         session.flush()
