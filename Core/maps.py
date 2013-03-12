@@ -1359,8 +1359,8 @@ class Channel(Base):
     __tablename__ = Config.get('DB', 'prefix') + 'channels'
     id = Column(Integer, primary_key=True)
     name = Column(String(255), unique=True)
-    userlevel = Column(Integer, default=2)
-    maxlevel = Column(Integer, default=2)
+    userlevel = Column(Integer, ForeignKey(Group.id, ondelete='set null'), default=2)
+    maxlevel = Column(Integer, ForeignKey(Group.id, ondelete='set null'), default=2)
     
     @property
     def has_access(self, access_id):
