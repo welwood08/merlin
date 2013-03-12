@@ -192,7 +192,7 @@ class request(loadable):
             if request is None:
                 noexist.append(id)
                 continue
-            if request.user is not user and not user.has_access("req_cancel") and not self.is_chan(message, self.scanchan()):
+            if request.user is not user and not self.check_access("req_cancel"):
                 noaccess.append(id)
                 continue
             
@@ -226,7 +226,7 @@ class request(loadable):
         if request is None:
             message.reply("No open request number %s exists (idiot)."%(id,))
             return
-        if request.user is not user and not user.has_access("req_update") and not self.is_chan(message, self.scanchan()):
+        if request.user is not user and not self.check_access("req_update"):
             message.reply("Scan request %s isn't yours and you're not a scanner!"%(id,))
             return
         
