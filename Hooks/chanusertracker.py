@@ -192,22 +192,22 @@ def auth(message):
 
 @system('PRIVMSG', command=True)
 def letmein(message):
-    """Invites the user to the private channel, if they provide their username and password"""
+    """Invites the user to private channels, if they provide their username and password"""
     # P redundancy
     msg = message.get_msg().split()
-    if len(msg) != 3:
+    if len(msg) < 3:
         message.alert("!letmein user pass")
         return
     try:
         chan = message.get_chan() if message.in_chan() else None
         user = CUT.auth_user(message.get_nick(), chan, message.get_pnick, username=msg[1], password=msg[2])
         if (user is not None) and user.group_id != 2:
-            if user.group_id == 1:
-                message.invite(message.get_nick(), Config.get("Channels","home"))
+            if user.group_id == 1 and len(msg) > 3:
+                for c in msg[3:]:
+                    message.invite(message.get_nick(), c)
                 return
             for c in user.group.channels:
-                if c.channel.name == Config.get("Channels", "home"):
-                    message.invite(message.get_nick(), Config.get("Channels","home"))
-                    return
+                message.invite(message.get_nick(), c.channel.name)
+                return
     except UserError:
         message.alert("You don't have access to this command")
