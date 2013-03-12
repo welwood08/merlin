@@ -1358,9 +1358,11 @@ class Channel(Base):
     def has_access(self, access_id):
         if self.userlevel == 1:
             return True
-        else:
-            access_id = access_id.lower()
-            return session.query(Access).filter(Access.group_id==self.userlevel).filter(Access.id==access_id).count() > 0
+
+        if self.userlevel is None:
+            self.userlevel = 2
+        access_id = access_id.lower()
+        return session.query(Access).filter(Access.group_id==self.userlevel).filter(Access.id==access_id).count() > 0
     
     def can_access(self, access_id):
         if self.maxlevel == 1:
