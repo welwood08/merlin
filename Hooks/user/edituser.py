@@ -47,7 +47,7 @@ class edituser(loadable):
                 message.reply("Invalid access group '%s'" % (access,))
                 return
     
-            if g.admin_only and not user.is_admin():
+            if g.admin_only and not user.is_admin:
                 message.reply("You may not add a user to the %s group." % (g.name))
                 return
 
@@ -69,7 +69,7 @@ class edituser(loadable):
                 message.reply("You should first re-activate user %s" %(member.name,))
                 return
             
-            if member.group.admin_only and not user.is_admin():
+            if member.group.admin_only and not user.is_admin:
                 message.reply("You may not change %s's access; they are in the %s group." % (member.name, member.group.name))
                 continue
 

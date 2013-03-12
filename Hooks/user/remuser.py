@@ -39,7 +39,7 @@ class remuser(loadable):
         if member is None:
             message.alert("No such user '%s'" % (username,))
             return
-        if member.group.admin_only and not user.is_admin():
+        if member.group.admin_only and not user.is_admin:
             message.reply("You may not remove %s; they are in the %s group." %(member.name, member.group.name,))
             return
         

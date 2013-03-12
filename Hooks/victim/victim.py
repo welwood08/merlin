@@ -83,7 +83,7 @@ class victim(loadable):
                     message.reply("No alliance matching '%s' found" % (m.group(1),))
                     return
                 continue
-            if p[:4] == "lots" and user.is_admin():
+            if p[:4] == "lots" and user.is_admin:
                 limit = int(p[4:])
 
         maxcap = PA.getfloat("roids","maxcap")

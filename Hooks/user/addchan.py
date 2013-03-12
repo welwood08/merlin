@@ -47,7 +47,7 @@ class addchan(loadable):
                 message.reply("Invalid access level '%s'" % (maxaccess,))
                 return
         
-        if (not user.is_admin()) and (g.admin_only or (maxaccess and mg.admin_only)):
+        if (not user.is_admin) and (g.admin_only or (maxaccess and mg.admin_only)):
             message.reply("You may not add a channel with higher access than your own")
             return
         

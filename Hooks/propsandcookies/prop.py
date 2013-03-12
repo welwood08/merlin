@@ -216,7 +216,7 @@ class prop(loadable):
         if not prop.active:
             message.reply("You can't expire prop %d, it's already expired."%(prop.id,))
             return
-        if prop.proposer is not user and not user.is_admin():
+        if prop.proposer is not user and not user.is_admin:
             message.reply("Only %s may expire proposition %d."%(prop.proposer.name,prop.id))
             return
         if prop.type == "invite" and not self.member_count_below_limit():
@@ -288,7 +288,7 @@ class prop(loadable):
         if not prop.active:
             message.reply("You can't cancel prop %d, it's already expired."%(prop.id,))
             return
-        if prop.proposer is not user and not user.is_admin():
+        if prop.proposer is not user and not user.is_admin:
             message.reply("Only %s may cancel proposition %d."%(prop.proposer.name,prop.id))
             return
         

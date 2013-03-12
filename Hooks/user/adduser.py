@@ -41,7 +41,7 @@ class adduser(loadable):
             message.reply("Invalid access group '%s'" % (access,))
             return
         
-        if g.admin_only and not user.is_admin():
+        if g.admin_only and not user.is_admin:
             message.reply("You may not add a user to the %s group." % (g.name))
             return
         
@@ -91,7 +91,7 @@ class adduser(loadable):
     def is_user(self, user):
         if loadable.is_user(self, user):
             return True
-        elif isinstance(user, User) and user.name == Config.get("Connection", "nick") and user.is_admin():
+        elif isinstance(user, User) and user.name == Config.get("Connection", "nick") and user.is_admin:
             return True
         else:
             return False

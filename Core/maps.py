@@ -1296,7 +1296,7 @@ class User(Base):
 
     @property
     def is_admin(self):
-        return self.group == 1
+        return self.group_id == 1
 Planet.user = relation(User, uselist=False, backref="planet")
 
 class Tell(Base):
