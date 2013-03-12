@@ -54,7 +54,7 @@ class addchan(loadable):
         try:
             session.add(Channel(name=chan, userlevel=g.id, maxlevel=mg.id if maxaccess else g.id))
             session.commit()
-            message.reply("Added chan %s with access %s (max: %s)" % (chan,access,))
+            message.reply("Added chan %s with access %s (max: %s)" % (chan, access, maxaccess if maxaccess else access))
             message.privmsg("set %s autoinvite on" %(chan,),Config.get("Services", "nick"));
             message.privmsg("invite %s" %(chan,),Config.get("Services", "nick"));
         except IntegrityError:

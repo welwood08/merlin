@@ -33,7 +33,8 @@ class galchan(loadable):
     @route(r"(#\S+)", access = "galchan")
     @require_user
     def execute(self, message, user, params):
-        
+
+        chan = params.group(1)
         try:
             session.add(Channel(name=chan, userlevel=2, maxlevel=2, owner_id=user.id))
             session.commit()
