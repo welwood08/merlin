@@ -116,6 +116,7 @@ for chan, name in Config.items("Channels"):
         session.add(channel)
         session.commit()
         if chan == "home":
+            session.add(ChannelAdd(channel_id=channel.id, group_id=1, level=100))
             session.add(ChannelAdd(channel_id=channel.id, group_id=3))
         session.flush()
     except IntegrityError:
