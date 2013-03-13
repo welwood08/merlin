@@ -45,7 +45,7 @@ class grant(loadable):
                 message.reply("Invalid access group '%s'." % (group,))
                 session.rollback()
                 return
-            if g.admin_only and not user.is_admin():
+            if g.admin_only and not user.is_admin:
                 message.reply("You don't have access to change the %s group." % (group,))
                 session.rollback()
                 return

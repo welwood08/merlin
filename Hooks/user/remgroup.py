@@ -19,30 +19,35 @@
 # along with this program; if not, write to the Free Software
 # Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA 02110-1301 USA
  
-# List of package modules
-__all__ = [
-           "adduser",
-           "galmate",
-           "edituser",
-           "getanewdaddy",
-           "remuser",
-           "whois",
-           "aids",
-           "pref",
-           "phone",
-           "quitter",
-           "quits",
-           "addchan",
-           "galchan",
-           "remchan",
-           "alias",
-           "forcepref",
-           "members",
-           "paranoidcunts",
-           "tell",
-           "grant",
-           "revoke",
-           "show",
-           "addgroup",
-           "remgroup",
-           ]
+# Module by Martin Stone
+
+from Core.db import session
+from Core.maps import Group, Access
+from Core.loadable import loadable, route, require_user
+
+class remgroup(loadable):
+    """Remove a user group."""
+    usage = " <name>"
+    alias = "delgroup"
+    access = 1 # Admin
+    
+    @route(r"(\S+)", access = "remgroup")
+    @require_user
+    def execute(self, message, user, params):
+        
+        name = params.group(1).lower()
+
+        g = Group.load(name)
+        if not g:
+            message.reply("Group '%s' does not exist." % (parent))
+            return
+        if g.id in [1,2,3]:
+            message.reply("Can't remove the %s group" % (g.name))
+            return
+        if g.admin_only and not user.is_admin:
+            message.reply("You don't have access to delete the %s group." % (group,))
+            return
+
+        session.delete(g)
+        session.commit()
+        message.reply("'%s' group has been deleted." % (g.name))
