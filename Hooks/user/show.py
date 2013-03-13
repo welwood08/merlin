@@ -19,29 +19,31 @@
 # along with this program; if not, write to the Free Software
 # Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA 02110-1301 USA
  
-# List of package modules
-__all__ = [
-           "adduser",
-           "galmate",
-           "edituser",
-           "getanewdaddy",
-           "remuser",
-           "whois",
-           "aids",
-           "pref",
-           "phone",
-           "quitter",
-           "quits",
-           "addchan",
-           "galchan",
-           "remchan",
-           "alias",
-           "forcepref",
-           "members",
-           "paranoidcunts",
-           "tell",
-           "grant",
-           "revoke",
-           "show",
-           "addgroup",
-           ]
+# Module by Martin Stone
+
+from Core.db import session
+from Core.maps import Group, Access
+from Core.loadable import loadable, route, require_user
+
+class show(loadable):
+    """Show commands granted to a given group."""
+    usage = " <access groups>"
+    access = 1 # Admin
+    
+    @route(r"(\S+)", access = "show")
+    @require_user
+    def execute(self, message, user, params):
+        
+        groups = params.group(1).lower().split(",")
+
+        for group in groups:
+            g = Group.load(group)
+            if not g:
+                message.reply("Invalid access group '%s'" % (group,))
+                continue
+            reply = "%s has access to: " % (g.name)
+            if g.id == 1:
+                exists[group] = "Everything (idiot)"
+            for command in g.commands.all():
+                reply += "%s, " % (command.name)
+            message.reply(reply[:-2])
