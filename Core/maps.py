@@ -1146,6 +1146,11 @@ planet_old_id_search = Table('planet_old_id_search', Base.metadata,
 # #############################    USER TABLES    ########################### #
 # ########################################################################### #
 
+class Access(Base):
+    __tablename__ = Config.get('DB', 'prefix') + 'access'
+    id = Column(Integer, primary_key=True)
+    name = Column(String(255))
+    
 class Group(Base):
     __tablename__ = Config.get('DB', 'prefix') + 'group'
     id = Column(Integer, primary_key=True)
@@ -1153,18 +1158,22 @@ class Group(Base):
     desc = Column(String(255))
     admin_only = Column(Boolean, default=False)
 
-    def has_access(self, access_id):
+    def has_access(self, access):
         if self.id == 1:
             return True
         else:
-            access_id = access_id.lower()
-            return session.query(Access).filter(Access.group_id==self.id).filter(Access.id==access_id).count() > 0
+            access = access.lower()
+            return self.commands.filter(name=access).count()
 
     @staticmethod
     def load(name=None):
         Q = session.query(Group)
         group = Q.filter(Group.name == name).first()
         return group
+
+grants = Table(Config.get('DB', 'prefix') + 'grant', Base.metadata, Column('access_id', Integer, ForeignKey(Access.id, ondelete='cascade')), Column('group_id', Integer, ForeignKey(Group.id, ondelete='cascade')))
+
+Group.commands = relation(Access, secondary=(grant), lazy='dynamic', backref="groups", order_by=asc(Command.name))
 
 class User(Base):
     __tablename__ = Config.get('DB', 'prefix') + 'users'
@@ -1212,11 +1221,7 @@ class User(Base):
 #            self.access = Config.getint("Access", value)
 
     def has_access(self, access_id):
-        if self.group_id == 1:
-            return True
-        else:
-            access_id = access_id.lower()
-            return session.query(Access).filter(Access.group_id==self.group_id).filter(Access.id==access_id).count() > 0
+        return self.group.has_access(access_id)
     
     @property
     def smsmode(self):
@@ -1298,6 +1303,8 @@ class User(Base):
     def is_admin(self):
         return self.group_id == 1
 Planet.user = relation(User, uselist=False, backref="planet")
+User.group = relation(Group)
+Group.users = relation(User, order_by=asc(User.name))
 
 class Tell(Base):
     __tablename__ = Config.get('DB', 'prefix') + 'tell'
@@ -1309,15 +1316,6 @@ class Tell(Base):
 Tell.user = relation(User, primaryjoin=(Tell.user_id==User.id), backref=backref("tells", order_by=desc(Tell.id)))
 Tell.sender = relation(User, primaryjoin=(Tell.sender_id==User.id))
 User.newtells = relation(Tell, primaryjoin=and_(User.id==Tell.user_id, Tell.read==False), order_by=asc(Tell.id))
-
-User.group = relation(Group)
-Group.users = relation(User, primaryjoin=(User.group_id==Group.id), order_by=asc(User.name))
-
-class Access(Base):
-    __tablename__ = Config.get('DB', 'prefix') + 'access'
-    id = Column(String(255), primary_key=True)
-    group_id = Column(Integer, ForeignKey(Group.id, ondelete='cascade'), primary_key=True)
-Group.commands = relation(Access, primaryjoin=(Access.group_id==Group.id), backref="group")
 
 class Arthur(Base):
     __tablename__ = Config.get('DB', 'prefix') + 'session'
@@ -1355,21 +1353,11 @@ class Channel(Base):
     maxlevel = Column(Integer, ForeignKey(Group.id, ondelete='set null'), default=2)
     owner_id = Column(Integer, ForeignKey(User.id, ondelete='set null'))
     
-    def has_access(self, access_id):
-        if self.userlevel == 1:
-            return True
-
-        if self.userlevel is None:
-            self.userlevel = 2
-        access_id = access_id.lower()
-        return session.query(Access).filter(Access.group_id==self.userlevel).filter(Access.id==access_id).count() > 0
+    def has_access(self, access):
+        return self.usergroup.has_access(access)
     
-    def can_access(self, access_id):
-        if self.maxlevel == 1:
-            return True
-        else:
-            access_id = access_id.lower()
-            return session.query(Access).filter(Access.group_id==self.maxlevel).filter(Access.id==access_id).count() > 0
+    def can_access(self, access):
+        return self.usergroup.has_access(access)
     
     @staticmethod
     def load(name):
@@ -1377,6 +1365,9 @@ class Channel(Base):
         channel = Q.filter(Channel.name.ilike(name)).first()
         return channel
 Channel.owner = relation(User)
+Channel.usergroup = relation(Group, primaryjoin=Group.id==Channel.userlevel)
+Channel.maxgroup = relation(Group, primaryjoin=Group.id==Channel.maxlevel)
+Group.channels = relation(Channel, primaryjoin=Channel.userlevel==Group.id, order_by=asc(Channel.name), lazy='dynamic')
 
 class ChannelAdd(Base):
     __tablename__ = Config.get('DB', 'prefix') + 'channeladd'
@@ -1385,7 +1376,6 @@ class ChannelAdd(Base):
     level = Column(Integer, default=24)
 ChannelAdd.channel = relation(Channel)
 ChannelAdd.group = relation(Group, backref="channels")
-
 
 # ########################################################################### #
 # ############################    INTEL TABLE    ############################ #

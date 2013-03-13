@@ -77,11 +77,13 @@ Base.metadata.create_all()
 
 print "Setting up default access groups"
 def addaccess(name, access):
+    command=Access(name=name)
+    session.add(command)
     if access == 2:
-        session.add(Access(id=name, group_id=2))
-        session.add(Access(id=name, group_id=3))
+        command.groups.append(Group(id=2))
+        command.groups.append(Group(id=3))
     elif access != 1:
-        session.add(Access(id=name, group_id=access))
+        command.groups.append(Group(id=access))
 
 if not round:
     print "Setting up default access levels"
