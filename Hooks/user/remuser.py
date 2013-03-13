@@ -44,7 +44,7 @@ class remuser(loadable):
             return
         
         for chan in member.group.channels:
-            message.privmsg("remuser %s %s" %(chan.channel.name, memner.name), Config.get("Services", "nick"))
+            message.privmsg("remuser %s %s" %(chan.channel.name, member.name), Config.get("Services", "nick"))
 #            message.privmsg("ban %s *!*@%s.%s GTFO, EAAD"%(chan.channel.name, member.name, Config.get("Services", "usermask"),), Config.get("Services", "nick"))
         session.delete(member)
         session.commit()
