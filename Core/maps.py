@@ -1173,7 +1173,7 @@ class Group(Base):
 
 grants = Table(Config.get('DB', 'prefix') + 'grant', Base.metadata, Column('access_id', Integer, ForeignKey(Access.id, ondelete='cascade')), Column('group_id', Integer, ForeignKey(Group.id, ondelete='cascade')))
 
-Group.commands = relation(Access, secondary=(grant), lazy='dynamic', backref="groups", order_by=asc(Command.name))
+Group.commands = relation(Access, secondary=(grant), lazy='dynamic', backref="groups", order_by=asc(Access.name))
 
 class User(Base):
     __tablename__ = Config.get('DB', 'prefix') + 'users'
