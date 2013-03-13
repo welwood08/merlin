@@ -1150,6 +1150,10 @@ class Access(Base):
     __tablename__ = Config.get('DB', 'prefix') + 'access'
     id = Column(Integer, primary_key=True)
     name = Column(String(255))
+
+    @staticmethod
+    def load(name=None):
+        return session.query(Access).filter_by(name=name).one()
     
 class Group(Base):
     __tablename__ = Config.get('DB', 'prefix') + 'group'
@@ -1167,9 +1171,7 @@ class Group(Base):
 
     @staticmethod
     def load(name=None):
-        Q = session.query(Group)
-        group = Q.filter(Group.name == name).first()
-        return group
+        return session.query(Group).filter_by(name=name).one()
 
 grants = Table(Config.get('DB', 'prefix') + 'grant', Base.metadata, Column('access_id', Integer, ForeignKey(Access.id, ondelete='cascade')), Column('group_id', Integer, ForeignKey(Group.id, ondelete='cascade')))
 
