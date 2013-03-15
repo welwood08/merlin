@@ -136,8 +136,9 @@ if round and not mysql:
         session.execute(text("INSERT INTO %susers (id, name, alias, passwd, active, group_id, url, email, phone, pubphone, _smsmode, sponsor, quits, available_cookies, carebears, last_cookie_date, fleetcount) SELECT id, name, alias, passwd, active, group_id, url, email, phone, pubphone, _smsmode::varchar::smsmode, sponsor, quits, available_cookies, carebears, last_cookie_date, 0 FROM %s.%susers;" % (prefix, round, old_prefix)))
         session.execute(text("SELECT setval('%susers_id_seq',(SELECT max(id) FROM %susers));" % (prefix, prefix)))
         session.execute(text("INSERT INTO %sphonefriends (user_id, friend_id) SELECT user_id, friend_id FROM %s.%sphonefriends;" % (prefix, round, old_prefix)))
-        session.execute(text("INSERT INTO %sgroup (id, name, desc, admin_only) SELECT id, name, desc, admin_only FROM %s.%sgroup;" % (prefix, round, old_prefix)))
-        session.execute(text("INSERT INTO %saccess (id, group_id) SELECT id, group_id FROM %s.%saccess;" % (prefix, round, old_prefix)))
+        session.execute(text("INSERT INTO %sgroups (id, name, desc, admin_only) SELECT id, name, desc, admin_only FROM %s.%sgroups;" % (prefix, round, old_prefix)))
+        session.execute(text("INSERT INTO %saccess (id, name) SELECT id, name FROM %s.%saccess;" % (prefix, round, old_prefix)))
+        session.execute(text("INSERT INTO %sgrants (access_id, group_id) SELECT access_id, group_id FROM %s.%sgrants;" % (prefix, round, old_prefix)))
         print "  - slogans/quotes"
         session.execute(text("INSERT INTO %sslogans (text) SELECT text FROM %s.%sslogans;" % (prefix, round, old_prefix)))
         session.execute(text("INSERT INTO %squotes (text) SELECT text FROM %s.%squotes;" % (prefix, round, old_prefix)))

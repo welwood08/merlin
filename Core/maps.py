@@ -1156,7 +1156,7 @@ class Access(Base):
         return session.query(Access).filter_by(name=name).one()
     
 class Group(Base):
-    __tablename__ = Config.get('DB', 'prefix') + 'group'
+    __tablename__ = Config.get('DB', 'prefix') + 'groups'
     id = Column(Integer, primary_key=True)
     name = Column(String(255))
     desc = Column(String(255))
@@ -1173,7 +1173,7 @@ class Group(Base):
     def load(name=None):
         return session.query(Group).filter_by(name=name).one()
 
-grants = Table(Config.get('DB', 'prefix') + 'grant', Base.metadata, Column('access_id', Integer, ForeignKey(Access.id, ondelete='cascade')), Column('group_id', Integer, ForeignKey(Group.id, ondelete='cascade')))
+grants = Table(Config.get('DB', 'prefix') + 'grants', Base.metadata, Column('access_id', Integer, ForeignKey(Access.id, ondelete='cascade')), Column('group_id', Integer, ForeignKey(Group.id, ondelete='cascade')))
 
 Group.commands = relation(Access, secondary=(grant), lazy='dynamic', backref="groups", order_by=asc(Access.name))
 
