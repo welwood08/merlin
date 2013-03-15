@@ -32,7 +32,6 @@ from Arthur.loadable import loadable, load, require_user
 @load
 @require_user
 class scans(loadable):
-    access = Config.get("Arthur", "scans")
     
     def execute(self, request, user, message=None, planet=None):
         tick = Updates.current_tick()
@@ -57,11 +56,11 @@ class scans(loadable):
         Q = Q.order_by(desc(Scan.id))
         scans = Q[:25]
         
-        return render("scans/scans.tpl", request, anonscans=Config.getboolean("Misc", "anonscans"), types=Request._requestable, open=open, completed=completed, scans=scans, message=message, planet=planet)
+        return render("scans/scans.tpl", request, anonscans=Config.getboolean("Scans", "anonscans"), types=Request._requestable, open=open, completed=completed, scans=scans, message=message, planet=planet)
 
 @load
 class group(loadable):
-    access = Config.get("Arthur", "scans")
+    access = "arthur_scans"
     
     def execute(self, request, user, id):
         Q = session.query(Planet, Scan)
@@ -85,7 +84,7 @@ class group(loadable):
 
 @load
 class tick(loadable):
-    access = Config.get("Arthur", "scans")
+    access = "arthur_scans"
     
     def execute(self, request, user, tick):
         Q = session.query(Planet, Scan)

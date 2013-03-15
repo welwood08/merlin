@@ -60,7 +60,7 @@ class scans(loadable):
         nicks = []
         reply = "Old " if old else ""
         reply += "%s on %s:%s:%s " % (PA.get(scantype,"name"),x,y,z,)
-        if ("showscanner" in Config.options("Misc") and Config.getboolean("Misc", "showscanner") and scanner != 'None'):
+        if Config.getboolean("Scans", "showscanner") and scanner != 'None':
             reply+= "from %s " % (User.load(id=scanner).name) if User.load(id=scanner) not in (None, 'None') else ""
         reply += Config.get("URL","viewscan") % (pa_id,)
         if old:
@@ -75,8 +75,8 @@ class scans(loadable):
         if not old:
             reply = "[-%s] %s on %s:%s:%s " % (reqs,PA.get(scantype,"name"),x,y,z,)
             reply+= "delivered to: "
-            reply+= ", ".join(nicks) if not Config.getboolean("Misc", "anonscans") else "Anon"
-            if Config.getboolean("Misc", "showurls"):
+            reply+= ", ".join(nicks) if not Config.getboolean("Scans", "anonscans") else "Anon"
+            if Config.getboolean("Scans", "showurls"):
                 reply += Config.get("URL","viewscan") % (pa_id,)
             from Hooks.scans.request import request
             message.privmsg(reply, request().scanchan())

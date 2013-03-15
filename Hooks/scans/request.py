@@ -51,7 +51,7 @@ class request(loadable):
                 message.alert("No galaxy with coords %s:%s" % params.group(1,3))
                 return
             planets = galaxy.planets
-            galscan = Config.has_option("Misc", "galscans") and Config.getboolean("Misc", "galscans")
+            galscan = Config.getboolean("Scans", "galscans")
         else:
             planet = Planet.load(*params.group(1,3,5))
             if planet is None:
@@ -61,11 +61,11 @@ class request(loadable):
             galscan = False
 
         # Scan Quota
-        if Config.has_section("ScanQuota") and not user.has_access("req_noquota"):
+        if not user.has_access("req_noquota"):
             if user.has_access("req_highquota"):
-                ScanQuota = Config.getint("ScanQuota", "higher")
+                ScanQuota = Config.getint("Scans", "highquota")
             else:
-                ScanQuota = Config.getint("ScanQuota", "default")
+                ScanQuota = Config.getint("Scans", "quota")
             reqs = session.query(Request.id).filter(Request.requester_id == user.id).filter(Request.tick == tick).count()
             if (reqs + len(planets) * len(params.group(6).upper())) > ScanQuota:
                 message.reply("This request will exceed your scan quota for this tick (%d scans remaining). " % (ScanQuota - reqs) +\
@@ -75,7 +75,7 @@ class request(loadable):
         dists = int(params.group(7) or 0)
         galdists = []
 
-        mergescans = (not galscan) and (Config.has_option("Misc", "maxscans") and len(planets)*len(params.group(6)) > Config.getint("Misc", "maxscans"))
+        mergescans = (not galscan) and (Config.getint("Scans", "maxscans") > 0 and len(planets)*len(params.group(6)) > Config.getint("Scans", "maxscans"))
 
         for planet in planets:
             if galscan or mergescans:
@@ -103,7 +103,7 @@ class request(loadable):
                         message.reply("%s Scan of %s:%s:%s is already available from %s ticks ago: %s. !request cancel %s if this is suitable." % (
                                                                         scantype, planet.x, planet.y, planet.z, request.tick - scan.tick, scan.link, request.id,))
                     # Tell the scanners
-                    requester = user.name if not Config.getboolean("Misc", "anonscans") else "Anon"
+                    requester = user.name if not Config.getboolean("Scans", "anonscans") else "Anon"
                     if galscan:
                         message.privmsg("[%s:%s] %s requested a Galaxy %s Scan of %s:%s Max Dists(i:%s%s) " % (request.id-len(planets)+1, request.id, requester, 
                                         request.type, planet.x, planet.y, max(galdists), 
@@ -147,7 +147,7 @@ class request(loadable):
         user = request.user
         planet = request.target
         
-        requester = user.name if not Config.getboolean("Misc", "anonscans") else "Anon"
+        requester = user.name if not Config.getboolean("Scans", "anonscans") else "Anon"
         dists_intel = planet.intel.dists if planet.intel else 0
         message.privmsg("[%s] %s requested a %s Scan of %s:%s:%s Dists(i:%s%s) " % (request.id, requester, request.type, planet.x,planet.y,planet.z, 
                                                         dists_intel, "/r:%s" % request.dists if request.dists > 0 else "") + request.link, self.scanchan())
@@ -158,7 +158,7 @@ class request(loadable):
         session.commit()
         
         if not gal:
-            requester = user.name if not Config.getboolean("Misc", "anonscans") else "Anon"
+            requester = user.name if not Config.getboolean("Scans", "anonscans") else "Anon"
             dists_intel = planet.intel.dists if planet.intel else 0
             message.privmsg("[%s] %s requested a %s Scan of %s:%s:%s Dists(i:%s%s) " % (request.id, requester, request.type, planet.x,planet.y,planet.z, 
                                                             dists_intel, "/r:%s" % request.dists if request.dists > 0 else "") + request.link, self.scanchan())
@@ -257,7 +257,7 @@ class request(loadable):
             message.reply("There are no open scan requests")
             return
         
-        message.reply(" ".join(map(lambda request: Config.get("Misc", "reqlist").decode("string_escape") % (request.id, request.target.intel.dists if request.target.intel else "0",
+        message.reply(" ".join(map(lambda request: Config.get("Scans", "reqlist").decode("string_escape") % (request.id, request.target.intel.dists if request.target.intel else "0",
                 "/%s" % request.dists if request.dists > 0 else "", request.scantype, request.target.x, request.target.y, request.target.z,), Q.all())))
     
     @route(r"links? ?(.*)", access="req_list")
@@ -279,7 +279,7 @@ class request(loadable):
             message.reply("There are no open scan requests")
             return
 
-        message.reply(self.url(" ".join(map(lambda request: Config.get("Misc", "reqlinks").decode("string_escape") % (request.id, request.target.intel.dists if request.target.intel else "0", 
+        message.reply(self.url(" ".join(map(lambda request: Config.get("Scans", "reqlinks").decode("string_escape") % (request.id, request.target.intel.dists if request.target.intel else "0", 
                     "/%s" % request.dists if request.dists > 0 else "", request.link), Q[:i] if i>0 else Q.all())), user))
     
     def scanchan(self):

@@ -123,11 +123,8 @@ class defcall(loadable):
         
         # Check for scans
 	if etype == "new" and p and user:
-           if Config.has_option("Misc", "autoscans"):
-               scantypes = Config.get("Misc", "autoscans")
-           else:
-               scantypes = "A"
-           scanage = (Config.getint("Misc", "scanage") or 2)
+           scantypes = Config.get("Misc", "autoscans")
+           scanage = Config.getint("Misc", "scanage")
 
            for stype in scantypes:
                scan = p.scan(stype)
