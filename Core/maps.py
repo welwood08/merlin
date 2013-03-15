@@ -1271,6 +1271,8 @@ class User(Base):
         Q = session.query(User)
         if active is True:
             Q = Q.filter(User.active == True)
+            if access:
+                Q = Q.filter(User.group_id != 2)
         if id is not None:
             user = Q.filter(User.id == id).first()
         if name is not None:
