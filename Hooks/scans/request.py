@@ -34,8 +34,8 @@ class request(loadable):
     alias = "req"
     usage = " <x.y.z> <scantype(s)> [dists] | <id> blocks <amps> | cancel <id> | list | links"
     access = 3 # Member
-    subcommands = ["req_cancel", "req_update", "req_list", "req_gal"]
-    subaccess = [3, 3, 3, 3]
+    subcommands = ["req_cancel", "req_update", "req_list", "req_gal", "req_noquota", "req_highquota"]
+    subaccess = [3, 3, 3, 3, 1, 3]
     
     @route(loadable.coord+"\s+(["+"".join(PA.options("scans"))+r"]+)\w*(?:\s+(\d+))?", access="request")
     @require_user
@@ -61,19 +61,16 @@ class request(loadable):
             galscan = False
 
         # Scan Quota
-        if Config.has_section("ScanQuota"):
-            opts = Config.options("ScanQuota") 
-            q = []
-            for o in opts:
-                if int(o) >= user.access:
-                    q.append(int(o))
-            if q:
-                ScanQuota = Config.getint("ScanQuota", str(min(q)))
-                reqs = session.query(Request.id).filter(Request.requester_id == user.id).filter(Request.tick == tick).count()
-                if (reqs + len(planets) * len(params.group(6).upper())) > ScanQuota:
-                    message.reply("This request will exceed your scan quota for this tick (%d scans remaining). " % (ScanQuota - reqs) +\
-                                  "Try searching with !planet, !dev, !unit, !news, !jgp, !au.")
-                    return
+        if Config.has_section("ScanQuota") and not user.has_access("req_noquota"):
+            if user.has_access("req_highquota"):
+                ScanQuota = Config.getint("ScanQuota", "higher")
+            else:
+                ScanQuota = Config.getint("ScanQuota", "default")
+            reqs = session.query(Request.id).filter(Request.requester_id == user.id).filter(Request.tick == tick).count()
+            if (reqs + len(planets) * len(params.group(6).upper())) > ScanQuota:
+                message.reply("This request will exceed your scan quota for this tick (%d scans remaining). " % (ScanQuota - reqs) +\
+                              "Try searching with !planet, !dev, !unit, !news, !jgp, !au.")
+                return
 
         dists = int(params.group(7) or 0)
         galdists = []
