@@ -197,13 +197,10 @@ class ChanUserTracker(object):
         user = User.load(name=pnick)
         if user is None and Config.getboolean("Misc", "autoreg"):
             if nick and not nick.puser:
-                if "galmate" in Config.options("Access"):
-                    access = Config.getint("Access","galmate")
-                else:
-                    access = 0
+                access = 0
                 user = User.load(name=pnick, active=False)
                 if user is None:
-                    user = User(name=pnick, access=access)
+                    user = User(name=pnick, group_id=2)
                     session.add(user)
                 else:
                     user.active = True

@@ -45,10 +45,7 @@ class getanewdaddy(loadable):
             message.reply("You are not %s's sponsor"%(idiot.name,))
             return
         
-        if "galmate" in Config.options("Access"):
-            idiot.access = Config.getint("Access","galmate")
-        else:
-            idiot.access = 0
+        idiot.group_id = 2
         
         if idiot.planet is not None and idiot.planet.intel is not None:
             intel = idiot.planet.intel

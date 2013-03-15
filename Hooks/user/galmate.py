@@ -19,7 +19,6 @@
 # along with this program; if not, write to the Free Software
 # Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA 02110-1301 USA
  
-from Core.config import Config
 from Core.db import session
 from Core.maps import User
 from Core.loadable import loadable, route
@@ -34,22 +33,17 @@ class galmate(loadable):
         
         pnick = params.group(1)
         
-        if "galmate" in Config.options("Access"):
-            access = Config.getint("Access","galmate")
-        else:
-            access = 0
-        
         member = User.load(name=pnick, active=False)
         if member is None:
-            member = User(name=pnick, access=access)
+            member = User(name=pnick, group_id=2)
             session.add(member)
         elif not member.active:
             member.active = True
-            member.access = access
-        elif member.access < access:
-            member.access = access
+            member.group_id = 2
+        elif member.group_id != 2:
+            member.group_id = 2
         else:
             message.reply("User %s already exists" % (pnick,))
             return
         session.commit()
-        message.reply("Added user %s at level %s" % (pnick,access))
+        message.reply("Added user %s at galmate level" % (pnick))

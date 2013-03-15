@@ -151,7 +151,7 @@ class prop(loadable):
         if person.lower() == Config.get("Connection","nick").lower():
             message.reply("I am already here, shitface.")
             return
-        u = User.load(name=person,access="member")
+        u = User.load(name=person, group_id=3)
         if u is not None:
             message.reply("Stupid %s, that wanker %s is already a member."%(user.name,person))
             return
@@ -185,7 +185,7 @@ class prop(loadable):
         if person.lower() == Config.get("Connection","nick").lower():
             message.reply("I'll peck your eyes out, cunt.")
             return
-        u = User.load(name=person,access="member")
+        u = User.load(name=person, group_id=3)
         if u is None:
             message.reply("Stupid %s, you can't kick %s, they're not a member."%(user.name,person))
             return
@@ -235,27 +235,23 @@ class prop(loadable):
         
         if prop.type == "invite" and passed:
             pnick = prop.person
-            access = Config.getint("Access", "member")
             member = User.load(name=pnick, active=False)
             if member is None:
-                member = User(name=pnick, access=access, sponsor=prop.proposer.name)
+                member = User(name=pnick, group_id=3, sponsor=prop.proposer.name)
                 session.add(member)
             elif not member.active:
                 member.active = True
-                member.access = access
+                member.group_id = 3
                 member.sponsor = prop.proposer.name
             elif not member.is_member():
-                member.access = access
+                member.group_id = 3
                 member.sponsor = prop.proposer.name
             message.privmsg("adduser %s %s 399" %(Config.get("Channels","home"), pnick,), Config.get("Services", "nick"))
             message.reply("%s has been added to %s and given member level access to me."%(pnick,Config.get("Channels","home")))
         
         if prop.type == "kick" and passed:
             idiot = prop.kicked
-            if "galmate" in Config.options("Access"):
-                idiot.access = Config.getint("Access","galmate")
-            else:
-                idiot.access = 0
+            idiot.group_id = 2
             
             if idiot.planet is not None and idiot.planet.intel is not None:
                 intel = idiot.planet.intel
@@ -319,7 +315,7 @@ class prop(loadable):
         message.reply(reply)
     
     def member_count_below_limit(self):
-        Q = session.query(User).filter(User.active == True).filter(User.access >= Config.getint("Access", "member"))
+        Q = session.query(User).filter(User.active == True).filter(User.group_id != 2)
         return Q.count() < Config.getint("Alliance", "members")
     
     def is_already_proposed_invite(self, person):
