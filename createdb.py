@@ -82,6 +82,10 @@ def addaccess(name, access):
     if access == 2:
         command.groups.append(Group(id=2))
         command.groups.append(Group(id=3))
+        command.groups.append(Group(id=4))
+    if access == 3:
+        command.groups.append(Group(id=3))
+        command.groups.append(Group(id=4))
     elif access != 1:
         command.groups.append(Group(id=access))
 
@@ -90,6 +94,7 @@ if not round:
     session.add(Group(id=1, name="admin", desc="Administrators", admin_only=True))
     session.add(Group(id=2, name="public", desc="Public commands"))
     session.add(Group(id=3, name="member", desc="Normal alliance members"))
+    session.add(Group(id=4, name="scanner", desc="Alliance scanners"))
 
     for callback in Callbacks.callbacks['PRIVMSG']:
         if not callback.access:
@@ -109,17 +114,19 @@ print "Setting up default channels"
 for chan, name in Config.items("Channels"):
     try:
         channel = Channel(name=name)
-        if chan != "public":
-            channel.userlevel = 3
-            channel.maxlevel = 1
-        else:
+        if chan == "public":
             channel.userlevel = 2
             channel.maxlevel = 2
+        else:
+            channel.userlevel = 3
+            channel.maxlevel = 1
         session.add(channel)
         session.commit()
         if chan == "home":
             session.add(ChannelAdd(channel_id=channel.id, group_id=1, level=100))
             session.add(ChannelAdd(channel_id=channel.id, group_id=3))
+        elif chan == "scans":
+            session.add(ChannelAdd(channel_id=channel.id, group_id=4))
         session.flush()
     except IntegrityError:
         print "Channel '%s' already exists" % (channel.name,)
