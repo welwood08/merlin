@@ -243,12 +243,12 @@ class search(loadable):
                 search[arg] = val
                 query = True
             
-            elif arg == "nick" and getattr(user, "is_" + Config.get("Arthur", "intel"))():
+            elif arg == "nick" and user.has_access("arthur_intel"):
                 Q = Q.filter(Intel.nick.ilike("%"+val+"%"))
                 search["nick"] = val
                 query = True
             
-            elif arg == "alliance" and getattr(user, "is_" + Config.get("Arthur", "intel"))():
+            elif arg == "alliance" and user.has_access("arthur_intel"):
                 if val[0] == "!":
                     val = val[1:]
                     inv = True

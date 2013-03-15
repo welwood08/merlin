@@ -96,6 +96,9 @@ if not round:
     session.add(Group(id=3, name="member", desc="Normal alliance members"))
     session.add(Group(id=4, name="scanner", desc="Alliance scanners"))
 
+    addaccess("arthur_intel", 3)
+    addaccess("arthur_scans", 3)
+
     for callback in Callbacks.callbacks['PRIVMSG']:
         if not callback.access:
             continue

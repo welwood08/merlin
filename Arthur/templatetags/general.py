@@ -34,11 +34,11 @@ def url(context, text):
 
 @filter
 def intel(user):
-    return getattr(user, "is_" + Config.get("Arthur", "intel"))()
+    return user.has_access("arthur_intel")
 
 @filter
 def scans(user):
-    return getattr(user, "is_" + Config.get("Arthur", "scans"))()
+    return user.has_access("arthur_scans")
 
 @filter
 def pc(string):
