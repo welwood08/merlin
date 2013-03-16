@@ -192,7 +192,7 @@ class prop(loadable):
         if self.is_already_proposed_kick(person):
             message.reply("Silly %s, there's already a proposal to kick %s."%(user.name,person))
             return
-        if u.access > user.access:
+        if (u.group_id == 1 and user.group_id != 1) or (u.group.admin_only and not user.group.admin_only):
             message.reply("Unfortunately I like %s more than you. So none of that."%(u.name,))
             return
         
@@ -246,12 +246,12 @@ class prop(loadable):
             elif not member.is_member():
                 member.group_id = 3
                 member.sponsor = prop.proposer.name
-            message.privmsg("adduser %s %s 399" %(Config.get("Channels","home"), pnick,), Config.get("Services", "nick"))
+            for chan in member.group.channels:
+                message.privmsg("adduser %s %s %s" %(chan.channel.name, member.name, chan.level), Config.get("Services", "nick"))
             message.reply("%s has been added to %s and given member level access to me."%(pnick,Config.get("Channels","home")))
         
         if prop.type == "kick" and passed:
             idiot = prop.kicked
-            idiot.group_id = 2
             
             if idiot.planet is not None and idiot.planet.intel is not None:
                 intel = idiot.planet.intel
@@ -259,8 +259,13 @@ class prop(loadable):
                 if intel.alliance == alliance:
                     intel.alliance = None
             
-            message.privmsg("remuser %s %s"%(Config.get("Channels","home"), idiot.name,),Config.get("Services", "nick"))
-            message.privmsg("ban %s *!*@%s.%s Your sponsor doesn't like you anymore"%(Config.get("Channels","home"), idiot.name, Config.get("Services", "usermask"),),Config.get("Services", "nick"))
+            for chan in idiot.group.channels:
+                message.privmsg("remuser %s %s" %(chan.channel.name, idiot.name), Config.get("Services", "nick"))
+#                message.privmsg("ban %s *!*@%s.%s GTFO, EAAD"%(chan.channel.name, idiot.name, Config.get("Services", "usermask"),), Config.get("Services", "nick"))
+            idiot.group_id = 2
+            for chan in idiot.group.channels:
+                message.privmsg("adduser %s %s %s" %(chan.channel.name, idiot.name, chan.level), Config.get("Services", "nick"))
+
             message.privmsg("note send %s A proposition to kick you from %s has been raised by %s with reason '%s' and passed by a vote of %s to %s."%(idiot.name,Config.get("Alliance","name"),prop.proposer.name,prop.comment_text,yes,no),Config.get("Services", "nick"))
             message.reply("%s has been reduced to \"galmate\" level and removed from the channel."%(idiot.name,))
         
