@@ -39,7 +39,7 @@ class paranoidcunts(loadable):
         # pubphone=F
         Q = session.query(User.name, User.alias)
         if ("galmates" not in opts):
-            Q = Q.filter(User.access > 0)
+            Q = Q.filter(User.group_id != 2)
         Q = Q.filter(User.pubphone == False)
         if ("noemail" not in opts):
             Q = Q.filter(User._smsmode.op("IS DISTINCT FROM")('E'))
@@ -54,7 +54,7 @@ class paranoidcunts(loadable):
         # No phone number
         Q = session.query(User.name, User.alias)
         if ("galmates" not in opts):
-            Q = Q.filter(User.access > 0)
+            Q = Q.filter(User.group_id != 2)
         Q = Q.filter(User.phone == None)
         if ("noemail" not in opts):
             Q = Q.filter(User._smsmode.op("IS DISTINCT FROM")('E'))
@@ -69,7 +69,7 @@ class paranoidcunts(loadable):
         # smsmode=email and no email set
         Q = session.query(User.name, User.alias)
         if ("galmates" not in opts):
-            Q = Q.filter(User.access > 0)
+            Q = Q.filter(User.group_id != 2)
         Q = Q.filter(User._smsmode == 'E')
         Q = Q.filter(User.email == None)
         Q = Q.order_by(asc(User.name))
@@ -83,7 +83,7 @@ class paranoidcunts(loadable):
         if ("check" in opts):
             Q = session.query(User.name, User.alias, User.phone)
             if ("galmates" not in opts):
-                Q = Q.filter(User.access > 0)
+                Q = Q.filter(User.group_id != 2)
             Q = Q.order_by(asc(User.name))
             result = Q.all()
             
