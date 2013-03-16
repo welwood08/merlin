@@ -261,7 +261,8 @@ class prop(loadable):
             
             for chan in idiot.group.channels:
                 message.privmsg("remuser %s %s" %(chan.channel.name, idiot.name), Config.get("Services", "nick"))
-#                message.privmsg("ban %s *!*@%s.%s GTFO, EAAD"%(chan.channel.name, idiot.name, Config.get("Services", "usermask"),), Config.get("Services", "nick"))
+                if Config.getboolean("Misc", "banonrem"):
+                    message.privmsg("ban %s *!*@%s.%s GTFO, EAAD"%(chan.channel.name, idiot.name, Config.get("Services", "usermask"),), Config.get("Services", "nick"))
             idiot.group_id = 2
             for chan in idiot.group.channels:
                 message.privmsg("adduser %s %s %s" %(chan.channel.name, idiot.name, chan.level), Config.get("Services", "nick"))

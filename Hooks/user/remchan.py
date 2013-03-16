@@ -39,7 +39,8 @@ class remchan(loadable):
         if chan is None:
             message.reply("Channel '%s' does not exist" % (channel,))
             if user.has_access("remchan_any"):
-#                message.privmsg("remuser %s %s" %(channel, Config.get('Connection', 'nick')),Config.get("Services", "nick"))
+                if Config.getboolean("Misc", "remself"):
+                    message.privmsg("remuser %s %s" %(channel, Config.get('Connection', 'nick')),Config.get("Services", "nick"))
                 message.privmsg("set %s autoinvite off" % (channel),Config.get("Services", "nick"))
                 message.part(channel)
             return
@@ -55,7 +56,8 @@ class remchan(loadable):
         session.delete(chan)
         session.commit()
         
-#        message.privmsg("remuser %s %s" %(chan.name, Config.get('Connection', 'nick')),Config.get("Services", "nick"))
+        if Config.getboolean("Misc", "remself"):
+            message.privmsg("remuser %s %s" %(chan.name, Config.get('Connection', 'nick')),Config.get("Services", "nick"))
         message.privmsg("set %s autoinvite off" % (channel),Config.get("Services", "nick"))
         message.part(chan.name)
         message.reply("Removed channel %s" % (chan.name,))

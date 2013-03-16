@@ -92,7 +92,8 @@ class edituser(loadable):
                             message.privmsg("remuser %s %s" % (chan.name, member.name,), Config.get("Services", "nick"))
                             if chan.name not in remchans:
                                 remchans.append(chan.name)
-#                            message.privmsg("ban %s *!*@%s.%s GTFO, EAAD"%(chan.name, member.name, Config.get("Services", "usermask"),), Config.get("Services", "nick"))
+                            if Config.getboolean("Misc", "banonrem"):
+                                message.privmsg("ban %s *!*@%s.%s GTFO, EAAD"%(chan.name, member.name, Config.get("Services", "usermask"),), Config.get("Services", "nick"))
                 member.group_id = g.id
             else:
                 if member.active != access and access == True:
@@ -106,7 +107,8 @@ class edituser(loadable):
                         message.privmsg("remuser %s %s" % (chan.channel.name, member.name,), Config.get("Services", "nick"))
                         if chan.channel.name not in remchans:
                             remchans.append(chan.channel.name)
-#                        message.privmsg("ban %s *!*@%s.%s GTFO, EAAD"%(chan.channel.name, member.name, Config.get("Services", "usermask"),), Config.get("Services", "nick"))
+                        if Config.getboolean("Misc", "banonrem"):
+                            message.privmsg("ban %s *!*@%s.%s GTFO, EAAD"%(chan.channel.name, member.name, Config.get("Services", "usermask"),), Config.get("Services", "nick"))
                 member.active = access
             if not member.active:
                 CUT.untrack_user(member.name)
