@@ -30,7 +30,7 @@ class addgroup(loadable):
     usage = " <name> \"<description>\" [T/F - only admins can change] [base]"
     access = 1 # Admin
     
-    @route(r"(\S+)\s+[\"']([^\"']*[\"'](?:\s+([TtFf]))?(?:\s+(\S+))?", access = "addgroup")
+    @route(r"(\S+)\s+[\"']([^\"']*)[\"'](?:\s+([TtFf]))?(?:\s+(\S+))?", access = "addgroup")
     @require_user
     def execute(self, message, user, params):
         
