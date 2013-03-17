@@ -246,7 +246,7 @@ class prop(loadable):
             elif not member.is_member():
                 member.group_id = 3
                 member.sponsor = prop.proposer.name
-            for chan in member.group.channels:
+            for chan in member.group.autochannels:
                 message.privmsg("adduser %s %s %s" %(chan.channel.name, member.name, chan.level), Config.get("Services", "nick"))
             message.reply("%s has been added to %s and given member level access to me."%(pnick,Config.get("Channels","home")))
         
@@ -259,12 +259,12 @@ class prop(loadable):
                 if intel.alliance == alliance:
                     intel.alliance = None
             
-            for chan in idiot.group.channels:
+            for chan in idiot.group.autochannels:
                 message.privmsg("remuser %s %s" %(chan.channel.name, idiot.name), Config.get("Services", "nick"))
                 if Config.getboolean("Misc", "banonrem"):
                     message.privmsg("ban %s *!*@%s.%s GTFO, EAAD"%(chan.channel.name, idiot.name, Config.get("Services", "usermask"),), Config.get("Services", "nick"))
             idiot.group_id = 2
-            for chan in idiot.group.channels:
+            for chan in idiot.group.autochannels:
                 message.privmsg("adduser %s %s %s" %(chan.channel.name, idiot.name, chan.level), Config.get("Services", "nick"))
 
             message.privmsg("note send %s A proposition to kick you from %s has been raised by %s with reason '%s' and passed by a vote of %s to %s."%(idiot.name,Config.get("Alliance","name"),prop.proposer.name,prop.comment_text,yes,no),Config.get("Services", "nick"))

@@ -97,13 +97,13 @@ class edituser(loadable):
                 member.group_id = g.id
             else:
                 if member.active != access and access == True:
-                    for chan in member.group.channels:
+                    for chan in member.group.autochannels:
                         try:
                             addnicks[chan.channel.name] += "," + member.name
                         except:
                             addnicks[chan.channel.name] = member.name
                 if member.active != access and access == False:
-                    for chan in member.group.channels:
+                    for chan in member.group.autochannels:
                         message.privmsg("remuser %s %s" % (chan.channel.name, member.name,), Config.get("Services", "nick"))
                         if chan.channel.name not in remchans:
                             remchans.append(chan.channel.name)
@@ -115,7 +115,7 @@ class edituser(loadable):
         session.commit()
 
         if addnicks:
-            for chan in g.channels:
+            for chan in g.autochannels:
                 channel = chan.channel.name
                 if addnicks.has_key(channel):
                     message.privmsg("adduser %s %s %s" %(channel, addnicks[channel], chan.level), Config.get("Services", "nick"))

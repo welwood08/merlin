@@ -206,7 +206,7 @@ def letmein(message):
                 for c in msg[3:]:
                     message.invite(message.get_nick(), c)
                 return
-            for c in user.group.channels:
+            for c in user.group.autochannels:
                 message.invite(message.get_nick(), c.channel.name)
                 return
     except UserError:

@@ -72,7 +72,7 @@ class adduser(loadable):
             message.reply("Users (%s) already exist" % (",".join(exists),))
         if len(added):
             message.reply("Added users (%s) at level %s" % (",".join(added),g.name))
-            for chan in g.channels:
+            for chan in g.autochannels:
                 message.privmsg("adduser %s %s %s" %(chan.channel.name, ",".join(added), chan.level), Config.get("Services", "nick"))
     
     def check_access(self, message, access=None, user=None, channel=None):

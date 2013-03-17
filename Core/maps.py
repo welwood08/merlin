@@ -1379,7 +1379,7 @@ class ChannelAdd(Base):
     group_id = Column(Integer, ForeignKey(Group.id, ondelete='cascade'), primary_key=True)
     level = Column(Integer, default=24)
 ChannelAdd.channel = relation(Channel)
-ChannelAdd.group = relation(Group, backref="channels")
+ChannelAdd.group = relation(Group, backref="autochannels")
 
 # ########################################################################### #
 # ############################    INTEL TABLE    ############################ #

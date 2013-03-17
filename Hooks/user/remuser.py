@@ -43,7 +43,7 @@ class remuser(loadable):
             message.reply("You may not remove %s; they are in the %s group." %(member.name, member.group.name,))
             return
         
-        for chan in member.group.channels:
+        for chan in member.group.autochannels:
             message.privmsg("remuser %s %s" %(chan.channel.name, member.name), Config.get("Services", "nick"))
 #            message.privmsg("ban %s *!*@%s.%s GTFO, EAAD"%(chan.channel.name, member.name, Config.get("Services", "usermask"),), Config.get("Services", "nick"))
         session.delete(member)
