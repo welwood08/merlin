@@ -98,6 +98,7 @@ if not round:
 
     addaccess("arthur_intel", 3)
     addaccess("arthur_scans", 3)
+    addaccess("arthur_attacks", 3)
 
     for callback in Callbacks.callbacks['PRIVMSG']:
         if not callback.access:

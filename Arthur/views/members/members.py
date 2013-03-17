@@ -23,7 +23,7 @@ from sqlalchemy import or_
 from sqlalchemy.sql import asc, desc
 from Core.config import Config
 from Core.db import session
-from Core.maps import Updates, Planet, User, PhoneFriend, Channel
+from Core.maps import Updates, Planet, User, Group, PhoneFriend, Channel
 from Arthur.context import menu, render
 from Arthur.loadable import loadable, load
 bot = Config.get("Connection","nick")
@@ -34,34 +34,32 @@ class members(loadable):
     access = "member"
     def execute(self, request, user, sort=None):
         
-        levels = [] + User.levels
-        
-        if sort is not None:
-            levels = [("All member", levels[-1][1],),]
-        
         order =  {"name"  : (asc(User.name),),
                   "sponsor" : (asc(User.sponsor),),
-                  "access" : (desc(User.access),desc(User.carebears),asc(User.name),),
+                  "access" : (asc(User.group.name),desc(User.carebears),asc(User.name),),
                   "carebears" : (desc(User.carebears),),
                   "planet" : (asc(Planet.x),asc(Planet.y),asc(Planet.z),),
                   "defage" : (asc(User.fleetupdated),),
                   }
+        nogroups = sort is not None
         if sort not in order.keys():
             sort = "name"
         order = order.get(sort)
         
         members = []
-        for level in levels:
-            Q = session.query(User.name, User.alias, User.sponsor, User.access, User.carebears, Planet, User.fleetupdated,
-                              User.phone, User.pubphone, or_(User.id == user.id, User.id.in_(session.query(PhoneFriend.user_id).filter_by(friend=user))))
-            Q = Q.outerjoin(User.planet)
-            Q = Q.filter(User.active == True)
-            Q = Q.filter(User.access >= level[1])
-            Q = Q.filter(User.access < levels[levels.index(level)-1][1]) if levels.index(level) > 0 else Q
-            for o in order:
-                Q = Q.order_by(o)
-            
-            members.append((level[0], Q.all(),))
+        Q = session.query(User.name, User.alias, User.sponsor, User.group.name, User.carebears, Planet, User.fleetupdated,
+                          User.phone, User.pubphone, or_(User.id == user.id, User.id.in_(session.query(PhoneFriend.user_id).filter_by(friend=user))))
+        Q = Q.filter(User.group_id != 2)
+        Q = Q.filter(User.active == True)
+        Q = Q.outerjoin(User.planet)
+        for o in order:
+            Q = Q.order_by(o)
+
+        if nogroups:
+            members.append(("All members", Q.all(),))
+        else:
+            for g in session.query(Group).filter(Group.id != 2).order_by(asc(Group.name)).all():
+                members.append((g.name, Q.filter(User.group_id == g.id).all(),))
         
         return render("members.tpl", request, accesslist=members)
 
@@ -70,8 +68,6 @@ class members(loadable):
 class galmates(loadable):
     access = "member"
     def execute(self, request, user, sort=None):
-        
-        levels = [] + User.levels
         
         order =  {"name"  : (asc(User.name),),
                   "sponsor" : (asc(User.sponsor),),
@@ -82,12 +78,11 @@ class galmates(loadable):
             sort = "name"
         order = order.get(sort)
         
-        members = []
         Q = session.query(User.name, User.alias, User.sponsor, User.access, Planet,
                           User.phone, User.pubphone, User.id.in_(session.query(PhoneFriend.user_id).filter_by(friend=user)))
-        Q = Q.outerjoin(User.planet)
+        Q = Q.filter(User.group_id == 2)
         Q = Q.filter(User.active == True)
-        Q = Q.filter(User.access < levels[-1][1])
+        Q = Q.outerjoin(User.planet)
         for o in order:
             Q = Q.order_by(o)
         
@@ -99,31 +94,24 @@ class channels(loadable):
     access = "member"
     def execute(self, request, user, sort=None):
         
-        levels = [] + User.levels
-        if "galmate" in Config.options("Access"):
-            levels.append(("Galaxy", Config.getint("Access","galmate"),))
-        else:
-            levels.append(("Galaxy", 0,))
-        
-        if sort is not None:
-            levels = [("All", 0,),]
-        
         order =  {"name"  : (asc(Channel.name),),
                   "userlevel" : (desc(Channel.userlevel),),
                   "maxlevel" : (desc(Channel.maxlevel),),
                   }
+        nogroups = sort is not None
         if sort not in order.keys():
             sort = "name"
         order = order.get(sort)
         
         channels = []
-        for level in levels:
-            Q = session.query(Channel.name, Channel.userlevel, Channel.maxlevel)
-            Q = Q.filter(Channel.userlevel >= level[1])
-            Q = Q.filter(Channel.userlevel < levels[levels.index(level)-1][1]) if levels.index(level) > 0 else Q
-            for o in order:
-                Q = Q.order_by(o)
-            
-            channels.append((level[0], Q.all(),))
-        
+        Q = session.query(Channel.name, Channel.userlevel, Channel.maxlevel)
+        for o in order:
+            Q = Q.order_by(o)
+
+        if nogroups:
+            members.append(("All", Q.all(),))
+        else:
+            for g in session.query(Group).filter(Group.id != 2).order_by(asc(Group.name)).all():
+                members.append((g.name, Q.filter(Channel.userlevel == g.id).all(),))
+
         return render("channels.tpl", request, accesslist=channels)

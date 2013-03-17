@@ -26,7 +26,7 @@ import re
 from Core.exceptions_ import LoadableError, UserError
 from Core.config import Config
 from Core.db import Session, session
-from Core.maps import Planet, Alliance, User, Arthur, Intel, PageView
+from Core.maps import Planet, Alliance, User, Group, Arthur, Intel, PageView
 from Core.loadable import _base, require_user, require_planet
 from Arthur.context import render
 
@@ -48,8 +48,15 @@ class loadable(_base):
         self = super(loadable, cls).__new__(cls)
         self.name = cls.__name__
         
-        if cls.access in Config.options("Access"):
-            self.access = Config.getint("Access", cls.access)
+        if type(cls.access)  is str:
+            if cls.access == "member":
+                self.access = 3
+            else:
+                g = Group.load(cls.access)
+                if g:
+                    self.access = g.id
+                else:
+                    raise LoadableError("Invalid access level")
         elif type(cls.access) in (int, type(None),):
             self.access = cls.access
         else:
@@ -129,13 +136,13 @@ class loadable(_base):
         pass
     
     def check_access(self, user):
-        user = user or User(access=0)
+        user = user or User(group_id=2)
         if not Config.getboolean("Arthur", "public") and not self.is_user(user):
             raise UserError("Hi! Please login below:")
         if getattr(self, "_USER", False) is True:
             if self.is_user(user) is False:
                 raise UserError("You need to be logged in to use this feature")
-        if user.access >= self.access:
+        if user.has_access(self.access):
             return user
         else:
             raise UserError("You don't have access to this page")

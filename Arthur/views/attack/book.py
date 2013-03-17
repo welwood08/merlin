@@ -31,7 +31,7 @@ from Arthur.loadable import loadable, load, require_user
 @load
 @require_user
 class book(loadable):
-    access = "half"
+    access = "arthur_attacks"
     
     def execute(self, request, user, id, x, y, z, when):
         planet = Planet.load(x,y,z)
@@ -78,7 +78,7 @@ class book(loadable):
 @load
 @require_user
 class unbook(loadable):
-    access = "half"
+    access = "arthur_attacks"
     
     def execute(self, request, user, id, x, y, z, when):
         planet = Planet.load(x,y,z)

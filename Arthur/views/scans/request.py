@@ -38,7 +38,7 @@ urlpatterns = patterns('Arthur.views.scans.request',
 @load
 @require_user
 class request(loadable):
-    access = Config.get("Arthur", "scans")
+    access = "arthur_scans"
     def execute(self, request, user, x, y, z, type, dists):
         from Arthur.views.scans.list import scans
         tick = Updates.current_tick()
@@ -60,7 +60,7 @@ class request(loadable):
 @load
 @require_user
 class cancel(loadable):
-    access = Config.get("Arthur", "scans")
+    access = "arthur_scans"
     def execute(self, request, user, id):
         req = Request.load(id)
         if req is None:
@@ -78,7 +78,7 @@ class cancel(loadable):
 @load
 @require_user
 class blocks(loadable):
-    access = Config.get("Arthur", "scans")
+    access = "arthur_scans"
     def execute(self, request, user, id, dists):
         req = Request.load(id)
         if req is None:
@@ -97,7 +97,7 @@ class blocks(loadable):
 @load
 @require_user
 class requests(loadable):
-    access = Config.get("Arthur", "scans")
+    access = "arthur_scans"
     def execute(self, request, user, message=None):
         tick = Updates.current_tick()
         
@@ -114,4 +114,4 @@ class requests(loadable):
         Q = Q.order_by(asc(Request.id))
         everyone = Q.all()
         
-        return render("scans/requests.tpl", request, anonscans=Config.getboolean("Misc", "anonscans"), types=Request._requestable, mine=mine, everyone=everyone, message=message)
+        return render("scans/requests.tpl", request, anonscans=Config.getboolean("Scans", "anonscans"), types=Request._requestable, mine=mine, everyone=everyone, message=message)

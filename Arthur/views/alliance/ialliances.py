@@ -22,7 +22,6 @@
 from sqlalchemy.orm import aliased
 from sqlalchemy.sql import alias, asc, desc, case
 from sqlalchemy.sql.functions import count, sum
-from Core.config import Config
 from Core.db import session
 from Core.maps import Planet, Alliance, Intel
 from Arthur.context import menu, render
@@ -31,7 +30,7 @@ from Arthur.loadable import loadable, load
 @menu("Rankings", "Alliances (intel)", suffix="intel")
 @load
 class alliances(loadable):
-    access = Config.get("Arthur", "intel")
+    access = "arthur_intel"
     def execute(self, request, user, page="1", sort="score"):
         page = int(page)
         offset = (page - 1)*50

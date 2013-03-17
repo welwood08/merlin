@@ -25,7 +25,6 @@ from sqlalchemy import and_
 from sqlalchemy.orm import aliased
 from sqlalchemy.sql import asc, desc, case, literal_column
 from sqlalchemy.sql.functions import count, sum
-from Core.config import Config
 from Core.db import session
 from Core.maps import Planet, PlanetHistory, Alliance, Intel
 from Arthur.context import render
@@ -33,7 +32,7 @@ from Arthur.loadable import loadable, load
 
 @load
 class ialliancehistory(loadable):
-    access = Config.get("Arthur", "intel")
+    access = "arthur_intel"
     def execute(self, request, user, name):
         alliance = Alliance.load(name)
         if alliance is None:

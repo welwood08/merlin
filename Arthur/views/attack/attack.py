@@ -30,7 +30,7 @@ from Arthur.loadable import loadable, load
 @menu("Attacks")
 @load
 class attack(loadable):
-    access = "half"
+    access = "arthur_attacks"
     
     def execute(self, request, user, message=None):
         tick = Updates.current_tick()
@@ -72,7 +72,7 @@ class attack(loadable):
 
 @load
 class view(loadable):
-    access = "half"
+    access = "arthur_attacks"
     
     def execute(self, request, user, id, message=None):
         attack = Attack.load(id)

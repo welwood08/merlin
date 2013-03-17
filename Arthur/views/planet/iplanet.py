@@ -29,7 +29,7 @@ from Arthur.loadable import loadable, load
 
 @load
 class planet(loadable):
-    access = "member"
+    access = "arthur_intel"
     def execute(self, request, user, x, y, z, fleets=False):
         week = Updates.week_tick()
         

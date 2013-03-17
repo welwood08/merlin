@@ -26,7 +26,7 @@ from Core.exceptions_ import MerlinSystemCall, LoadableError, PrefError, ParseEr
 from Core.config import Config
 from Core.paconf import PA
 from Core.db import Session, session
-from Core.maps import User, Channel, Command
+from Core.maps import User, Group, Channel, Command
 from Core.chanusertracker import CUT
 from Core.messages import PUBLIC_REPLY
 
@@ -112,8 +112,15 @@ class loadable(_base):
         self.routes = self.routes or []
         self.routes.extend([(name, route._ROUTE, route._ACCESS,) for name, route in sorted(cls.__dict__.items()) if hasattr(route, "_ROUTE") and hasattr(route, "_ACCESS")])
         
-        if cls.access in Config.options("Access"):
-            self.access = Config.getint("Access", cls.access)
+        if type(cls.access)  is str:
+            if cls.access == "member":
+                self.access = 3
+            else:
+                g = Group.load(cls.access)
+                if g:
+                    self.access = g.id
+                else:
+                    raise LoadableError("Invalid access level")
         elif type(cls.access) is int:
             self.access = cls.access
         else:

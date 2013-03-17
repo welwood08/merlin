@@ -31,7 +31,7 @@ from Arthur.loadable import loadable, load
 
 @load
 class planet(loadable):
-    access = Config.get("Arthur", "scans")
+    access = "arthur_scans"
     
     def execute(self, request, user, x, y, z):
         
@@ -55,7 +55,7 @@ class planet(loadable):
 
 @load
 class id(loadable):
-    access = Config.get("Arthur", "scans")
+    access = "arthur_scans"
     
     def execute(self, request, user, tick, id):
         Q = session.query(Scan)
@@ -70,7 +70,7 @@ class id(loadable):
 
 @load
 class scan(loadable):
-    access = Config.get("Arthur", "scans")
+    access = "arthur_scans"
     
     def execute(self, request, user, x, y, z, type):
         planet = Planet.load(x,y,z)
@@ -85,7 +85,7 @@ class scan(loadable):
 
 @load
 class types(loadable):
-    access = Config.get("Arthur", "scans")
+    access = "arthur_scans"
     
     def execute(self, request, user, x, y, z, types):
         types = types.upper()

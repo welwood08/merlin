@@ -1175,7 +1175,7 @@ class Group(Base):
 
 grants = Table(Config.get('DB', 'prefix') + 'grants', Base.metadata, Column('access_id', Integer, ForeignKey(Access.id, ondelete='cascade')), Column('group_id', Integer, ForeignKey(Group.id, ondelete='cascade')))
 
-Group.commands = relation(Access, secondary=(grant), lazy='dynamic', backref="groups", order_by=asc(Access.name))
+Group.commands = relation(Access, secondary=(grants), lazy='dynamic', backref="groups", order_by=asc(Access.name))
 
 class User(Base):
     __tablename__ = Config.get('DB', 'prefix') + 'users'
@@ -1201,7 +1201,7 @@ class User(Base):
     fleetcount = Column(Integer, default=0)
     fleetcomment = Column(String(255))
     fleetupdated = Column(Integer, default=0)
-    levels = filter(lambda lev: not lev[0] == "galmate", sorted(Config.items("Access"), key=lambda acc: int(acc[1]), reverse=True))
+#    levels = filter(lambda lev: not lev[0] == "galmate", sorted(Config.items("Access"), key=lambda acc: int(acc[1]), reverse=True))
     
     def is_user(self):
         return self in session

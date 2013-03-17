@@ -22,7 +22,6 @@
 from django.core.urlresolvers import reverse
 from django.http import HttpResponseRedirect
 from sqlalchemy.sql import asc, desc
-from Core.config import Config
 from Core.paconf import PA
 from Core.db import session
 from Core.maps import Planet, Alliance, Intel
@@ -31,7 +30,7 @@ from Arthur.loadable import loadable, load
 
 @load
 class alliance(loadable):
-    access = Config.get("Arthur", "intel")
+    access = "arthur_intel"
     def execute(self, request, user, name, page="1", sort="score", race="all"):
         page = int(page)
         offset = (page - 1)*50

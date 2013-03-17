@@ -29,7 +29,7 @@ from Arthur.loadable import loadable, load
 
 @load
 class galaxy(loadable):
-    access = Config.get("Arthur", "scans")
+    access = "arthur_scans"
     
     def execute(self, request, user, x, y):
         galaxy = Galaxy.load(x,y)
@@ -58,7 +58,7 @@ class galaxy(loadable):
 
 @load
 class types(loadable):
-    access = Config.get("Arthur", "scans")
+    access = "arthur_scans"
     
     def execute(self, request, user, x, y, types):
         types = types.upper()
