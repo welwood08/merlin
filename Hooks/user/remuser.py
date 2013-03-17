@@ -45,7 +45,8 @@ class remuser(loadable):
         
         for chan in member.group.autochannels:
             message.privmsg("remuser %s %s" %(chan.channel.name, member.name), Config.get("Services", "nick"))
-#            message.privmsg("ban %s *!*@%s.%s GTFO, EAAD"%(chan.channel.name, member.name, Config.get("Services", "usermask"),), Config.get("Services", "nick"))
+            if Config.getboolean("Misc", "banonrem"):
+                message.privmsg("ban %s *!*@%s.%s GTFO, EAAD"%(chan.channel.name, member.name, Config.get("Services", "usermask"),), Config.get("Services", "nick"))
         session.delete(member)
         session.commit()
         message.reply("Removed user %s" % (member.name,))
