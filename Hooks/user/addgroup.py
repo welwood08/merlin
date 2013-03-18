@@ -26,7 +26,7 @@ from Core.maps import Group, Access
 from Core.loadable import loadable, route, require_user
 
 class addgroup(loadable):
-    """Add a new user group."""
+    """Add a new user group. Optionally copy initial command access from an existing group."""
     usage = " <name> \"<description>\" [T/F - only admins can change] [base]"
     access = 1 # Admin
     
