@@ -1167,11 +1167,14 @@ class Group(Base):
             return True
         else:
             access = access.lower()
-            return self.commands.filter(name=access).count()
+            return self.commands.filter_by(name=access).count()
 
     @staticmethod
-    def load(name=None):
-        return session.query(Group).filter_by(name=name).one()
+    def load(name=None, id=None):
+        if name:
+            return session.query(Group).filter_by(name=name).first()
+        else:
+            return session.query(Group).filter_by(id=id).first()
 
 grants = Table(Config.get('DB', 'prefix') + 'grants', Base.metadata, Column('access_id', Integer, ForeignKey(Access.id, ondelete='cascade')), Column('group_id', Integer, ForeignKey(Group.id, ondelete='cascade')))
 
