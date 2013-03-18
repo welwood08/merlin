@@ -31,17 +31,18 @@ def addaccess(name, access):
     if command:
         return
 
+    print "Adding %s" % (name)
     command = Access(name=name)
     session.add(command)
     if access == 2:
-        command.groups.append(Group(id=2))
-        command.groups.append(Group(id=3))
-        command.groups.append(Group(id=4))
-    if access == 3:
-        command.groups.append(Group(id=3))
-        command.groups.append(Group(id=4))
+        command.groups.append(session.merge(Group.load(id=2)))
+        command.groups.append(session.merge(Group.load(id=3)))
+        command.groups.append(session.merge(Group.load(id=4)))
+    elif access == 3:
+        command.groups.append(session.merge(Group.load(id=3)))
+        command.groups.append(session.merge(Group.load(id=4)))
     elif access != 1:
-        command.groups.append(Group(id=access))
+        command.groups.append(session.merge(Group.load(id=access)))
 
 
 for callback in Callbacks.callbacks['PRIVMSG']:

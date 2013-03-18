@@ -20,13 +20,10 @@
 # Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA 02110-1301 USA
  
 import sys
-import sqlalchemy
 from sqlalchemy.exc import DBAPIError, IntegrityError, ProgrammingError
-from sqlalchemy.sql import text, bindparam
+from sqlalchemy.sql import text
 from Core.config import Config
 from Core.db import Base, session
-from Core.maps import Group, Access, Channel, ChannelAdd
-from Core.callbacks import Callbacks
 import shipstats
 
 mysql = Config.get("DB", "dbms") == "mysql"
@@ -75,27 +72,34 @@ if not mysql:
 
 Base.metadata.create_all()
 
-print "Setting up default access groups"
+# This import has to be after the line above if we change some parts of the database structure.
+# The Core.maps import must be below it to avoid very strange behaviour.
+from Core.callbacks import Callbacks
+from Core.maps import Group, Access, Channel, ChannelAdd
+
 def addaccess(name, access):
+    print "Adding %s" % (name)
     command=Access(name=name)
     session.add(command)
     if access == 2:
-        command.groups.append(Group(id=2))
-        command.groups.append(Group(id=3))
-        command.groups.append(Group(id=4))
-    if access == 3:
-        command.groups.append(Group(id=3))
-        command.groups.append(Group(id=4))
+        command.groups.append(session.merge(Group.load(id=2)))
+        command.groups.append(session.merge(Group.load(id=3)))
+        command.groups.append(session.merge(Group.load(id=4)))
+    elif access == 3:
+        command.groups.append(session.merge(Group.load(id=3)))
+        command.groups.append(session.merge(Group.load(id=4)))
     elif access != 1:
-        command.groups.append(Group(id=access))
+        command.groups.append(session.merge(Group.load(id=access)))
 
 if not round:
-    print "Setting up default access levels"
+    print "Setting up default access groups"
     session.add(Group(id=1, name="admin", desc="Administrators", admin_only=True))
     session.add(Group(id=2, name="public", desc="Public commands"))
     session.add(Group(id=3, name="member", desc="Normal alliance members"))
     session.add(Group(id=4, name="scanner", desc="Alliance scanners"))
+    session.commit()
 
+    print "Setting up default access levels"
     addaccess("arthur_intel", 3)
     addaccess("arthur_scans", 3)
     addaccess("arthur_attacks", 3)
