@@ -1361,10 +1361,13 @@ class Channel(Base):
     owner_id = Column(Integer, ForeignKey(User.id, ondelete='set null'))
     
     def has_access(self, access):
-        return self.usergroup.has_access(access)
+        if self.userlevel:
+            return self.usergroup.has_access(access)
+        else:
+            return Group.load(id=2).has_access(access)
     
     def can_access(self, access):
-        return self.usergroup.has_access(access)
+        return self.maxgroup.has_access(access)
     
     @staticmethod
     def load(name):
