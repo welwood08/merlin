@@ -1153,7 +1153,7 @@ class Access(Base):
 
     @staticmethod
     def load(name=None):
-        return session.query(Access).filter_by(name=name).one()
+        return session.query(Access).filter_by(name=name).first()
     
 class Group(Base):
     __tablename__ = Config.get('DB', 'prefix') + 'groups'
