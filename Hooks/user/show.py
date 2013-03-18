@@ -43,7 +43,8 @@ class show(loadable):
                 continue
             reply = "%s has access to: " % (g.name)
             if g.id == 1:
-                exists[group] = "Everything (idiot)"
-            for command in g.commands.all():
-                reply += "%s, " % (command.name)
+                reply += "Everything (idiot)  "
+            else:
+                for command in g.commands.all():
+                    reply += "%s, " % (command.name)
             message.reply(reply[:-2])

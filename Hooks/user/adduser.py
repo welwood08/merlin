@@ -77,7 +77,7 @@ class adduser(loadable):
     
     def check_access(self, message, access=None, user=None, channel=None):
         try:
-            user = loadable.check_access(self, message, access, user, channel)
+            user = loadable.check_access(self, message, access or "adduser", user, channel)
             if not self.is_user(user):
                 raise UserError
             else:

@@ -49,6 +49,6 @@ class whois(loadable):
             reply+="You are %s, you are a %s" + (" and you are also known as %s" if whore.alias else "%s") + ". Your sponsor is %s. You have %s carebears."
         else:
             reply+="Information about %s; they are a %s" + (" and they are also known as %s" if whore.alias else "%s") + ". Their sponsor is %s. They have %s carebears."
-        reply=reply%(whore.name,whore.level,whore.alias or "",whore.sponsor,whore.carebears,)
+        reply=reply%(whore.name,whore.group.name,whore.alias or "",whore.sponsor,whore.carebears,)
 
         message.reply(reply)
