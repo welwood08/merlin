@@ -48,19 +48,22 @@ class loadable(_base):
         self = super(loadable, cls).__new__(cls)
         self.name = cls.__name__
         
-        if type(cls.access)  is str:
+        try:
+            self.access = int(cls.access)
+        except ValueError:
             if cls.access == "member":
                 self.access = 3
-            else:
+            else: 
                 g = Group.load(cls.access)
                 if g:
                     self.access = g.id
                 else:
-                    raise LoadableError("Invalid access level")
-        elif type(cls.access) in (int, type(None),):
-            self.access = cls.access
-        else:
-            raise LoadableError("Invalid access level")
+                    raise LoadableError("Invalid access level: %s" % cls.access)
+        except TypeError:
+            if cls.access is None:
+                self.access = cls.access
+            else:
+                raise LoadableError("Invalid access level: %s" % cls.access)
         
         return self
     

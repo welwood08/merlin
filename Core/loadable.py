@@ -112,7 +112,9 @@ class loadable(_base):
         self.routes = self.routes or []
         self.routes.extend([(name, route._ROUTE, route._ACCESS,) for name, route in sorted(cls.__dict__.items()) if hasattr(route, "_ROUTE") and hasattr(route, "_ACCESS")])
         
-        if type(cls.access)  is str:
+        try:
+            self.access = int(cls.access)
+        except ValueError:
             if cls.access == "member":
                 self.access = 3
             else:
@@ -120,10 +122,8 @@ class loadable(_base):
                 if g:
                     self.access = g.id
                 else:
-                    raise LoadableError("Invalid access level")
-        elif type(cls.access) is int:
-            self.access = cls.access
-        else:
+                    raise LoadableError("Invalid access level: %s" % cls.access)
+        except TypeError:
             self.access = min([route._ACCESS for route in cls.__dict__.values() if hasattr(route, "_ROUTE") and hasattr(route, "_ACCESS")])
         
         return self
