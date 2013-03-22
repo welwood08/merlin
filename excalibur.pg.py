@@ -25,10 +25,22 @@ from Core.config import Config
 from Core.paconf import PA
 from Core.string import decode, excaliburlog
 from Core.db import true, false, session
-from Core.maps import Updates, Cluster, Galaxy, Planet, Alliance, epenis, galpenis, apenis, Request
+from Core.maps import Updates, galpenis, apenis
 from Core.maps import galaxy_temp, planet_temp, alliance_temp, planet_new_id_search, planet_old_id_search
+from ConfigParser import ConfigParser as CP
 
-prefixes = ['ally_']
+# Config files (absolute or relative paths) for all bots to be updated by this excalibur
+configs = ['merlin.cfg']
+
+bots = []
+prefixes = []
+for config in configs:
+    cp = CP()
+    cp.optionxform = str
+    cp.read(config)
+    bots += [cp]
+    prefixes += [cp.get("DB", "prefix")]
+
 
 if len(sys.argv) > 1:
     Config.set("URL", "dumps", sys.argv[1])
@@ -1024,8 +1036,11 @@ excaliburlog("Total penis time: %.3f seconds" % (t1,))
 session.close()
 
 # Close old scan requests
-session.query(Request).filter(Request.active).filter(Request.tick < planet_tick - Config.get("Scans", "reqexpire")).update({"active":False}, synchronize_session=False)
+t_start = time.time()
+for i in range(len(bots)):
+    session.execute("UPDATE %srequest SET active=:false WHERE active=:true AND tick < %s;" % (prefixes[i], cp[i].get("Misc", "reqexpire")), bindparams=[false, true])
 session.commit()
+excaliburlog("Expired requests removed in %.3f seconds" % (time.time() - t_start))
 session.close()
 
 # Clean tick dependant graph cache
