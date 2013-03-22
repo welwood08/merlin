@@ -838,6 +838,8 @@ class Alliance(Base):
     members = Column(Integer)
     score = Column(Integer)
     points = Column(Integer)
+    score_total = Column(Integer)
+    value_total = Column(Integer)
     ratio = Column(Float)
     size_rank = Column(Integer)
     members_rank = Column(Integer)
@@ -990,6 +992,8 @@ class AllianceHistory(Base):
     members = Column(Integer)
     score = Column(Integer)
     points = Column(Integer)
+    score_total = Column(Integer)
+    value_total = Column(Integer)
     ratio = Column(Float)
     size_rank = Column(Integer)
     members_rank = Column(Integer)
@@ -1113,6 +1117,8 @@ alliance_temp = Table('alliance_temp', Base.metadata,
     Column('score', Integer),
     Column('points', Integer),
     Column('score_rank', Integer),
+    Column('score_total', Integer),
+    Column('value_total', Integer),
     Column('size_avg', Integer),
     Column('score_avg', Integer),
     Column('points_avg', Integer))
