@@ -140,7 +140,7 @@ Any time you make changes to any of Merlin's code, you will need to use
 Configuring Excalibur
 ----------------------------
 
-excalibur.sh will need updating for the relevant DB and the relevant excalibur.*.py will need updating if you changed the prefix in merlin.cfg.
+excalibur.sh will need updating if you want to use MySQL and the relevant excalibur.*.py will need updating if you want to use the same excalibur for more than one bot.
 
 You need to use a task scheduler to run excalibur.py one minute after every tick. If you're using crontab, you might use a command like this
 
