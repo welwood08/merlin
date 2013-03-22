@@ -824,6 +824,7 @@ while True:
         session.execute(text("""UPDATE alliance AS a SET
                                   age = COALESCE(a.age, 0) + 1,
                                   size = t.size, members = t.members, score = t.score, points = t.points,
+                                  score_total = t.score_total, value_total = t.value_total,
                                   size_avg = t.size_avg, score_avg = t.score_avg, points_avg = t.points_avg,
                                   ratio = CASE WHEN (t.score != 0) THEN 10000.0 * t.size / t.score ELSE 0 END,
                              """ + (
