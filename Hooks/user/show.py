@@ -21,8 +21,7 @@
  
 # Module by Martin Stone
 
-from Core.db import session
-from Core.maps import Group, Access
+from Core.maps import Group
 from Core.loadable import loadable, route, require_user
 
 class show(loadable):
