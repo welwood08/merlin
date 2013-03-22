@@ -169,6 +169,8 @@ while True:
                                                 "members": int(a[3] or 1),
                                                 "score": int(a[4] or 0),
                                                 "points": int(a[5] or 0),
+                                                "score_total": int(a[6] or 0),
+                                                "value_total": int(a[7] or 0),
                                                 "size_avg": int(a[2] or 0) / int(a[3] or 1),
                                                 "score_avg": int(a[4] or 0) / min(int(a[3] or 1), PA.getint("numbers", "tag_count")),
                                                 "points_avg": int(a[5] or 0) / int(a[3] or 1),
@@ -1014,6 +1016,7 @@ while True:
 
                                   a.age = COALESCE(a.age, 0) + 1,
                                   a.size = t.size, a.members = t.members, a.score = t.score, a.points = t.points,
+                                  score_total = t.score_total, value_total = t.value_total,
                                   a.size_avg = t.size_avg, a.score_avg = t.score_avg, a.points_avg = t.points_avg,
                                   a.ratio = CASE WHEN (t.score != 0) THEN 10000.0 * t.size / t.score ELSE 0 END,
                              """ + (
