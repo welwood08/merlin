@@ -26,7 +26,7 @@ from Core.exceptions_ import MerlinSystemCall, LoadableError, PrefError, ParseEr
 from Core.config import Config
 from Core.paconf import PA
 from Core.db import Session, session
-from Core.maps import User, Group, Channel, Command
+from Core.maps import User, Access, Channel, Command
 from Core.chanusertracker import CUT
 from Core.messages import PUBLIC_REPLY
 
@@ -118,9 +118,9 @@ class loadable(_base):
             if cls.access == "member":
                 self.access = 3
             else:
-                g = Group.load(cls.access)
-                if g:
-                    self.access = g.id
+                a = Access.load(cls.access)
+                if a:
+                    self.access = a.name
                 else:
                     raise LoadableError("Invalid access level: %s" % cls.access)
         except TypeError:
