@@ -260,3 +260,12 @@ For accounts set up from a phone, "password" is the IMEI reversed and MD5 hashed
 For accounts set up using yowsup, "password" is the password given by yowsup, base64 decoded. In python:
 
     "your password".decode("base64")
+
+
+### FluxBB Integration
+Merlin can integrate with FluxBB, creating user accounts and updating passwords when the arthur password is updated in !pref.
+
+Notes:
+
++ FluxBB must be set up to use the same database as merlin, and the merlin user must have SELECT, UPDATE and INSERT privileges to the FluxBB users table.
++ To avoid conflicts, FluxBB should be set up using the table prefix option. This can then be set in merlin.cfg.

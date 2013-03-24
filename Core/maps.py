@@ -1272,7 +1272,7 @@ class User(Base):
         # *Every* user password operation should go through this function
         # This can be easily adapted to use SHA1 instead, or add salts
         passwd = encode(passwd)
-        return hashlib.md5(passwd).hexdigest()
+        return hashlib.sha1(passwd).hexdigest()
     
     @staticmethod
     def load(name=None, id=None, passwd=None, exact=True, active=True, access=0):
