@@ -269,3 +269,4 @@ Notes:
 
 + FluxBB must be set up to use the same database as merlin, and the merlin user must have SELECT, UPDATE and INSERT privileges to the FluxBB users table.
 + To avoid conflicts, FluxBB should be set up using the table prefix option. This can then be set in merlin.cfg.
++ Passwords updated from within FluxBB will not be updated on arthur.
