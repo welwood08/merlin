@@ -85,7 +85,7 @@ class pref(loadable):
                 user.passwd = val
                 reply += " password=%s"%(val)
                 if Config.has_section("FluxBB"):
-                    flux_update = self.flux_passwd(val)
+                    flux_update = self.flux_passwd(user)
             if opt == "url":
                 if val == "game" or val in self.nulls:
                     user.url = None
@@ -143,14 +143,14 @@ class pref(loadable):
             elif flux_update == 1:
                 message.reply("Updated forum password.")
 
-    def flux_passwd(user):
+    def flux_passwd(self, user):
         if not Config.getboolean("FluxBB", "enabled"):
             return -1
-        if session.execute("SELECT username FROM %s_users WHERE LOWER(username) LIKE '%s';" % (Config.get("FluxBB", "prefix"), user.name.lower())).rowcount > 0:
-            return session.execute("UPDATE %s_users SET password='%s' WHERE LOWER(username) LIKE ''%s';" % (Config.get("FluxBB", "prefix"), user.passwd, user.name.lower())).rowcount
+        if session.execute("SELECT username FROM %susers WHERE LOWER(username) LIKE '%s';" % (Config.get("FluxBB", "prefix"), user.name.lower())).rowcount > 0:
+            return session.execute("UPDATE %susers SET password='%s' WHERE LOWER(username) LIKE ''%s';" % (Config.get("FluxBB", "prefix"), user.passwd, user.name.lower())).rowcount
         else:
             group = Config.get("FluxBB", "memgroup") if user.is_member() else Config.get("FluxBB", "galgroup")
             if group == 0:
                 return -1
-            return session.execute("INSERT INTO %s_users (group_id, username, password, email, title) VALUES ('%s', '%s', '%s', '%s', '%s');" % (
+            return session.execute("INSERT INTO %susers (group_id, username, password, email, title) VALUES ('%s', '%s', '%s', '%s', '%s');" % (
                                    Config.get("FluxBB", "prefix"), group, user.name, user.passwd, user.email, user.level)).rowcount
