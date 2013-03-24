@@ -55,6 +55,8 @@ class pref(loadable):
         
         params = self.split_opts(params.group(1))
         reply = ""
+        flux_update = -1
+
         for opt, val in params.items():
             if opt == "planet":
                 m = self.planet_coordre.match(val)
@@ -81,6 +83,8 @@ class pref(loadable):
                     continue
                 user.passwd = val
                 reply += " password=%s"%(val)
+                if Config.has_section("FluxBB"):
+                    flux_update = self.flux_passwd(val)
             if opt == "url":
                 if val == "game" or val in self.nulls:
                     user.url = None
@@ -133,3 +137,19 @@ class pref(loadable):
         session.commit()
         if len(reply) > 0:
             message.reply("Updated your preferences:"+reply)
+            if flux_update == 0:
+                message.reply("Failed to update forum password.")
+            elif flux_update == 1:
+                message.reply("Updated forum password.")
+
+    def flux_passwd(user):
+        if not Config.getboolean("FluxBB", "enabled"):
+            return -1
+        if session.execute("SELECT username FROM %s_users WHERE LOWER(username) LIKE '%s';" % (Config.get("FluxBB", "prefix"), user.name.lower())).rowcount > 0:
+            return session.execute("UPDATE %s_users SET password='%s' WHERE LOWER(username) LIKE ''%s';" % (Config.get("FluxBB", "prefix"), user.passwd, user.name.lower())).rowcount
+        else:
+            group = Config.get("FluxBB", "memgroup") if user.is_member() else Config.get("FluxBB", "galgroup")
+            if group == 0:
+                return -1
+            return session.execute("INSERT INTO %s_users (group_id, username, password, email, title) VALUES ('%s', '%s', '%s', '%s', '%s');" % (
+                                   Config.get("FluxBB", "prefix"), group, user.name, user.passwd, user.email, user.level)).rowcount
