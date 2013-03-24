@@ -140,12 +140,11 @@ Any time you make changes to any of Merlin's code, you will need to use
 Configuring Excalibur
 ----------------------------
 
-excalibur.sh will need updating with the path to your bot, and if you want to use MySQL. The relevant excalibur.*.py will need updating if you want to use the same excalibur for more than one bot.
-
-You need to use a task scheduler to run excalibur.py one minute after every tick. If you're using crontab, you might use a command like this
+You need to use a task scheduler to run excalibur.py one minute after every tick. If you're using crontab, you might use a command like this, which uses the supplied excalibur.sh
 
 	1 * * * * /path/to/merlin/excalibur.sh >> /path/to/merlin/dumplog.txt 2>&1
 
+excalibur.sh will need updating with the path to your bot, and if you want to use MySQL. The relevant excalibur.*.py will need updating if you want to use the same excalibur for more than one bot.
 
 Configuring Apache and running Arthur
 ----------------------------
