@@ -31,6 +31,8 @@ INSTALLED_APPS = (
     'Arthur',
 )
 
+SECRET_KEY = Config.get("Arthur", "secretkey")
+
 ALLOWED_HOSTS = (
     hostre.match(Config.get("URL", "arthur")).group(1),
 )
