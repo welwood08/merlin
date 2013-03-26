@@ -104,13 +104,13 @@ def members(object, all=False):
 def rank(object, attr):
     value = getattr(object, attr+"_rank")
     diff = getattr(object, attr+"_rank_change") or 0
-    ret = str(value) + ' <img src='
-    if diff > 0:
-        ret += '"/static/down.gif"'
+    ret = str(value) + ' <span class='
+    if diff > 0: 
+        ret += '"arrow-down"'
     elif diff < 0:
-        ret += '"/static/up.gif"'
+        ret += '"arrow-up"'
     else:
-        ret += '"/static/nonemover.gif"'
+        ret += '"arrow-left"'
     ret += ' title='
     if diff > 0:
         ret += '"Down %s places"' %(diff,)
@@ -118,19 +118,19 @@ def rank(object, attr):
         ret += '"Up %s places"' %(-diff,)
     else:
         ret += '"Non mover"'
-    ret += ' />'
+    ret += '> </span></div>'
     return ret
 
 @filter
 def hrank(object, attr, diff):
     value = getattr(object, attr+"_rank")
-    ret = str(value) + ' <img src='
+    ret = str(value) + ' <span class='
     if diff > 0:
-        ret += '"/static/down.gif"'
+        ret += '"arrow-down"'
     elif diff < 0:
-        ret += '"/static/up.gif"'
+        ret += '"arrow-up"'
     else:
-        ret += '"/static/nonemover.gif"'
+        ret += '"arrow-left"' 
     ret += ' title='
     if diff > 0:
         ret += '"Down %s places"' %(diff,)
@@ -138,5 +138,5 @@ def hrank(object, attr, diff):
         ret += '"Up %s places"' %(-diff,)
     else:
         ret += '"Non mover"'
-    ret += ' />'
+    ret += '> </span></div>'
     return ret

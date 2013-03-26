@@ -273,3 +273,36 @@ tr.nolongerexists {
 .growth_diff {
 	display: none;
 }
+
+.arrow-up {
+	width: 0;
+	height: 0;
+	position: relative;
+	vertical-align: middle;
+	display: inline-block;
+	border-color: green transparent;
+	border-style: solid;
+	border-width: 0px 7px 7px 7px;
+}   
+	
+.arrow-down {
+	width: 0;
+	height: 0;
+	position: relative;
+	vertical-align: middle; 
+	display: inline-block;
+	border-color: red transparent;
+	border-style: solid;
+	border-width: 7px 7px 0px 7px;
+}
+
+.arrow-left {
+	width: 0;
+	height: 0;
+	position: relative;
+	vertical-align: middle;
+	display: inline-block;
+	border-color: transparent yellow;
+	border-style: solid;
+	border-width: 7px 7px 7px 0px;
+} 
