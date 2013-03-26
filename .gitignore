@@ -17,4 +17,5 @@ tablenames
 PG_setup.txt
 1000scans.txt
 IMAPLog.txt
+imaplog.txt
 imappush.sh
