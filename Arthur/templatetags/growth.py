@@ -104,7 +104,7 @@ def members(object, all=False):
 def rank(object, attr):
     value = getattr(object, attr+"_rank")
     diff = getattr(object, attr+"_rank_change") or 0
-    ret = str(value) + ' <span class='
+    ret = str(value) + ' &nbsp;<span class='
     if diff > 0: 
         ret += '"arrow-down"'
     elif diff < 0:
@@ -124,7 +124,7 @@ def rank(object, attr):
 @filter
 def hrank(object, attr, diff):
     value = getattr(object, attr+"_rank")
-    ret = str(value) + ' <span class='
+    ret = str(value) + ' &nbsp;<span class='
     if diff > 0:
         ret += '"arrow-down"'
     elif diff < 0:
