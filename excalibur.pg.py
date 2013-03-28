@@ -1023,7 +1023,6 @@ t1=time.time()
 for prefix in prefixes:
     t2=time.time()
     session.execute("DELETE FROM %sepenis;" % (prefix))
-#    session.execute(epenis.__table__.delete())
     session.execute(text("SELECT setval('%sepenis_rank_seq', 1, :false);" % (prefix), bindparams=[false]))
     session.execute(text("INSERT INTO %sepenis (user_id, penis) SELECT %susers.id, planet.score - planet_history.score FROM %susers, planet, planet_history WHERE %susers.active = :true AND %susers.access >= :member AND planet.active = :true AND %susers.planet_id = planet.id AND planet.id = planet_history.id AND planet_history.tick = :tick ORDER BY planet.score - planet_history.score DESC;" % (prefix, prefix, prefix, prefix, prefix, prefix), bindparams=[bindparam("member",Config.getint("Access","member")), history_tick, true]))
     t3=time.time()-t2
@@ -1038,7 +1037,7 @@ session.close()
 # Close old scan requests
 t_start = time.time()
 for i in range(len(bots)):
-    session.execute("UPDATE %srequest SET active=:false WHERE active=:true AND tick < %s;" % (prefixes[i], bots[i].get("Misc", "reqexpire")), bindparams=[false, true])
+    session.execute(text("UPDATE %srequest SET active=:false WHERE active=:true AND tick < %s;" % (prefixes[i], bots[i].get("Misc", "reqexpire")), bindparams=[false, true]))
 session.commit()
 excaliburlog("Expired requests removed in %.3f seconds" % (time.time() - t_start))
 session.close()
