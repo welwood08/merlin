@@ -146,7 +146,7 @@ class pref(loadable):
         if not Config.getboolean("FluxBB", "enabled"):
             return -1
         if session.execute("SELECT username FROM %susers WHERE LOWER(username) LIKE '%s';" % (Config.get("FluxBB", "prefix"), user.name.lower())).rowcount > 0:
-            return session.execute("UPDATE %susers SET password='%s' WHERE LOWER(username) LIKE ''%s';" % (Config.get("FluxBB", "prefix"), user.passwd, user.name.lower())).rowcount
+            return session.execute("UPDATE %susers SET password='%s' WHERE LOWER(username) LIKE '%s';" % (Config.get("FluxBB", "prefix"), user.passwd, user.name.lower())).rowcount
         else:
             group = Config.get("FluxBB", "memgroup") if user.is_member() else Config.get("FluxBB", "galgroup")
             if group == 0:
