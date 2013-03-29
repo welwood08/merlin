@@ -43,7 +43,7 @@
         <td class="{{ owner.race }} center"> {{ owner.race }} </td>
         <td class="right"> {{ ((owner.value or 0)/1000000.0)|round(1) }}M </td>
         <td class="center"> {{ fleet.eta }} </td>
-        <td class="center"> {%if owner.intel%}{{ owner.intel.nick }}{%if owner.intel.nick and owner.alliance%}<br>{%endif%}{%if owner.alliance%}
+        <td class="center"> {%if owner.intel%}{{ owner.intel.nick or "" }}{%if owner.intel.nick and owner.alliance%}<br>{%endif%}{%if owner.alliance%}
             <a {{alliancelink(owner.alliance.name)}}>{{ owner.alliance.name }}</a>{%endif%}{%endif%} </td>
         <td class="right"> {{ fleet.fleet_size|intcomma }}</td>
     </tr>
