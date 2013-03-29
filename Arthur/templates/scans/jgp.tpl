@@ -1,4 +1,4 @@
-{% from 'macros.tpl' import planetscanslink with context %}
+{% from 'macros.tpl' import planetscanslink, alliancelink with context %}
 <table cellspacing="1" cellpadding="3" width="700" class="black">
 {% with planet = scan.planet %}
 <tr class="datahigh">
@@ -13,11 +13,13 @@
         <th width="6%">Race</th>
         <th width="7%">Value</th>
         <th width="5%">ETA</th>
-        <th class="right" width="34%">Ships <span class="red">(H)</span>/<span class="green">(F)</span></th>
+        <th width="15%">Alliance</th>
+        <th class="right" width="20%">Ships <span class="red">(H)</span>/<span class="green">(F)</span></th>
     </tr>
     
     <tr class="datahigh">
         <td class="center">{{ planet.x }}:{{ planet.y }}:{{ planet.z }}</td>
+        <td> </td>
         <td> </td>
         <td> </td>
         <td> </td>
@@ -41,6 +43,8 @@
         <td class="{{ owner.race }} center"> {{ owner.race }} </td>
         <td class="right"> {{ ((owner.value or 0)/1000000.0)|round(1) }}M </td>
         <td class="center"> {{ fleet.eta }} </td>
+        <td class="center"> {%if owner.intel%}{{ owner.intel.nick }}{%if owner.intel.nick and owner.alliance%}<br>{%endif%}{%if owner.alliance%}
+            <a {{alliancelink(owner.alliance.name)}}>{{ owner.alliance.name }}</a>{%endif%}{%endif%} </td>
         <td class="right"> {{ fleet.fleet_size|intcomma }}</td>
     </tr>
     {% endwith %}
@@ -49,14 +53,14 @@
     
     
     <tr class="header">
-        <th colspan="6">Overview for each ETA with incoming</th>
+        <th colspan="7">Overview for each ETA with incoming</th>
     </tr>
     <tr class="datahigh">
         <th> </th>
         <th> Combat Tick </th>
         <th> </th>
+        <th colspan="2"> ETA </th>
         <th> </th>
-        <th> ETA </th>
         <th class="right">
         Ships <span class="red">(H)</span>/<span class="green">(F)</span>
         </th>
@@ -67,8 +71,8 @@
         <td> </td>
         <td> Tick: {{ lt[0] }} </td>
         <td> </td>
+        <td colspan="2"> {{ lt[1] }} </td>
         <td> </td>
-        <td> {{ lt[1] }} </td>
         <td class="right">
             <span class="red"> {{ lt[3] }} ({{ lt[2] }}) </span>
             /
