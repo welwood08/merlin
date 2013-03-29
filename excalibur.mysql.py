@@ -1203,7 +1203,7 @@ for prefix in prefixes:
     #session.execute(text("SELECT setval('epenis_rank_seq', 1, :false);", bindparams=[false]))
     session.execute(text("INSERT INTO %sepenis (user_id, penis) SELECT %susers.id, planet.score - planet_history.score FROM %susers, planet, planet_history WHERE %susers.active = :true AND %susers.access >= :member AND planet.active = :true AND %susers.planet_id = planet.id AND planet.id = planet_history.id AND planet_history.tick = :tick ORDER BY planet.score - planet_history.score DESC;" % (prefix, prefix, prefix, prefix, prefix, prefix), bindparams=[bindparam("member",Config.getint("Access","member")), history_tick, true]))
     t3=time.time()-t2
-    excaliburlog("epenis for %s in %.3f seconds" % (prefix,t2,))
+    excaliburlog("epenis for %s in %.3f seconds" % (prefix,t3,))
 t2=time.time()-t1
 excaliburlog("epenis in %.3f seconds" % (t2,))
 session.commit()
