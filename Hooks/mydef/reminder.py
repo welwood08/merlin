@@ -34,7 +34,7 @@ def join(message):
         # Someone is joining a channel we're in
         try:
             u = User.load(name=message.get_pnick())
-            if u is None:
+            if u is None or not u.is_member():
                 return
             defage = Updates.current_tick() - (u.fleetupdated or 0)
             if defage > (Config.getint("Misc", "defage") if Config.has_option("Misc", "defage") else 24):
