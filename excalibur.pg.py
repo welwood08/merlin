@@ -1037,7 +1037,7 @@ session.close()
 # Close old scan requests
 t_start = time.time()
 for i in range(len(bots)):
-    session.execute(text("UPDATE %srequest SET active=:false WHERE active=:true AND tick < %s;" % (prefixes[i], planet_tick-bots[i].get("Misc", "reqexpire")), bindparams=[false, true]))
+    session.execute(text("UPDATE %srequest SET active=:false WHERE active=:true AND tick < %s;" % (prefixes[i], planet_tick-bots[i].getint("Misc", "reqexpire")), bindparams=[false, true]))
 session.commit()
 excaliburlog("Expired requests removed in %.3f seconds" % (time.time() - t_start))
 session.close()
