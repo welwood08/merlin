@@ -23,8 +23,10 @@ import re
 from sqlalchemy.sql import asc
 from Core.paconf import PA
 from Core.db import session
-from Core.maps import Updates, Galaxy, Planet, Attack
+from Core.maps import Updates, Galaxy, Planet, Attack, Request
 from Core.loadable import loadable, route
+from Core.config import Config
+from Core.robocop import push
 
 class attack(loadable):
     """Create an attack page on the webby with automatic parsed scans"""
@@ -84,3 +86,22 @@ class attack(loadable):
         
         session.commit()
         message.reply(str(attack))
+
+        # Request scans
+        if Config.has_option("Misc", "attscans"):
+            scantypes = Config.get("Misc", "attscans")
+        else:
+            scantypes = ""
+
+        for stype in scantypes:
+           for p in attack.planets:
+               scan = p.scan(stype)
+               if scan and (int(tick) == scan.tick):
+                   return
+               else:
+                   req = Request(target=p, scantype=stype, dists=0)
+                   user.requests.append(req)
+                   session.commit()
+                   push("request", request_id=req.id, mode="request")
+        if scantypes:
+            message.reply("Scans requested: %s" % (scantypes))
