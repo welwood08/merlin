@@ -97,11 +97,26 @@ class request(loadable):
                     if galscan and (message.get_chan() != self.scanchan()):
                         message.reply("Requested a Galaxy %s Scan of %s:%s. !request cancel %s:%s to cancel the request." % (request.type, planet.x, planet.y, 
                                                                                                                              request.id-len(planets)+1, request.id))
-                    ## Check existing scans
+                    # Check for existing scans
                     scan = planet.scan(scantype)
                     if scan and request.tick - scan.tick < PA.getint(scantype,"expire"):
                         message.reply("%s Scan of %s:%s:%s is already available from %s ticks ago: %s. !request cancel %s if this is suitable." % (
                                                                         scantype, planet.x, planet.y, planet.z, request.tick - scan.tick, scan.link, request.id,))
+                        # Cancel requests with a 0-tick old scan, if required
+                        if (request.tick == scan.tick):
+                            req0age = Config.getint("Scans", "req0agej") if request.scantype == "J" else Config.getint("Scans", "req0age")
+                            if req0age == 1:
+                               Q = session.query(Request).filter(Request.tick == request.tick).filter(Request.planet_id == request.planet_id)
+                               Q = Q.filter(Request.scantype == request.scantype).filter(Request.requester_id == request.requester_id)
+                               if Q.count() == 1:
+                                   request.active = False
+                                   message.reply("Request %s cancelled due to an existing scan. If you really need a newer one, repeat your scan request." % (request.id))
+                                   message.privmsg("Cancelled scan request %s due to existing scan" % (request.id), self.scanchan())
+                            elif req0age == 0:
+                                request.active = False
+                                message.reply("Request %s cancelled due to an existing scan." % (request.id))
+                                message.privmsg("Cancelled scan request %s due to existing scan" % (request.id), self.scanchan())
+
                     # Tell the scanners
                     requester = user.name if not Config.getboolean("Scans", "anonscans") else "Anon"
                     if galscan:
@@ -112,15 +127,32 @@ class request(loadable):
                     request = self.request(message, user, planet, scantype, dists)
                     if message.get_chan() != self.scanchan():
                         message.reply("Requested a %s Scan of %s:%s:%s. !request cancel %s to cancel the request." % (request.type, planet.x, planet.y, planet.z, request.id,))
-                    
+
+                    # Check for existing scans
                     scan = planet.scan(scantype)
                     if scan and request.tick - scan.tick < PA.getint(scan.scantype,"expire"):
                         message.reply("%s Scan of %s:%s:%s is already available from %s ticks ago: %s. !request cancel %s if this is suitable." % (
                                                                         scantype, planet.x, planet.y, planet.z, request.tick - scan.tick, scan.link, request.id,))
+                        # Cancel requests with a 0-tick old scan, if required
+                        if (request.tick == scan.tick):
+                            req0age = Config.getint("Scans", "req0agej") if request.scantype == "J" else Config.getint("Scans", "req0age")
+                            if req0age == 1:
+                               Q = session.query(Request).filter(Request.tick == request.tick).filter(Request.planet_id == request.planet_id)
+                               Q = Q.filter(Request.scantype == request.scantype).filter(Request.requester_id == request.requester_id)
+                               if Q.count() == 1:
+                                   request.active = False
+                                   message.reply("Request %s cancelled due to an existing scan. If you really need a newer one, repeat your scan request." % (request.id))
+                                   message.privmsg("Cancelled scan request %s due to existing scan" % (request.id), self.scanchan())
+                            elif req0age == 0:
+                                request.active = False
+                                message.reply("Request %s cancelled due to an existing scan." % (request.id))
+                                message.privmsg("Cancelled scan request %s due to existing scan" % (request.id), self.scanchan())
+
             if mergescans:
                 message.reply("Requested %d scans. !request cancel %s:%s to cancel the request." % (len(planets) * types, request.id-len(planets)*types+1, request.id))
                 message.privmsg("[%s:%s] %s requested %d scans (%s) Max Dists(i:%s%s). !request links for details " % (request.id-len(planets)*types+1, request.id, 
                                 requester, len(planets)*types, params.group(6).upper(), max(galdists), "/r:%s" % dists if dists > 0 else ""), self.scanchan())
+        session.commit()
     
     @robohci
     def robocop(self, message, request_id, mode):
