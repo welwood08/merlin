@@ -174,7 +174,7 @@ At the bottom of your httpd.conf, add the following lines
        
 Make sure you edit all the paths!
 
-Open the arthur.wsgi file and edit the two paths in that file.
+Open the arthur.wsgi file and edit the two paths in that file. Open Arthur/__init__.py and edit the path in that file.
 
 Arthur Access Settings
 ----------------------------
