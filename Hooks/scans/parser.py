@@ -345,7 +345,7 @@ class parse(Thread):
     def parse_N(self, scan_id, scan, page):
         #incoming fleets
         #<td class=left valign=top>Incoming</td><td valign=top>851</td><td class=left valign=top>We have detected an open jumpgate from Tertiary, located at 18:5:11. The fleet will approach our system in tick 855 and appears to have roughly 95 ships.</td>
-        for m in re.finditer('<td class="left" valign="top">Incoming</td><td valign="top">(\d+)</td><td class="left" valign="top">We have detected an open jumpgate from ([^<]+), located at (\d+):(\d+):(\d+). The fleet will approach our system in tick (\d+) and appears to have roughly (\d+) ships.</td>', page):
+        for m in re.finditer('<td class="left" valign="top">Incoming</td><td valign="top">(\d+)</td><td class="left" valign="top">We have detected an open jumpgate from ([^<]+), located at <a[^>]+>(\d+):(\d+):(\d+)</a>. The fleet will approach our system in tick (\d+) and appears to have (\d+) visible ships.</td>', page):
             fleetscan = FleetScan()
 
             newstick = m.group(1)
@@ -353,13 +353,13 @@ class parse(Thread):
             originx = m.group(3)
             originy = m.group(4)
             originz = m.group(5)
-            arrivaltick = int(m.group(6))
+            arrivaltick = m.group(6)
             numships = m.group(7)
 
             fleetscan.mission = "Unknown"
             fleetscan.fleet_name = fleetname
             fleetscan.launch_tick = newstick
-            fleetscan.landing_tick = arrivaltick
+            fleetscan.landing_tick = int(arrivaltick)
             fleetscan.fleet_size = numships
 
             owner=Planet.load(originx,originy,originz)
@@ -382,7 +382,7 @@ class parse(Thread):
 
         #launched attacking fleets
         #<td class=left valign=top>Launch</td><td valign=top>848</td><td class=left valign=top>The Disposable Heroes fleet has been launched, heading for 15:9:8, on a mission to Attack. Arrival tick: 857</td>
-        for m in re.finditer('<td class="left" valign="top">Launch</td><td valign="top">(\d+)</td><td class="left" valign="top">The ([^,]+) fleet has been launched, heading for (\d+):(\d+):(\d+), on a mission to Attack. Arrival tick: (\d+)</td>', page):
+        for m in re.finditer('<td class="left" valign="top">Launch</td><td valign="top">(\d+)</td><td class="left" valign="top">The ([^,]+) fleet has been launched, heading for <a[^>]+>(\d+):(\d+):(\d+)</a>, on a mission to Attack. Arrival tick: (\d+)</td>', page):
             fleetscan = FleetScan()
 
             newstick = m.group(1)
@@ -417,7 +417,7 @@ class parse(Thread):
 
         #launched defending fleets
         #<td class=left valign=top>Launch</td><td valign=top>847</td><td class=left valign=top>The Ship Collection fleet has been launched, heading for 2:9:14, on a mission to Defend. Arrival tick: 853</td>
-        for m in re.finditer('<td class="left" valign="top">Launch</td><td valign="top">(\d+)</td><td class="left" valign="top">The ([^<]+) fleet has been launched, heading for (\d+):(\d+):(\d+), on a mission to Defend. Arrival tick: (\d+)</td>', page):
+        for m in re.finditer('<td class="left" valign="top">Launch</td><td valign="top">(\d+)</td><td class="left" valign="top">The ([^<]+) fleet has been launched, heading for <a[^>]+>(\d+):(\d+):(\d+)</a>, on a mission to Defend. Arrival tick: (\d+)</td>', page):
             fleetscan = FleetScan()
 
             newstick = m.group(1)
@@ -452,7 +452,7 @@ class parse(Thread):
 
         #tech report
         #<td class=left valign=top>Tech</td><td valign=top>838</td><td class=left valign=top>Our scientists report that Portable EMP emitters has been finished. Please drop by the Research area and choose the next area of interest.</td>
-        for m in re.finditer('<td class="left" valign="top">Tech</td><td valign="top">(\d+)</td><td class="left" valign="top">Our scientists report that ([^<]+) has been finished. Please drop by the Research area and choose the next area of interest.</td>', page):
+        for m in re.finditer('<td class="left" valign="top">Tech</td><td valign="top">(\d+)</td><td class="left" valign="top">Our scientists report that ([^<]+) has been finished. Please drop by the <a[^>]+>Research area</a> and choose the next area of interest.</td>', page):
             newstick = m.group(1)
             research = m.group(2)
 
@@ -460,7 +460,7 @@ class parse(Thread):
 
         #failed security report
         #<td class=left valign=top>Security</td><td valign=top>873</td><td class=left valign=top>A covert operation was attempted by Ikaris (2:5:5), but our agents were able to stop them from doing any harm.</td>
-        for m in re.finditer('<td class="left" valign="top">Security</td><td valign="top">(\d+)</td><td class="left" valign="top">A covert operation was attempted by ([^<]+) \\((\d+):(\d+):(\d+)\\), but our agents were able to stop them from doing any harm.</td>', page):
+        for m in re.finditer('<td class="left" valign="top">Security</td><td valign="top">(\d+)</td><td class="left" valign="top">A covert operation was attempted by ([^<]+) \\(<a[^>]+>(\d+):(\d+):(\d+)</a>\\), but our security guards were able to stop them from doing any harm.[^<]*</td>', page):
             covop = CovOp()
 
             newstick = m.group(1)
