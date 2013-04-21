@@ -24,6 +24,7 @@ from django.http import HttpResponseRedirect
 from sqlalchemy.sql import asc
 from Core.db import session
 from Core.maps import Updates, Planet, Target, Attack
+from Core.config import Config
 from Arthur.context import menu, render
 from Arthur.loadable import loadable, load
 
@@ -36,7 +37,7 @@ class attack(loadable):
         tick = Updates.current_tick()
         
         Q = session.query(Attack)
-        Q = Q.filter(Attack.landtick >= tick - Attack._active_ticks)
+        Q = Q.filter(Attack.landtick >= tick - Config.getint("Misc", "attactive"))
         Q = Q.order_by(asc(Attack.id))
         attacks = Q.all()
         
@@ -45,7 +46,7 @@ class attack(loadable):
         Q = Q.join(Target.user)
         Q = Q.filter(Planet.active == True)
         Q = Q.filter(Target.user == user)
-        Q = Q.filter(Target.tick >= tick - Attack._active_ticks)
+        Q = Q.filter(Target.tick >= tick - Config.getint("Misc", "attactive"))
         Q = Q.order_by(asc(Target.tick), asc(Planet.x), asc(Planet.y), asc(Planet.z))
         
         bookings = []
@@ -64,7 +65,7 @@ class attack(loadable):
                 bookings[-1][2].append(planet.scan("A") or planet.scan("U"))
                 scans.append(planet.scan("A") or planet.scan("U"))
             
-            if tock <= tick + Attack._show_jgp_ticks and planet.scan("J"):
+            if tock <= tick + Config.getint("Misc", "attjgp") and planet.scan("J"):
                 bookings[-1][2].append(planet.scan("J"))
                 scans.append(planet.scan("J"))
         
@@ -79,8 +80,8 @@ class view(loadable):
         if attack is None or not attack.active:
             return HttpResponseRedirect(reverse("attacks"))
         
-        waves = xrange(attack.landtick, attack.landtick + Attack._waves)
-        show_jgps = attack.landtick <= Updates.current_tick() + Attack._show_jgp_ticks
+        waves = xrange(attack.landtick, attack.landtick + attack.waves)
+        show_jgps = attack.landtick <= Updates.current_tick() + Config.getint("Misc", "attjgp")
         
         group = []
         scans = []
@@ -118,7 +119,7 @@ class view(loadable):
                 group[-1][1].append(planet.scan("J"))
                 scans.append(planet.scan("J"))
             
-            bookings = dict([(target.tick, target,) for target in planet.bookings.filter(Target.tick.between(attack.landtick, attack.landtick+4))])
+            bookings = dict([(target.tick, target,) for target in planet.bookings.filter(Target.tick.between(attack.landtick, attack.landtick+attack.waves+1))])
             for tick in waves:
                 group[-1][2].append((tick, bookings.get(tick) or (False if show_jgps else None),))
         

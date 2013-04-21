@@ -26,7 +26,7 @@ from Core.maps import Updates, Galaxy, Planet, Attack
 from Core.loadable import loadable, route
 
 class editattack(loadable):
-    usage = " [<id> add|remove <coordlist>] | [<id> land <tick|eta>] | [<id> comment <comment>]"
+    usage = " [<id> add|remove <coordlist>] | [<id> land <tick|eta>] | [<id> comment <comment>] [<id> waves <waves>]"
     access = 3 # Member
     
     @route(r"(\d+)\s+add\s+([. :\-\d,]+)")
@@ -126,3 +126,16 @@ class editattack(loadable):
         
         session.commit()
         message.reply("Updated comment for attack %d: %s"%(id,attack.comment,))
+
+    @route(r"(\d+)\s+waves\s+(\d+)")
+    def waves(self, message, user, params):
+        id = int(params.group(1))
+        attack = Attack.load(id)
+        if attack is None:
+            message.alert("No attack exists with id %d" %(id))
+            return
+        
+        attack.waves = params.group(2)
+        
+        session.commit()
+        message.reply("Updated waves for attack %d: %d"%(id,attack.waves,))
