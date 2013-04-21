@@ -775,6 +775,16 @@ class PlanetHistory(Base):
     xp_highest_rank_tick = Column(Integer)
     xp_lowest_rank = Column(Integer)
     xp_lowest_rank_tick = Column(Integer)
+
+    @staticmethod
+    def load(x,y,z,tick):
+        if not x or not y or not z or not tick:
+            return None
+        Q = session.query(PlanetHistory)
+        Q = Q.filter_by(x=x, y=y, z=z, tick=tick)
+        planet = Q.first()
+        return planet
+    
 Planet.history_loader = relation(PlanetHistory, backref=backref('current', lazy='select'), lazy='dynamic')
 GalaxyHistory.planets = relation(PlanetHistory, order_by=asc(PlanetHistory.z), backref="galaxy")
 GalaxyHistory.planet_loader = dynamic_loader(PlanetHistory)
