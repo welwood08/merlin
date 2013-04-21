@@ -29,7 +29,7 @@ from Core.config import Config
 from Core.paconf import PA
 from Core.string import decode, scanlog
 from Core.db import session
-from Core.maps import Updates, Planet, User, Intel, Ship, Scan, Request
+from Core.maps import Updates, Planet, PlanetHistory, User, Intel, Ship, Scan, Request
 from Core.maps import PlanetScan, DevScan, UnitScan, FleetScan, CovOp
 from Core.loadable import system
 from Core.robocop import push
@@ -362,7 +362,7 @@ class parse(Thread):
             fleetscan.landing_tick = int(arrivaltick)
             fleetscan.fleet_size = numships
 
-            owner=Planet.load(originx,originy,originz)
+            owner=PlanetHistory.load(originx,originy,originz,newstick).current
             if owner is None:
                 continue
             fleetscan.owner = owner
@@ -397,7 +397,7 @@ class parse(Thread):
             fleetscan.launch_tick = newstick
             fleetscan.landing_tick = arrivaltick
 
-            target=Planet.load(originx,originy,originz)
+            target=PlanetHistory.load(originx,originy,originz,newstick).current
             if target is None:
                 continue
             fleetscan.owner = scan.planet
@@ -432,7 +432,7 @@ class parse(Thread):
             fleetscan.launch_tick = newstick
             fleetscan.landing_tick = arrivaltick
 
-            target=Planet.load(originx,originy,originz)
+            target=PlanetHistory.load(originx,originy,originz,newstick).current
             if target is None:
                 continue
             fleetscan.owner = scan.planet
@@ -469,7 +469,7 @@ class parse(Thread):
             originy = m.group(4)
             originz = m.group(5)
 
-            covopper=Planet.load(originx,originy,originz)
+            covopper=PlanetHistory.load(originx,originy,originz,newstick).current
             if covopper is None:
                 continue
             fleetscan.covopper = covopper
