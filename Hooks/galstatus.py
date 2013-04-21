@@ -25,6 +25,8 @@ from sqlalchemy.exc import IntegrityError
 from Core.db import session
 from Core.maps import Updates, Planet, FleetScan
 from Core.loadable import system
+from Core.string import scanlog
+from time import asctime
 
 statusre=re.compile(r"(\d+):(\d+):(\d+)\*?\s+(\d+):(\d+):(\d+)\*?\s+(R|A|D)\s+(.*?)\s+((Xan|Ter|Cat|Zik|Etd)\s+)?(\d+)\s+(\d+)")
 
@@ -41,7 +43,12 @@ def catcher(message):
 class parse(object):
     def __init__(self, message, m):
 
-        print m.groups()
+        scanlog(asctime())
+        try:
+            pnick = "(%s)" % message.get_pnick()
+        except:
+            pnick = ""
+        scanlog("Galaxy status from %s%s" % (message.get_nick(), pnick))
 
         target_x=m.group(1)
         target_y=m.group(2)
@@ -66,8 +73,6 @@ class parse(object):
         elif mission == "R":
             mission = "Return"
 
-        print "%s:%s:%s %s:%s:%s '%s' %s m:%s e:%s"%(owner_x,owner_y,owner_z,target_x,target_y,target_z,fleetname,fleetsize,mission,eta)
-
         target=Planet.load(target_x,target_y,target_z)
         if target is None:
             return
@@ -79,6 +84,8 @@ class parse(object):
         curtick=Updates.current_tick()
         landing_tick = int(eta) + int(curtick)
 
+        scanlog("%s:%s:%s %s:%s:%s '%s' %s %s eta %s" % (owner_x,owner_y,owner_z,target_x,target_y,target_z,fleetname,fleetsize,mission,eta))
+
         fleet = FleetScan(owner=owner, target=target, fleet_size=fleetsize, fleet_name=fleetname, landing_tick=landing_tick, mission=mission)
         fleet.in_cluster = owner_x == target_x
         fleet.in_galaxy = fleet.in_cluster and owner_y == target_y
@@ -88,6 +95,7 @@ class parse(object):
         except IntegrityError,e:
             session.rollback()
             print "Exception in galstatus: "+e.__str__()
+            scanlog("Exception in galstatus: "+e.__str__())
             traceback.print_exc()
 
         self.report_incoming(message,target,owner,fleet)
@@ -95,7 +103,7 @@ class parse(object):
     def report_incoming(self, message, target, owner, fleet):
         i=target.intel
         if i is None:
-            print "planet %s:%s:%s not in intel"%(target.x,target.y,target.z)
+            scanlog("planet %s:%s:%s not in intel" % (target.x,target.y,target.z))
             return
         reply="%s reports: " % (message.get_nick(),)
         if i.nick:
@@ -109,4 +117,4 @@ class parse(object):
             reply+=message.get_msg().replace("\x02","")
             message.privmsg(reply,i.reportchan)
         else:
-            print "planet not set to relay (%s) or report (%s) or report is source (%s)"%(i.relay,i.reportchan,message.get_chan())
+            scanlog("planet not set to relay (%s) or report (%s) or report is source (%s)" % (i.relay,i.reportchan,message.get_chan()))
