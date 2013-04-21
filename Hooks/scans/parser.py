@@ -109,7 +109,7 @@ class parse(Thread):
         z = int(m.group(4))
         tick = int(m.group(5))
         
-        planet = Planet.load(x,y,z)
+        planet = PlanetHistory.load(x,y,z,tick).current
         if planet is None:
             return
         try:
