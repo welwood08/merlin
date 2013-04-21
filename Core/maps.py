@@ -1426,9 +1426,7 @@ class Attack(Base):
     id = Column(Integer, primary_key=True)
     landtick = Column(Integer)
     comment = Column(Text)
-    _waves = 3
-    _active_ticks = 12
-    _show_jgp_ticks = 4
+    waves = Column(Integer, default=Config.get('Misc', 'attwaves'))
     
     def addPlanet(self, planet):
         if planet in self.planets:
@@ -1465,7 +1463,7 @@ class Attack(Base):
     
     @property
     def active(self):
-        return self.landtick >= Updates.current_tick() - Attack._active_ticks
+        return self.landtick >= Updates.current_tick() - Config.getint("Misc", "attactive")
     
     def __str__(self):
         reply = "Attack %d LT: %d %s | %s | Planets: "%(self.id,self.landtick,self.comment,self.link,)

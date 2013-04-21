@@ -30,13 +30,13 @@ from Core.robocop import push
 
 class attack(loadable):
     """Create an attack page on the webby with automatic parsed scans"""
-    usage = " [<eta|landingtick> <coordlist> [comment]] | [list] | [show <id>]"
+    usage = " [<eta|landingtick> [<#waves>w] <coordlist> [comment]] | [list] | [show <id>]"
     access = "half"
     
     @route(r"(?:list)?")
     def list(self,message,user,params):
         Q = session.query(Attack)
-        Q = Q.filter(Attack.landtick >= Updates.current_tick() - Attack._active_ticks)
+        Q = Q.filter(Attack.landtick >= Updates.current_tick() - Config.getint("Misc", "attactive"))
         Q = Q.order_by(asc(Attack.id))
         
         replies = []
@@ -57,11 +57,12 @@ class attack(loadable):
         
         message.reply(str(attack))
     
-    @route(r"(?:new\s+)?(\d+)\s+([. :\-\d,]+)(?:\s*(.+))?")
+    @route(r"(?:new\s+)?(\d+)\s+(?:(\d+)\s*w(?:ave)?s?\s+)?([. :\-\d,]+)(?:\s*(.+))?")
     def new(self, message, user, params):
         tick = Updates.current_tick()
-        comment = params.group(3) or ""
+        comment = params.group(4) or ""
         when = int(params.group(1))
+        waves = params.group(2) or Config.get("Misc", "attwaves")
         if when < PA.getint("numbers", "protection"):
             when += tick
         elif when <= tick:
@@ -70,10 +71,10 @@ class attack(loadable):
         if when > 32767:
             when = 32767
         
-        attack = Attack(landtick=when,comment=comment)
+        attack = Attack(landtick=when,comment=comment,waves=int(waves))
         session.add(attack)
         
-        for coord in re.findall(loadable.coord, params.group(2)):
+        for coord in re.findall(loadable.coord, params.group(3)):
             if not coord[4]:
                 galaxy = Galaxy.load(coord[0],coord[2])
                 if galaxy:
