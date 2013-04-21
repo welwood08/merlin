@@ -26,7 +26,7 @@ from Core.db import session
 from Core.maps import Updates, Planet, FleetScan
 from Core.loadable import system
 
-statusre=re.compile(r"(\d+):(\d+):(\d+)\*?\s+(\d+):(\d+):(\d+)\s+(.*?)\s+((Xan|Ter|Cat|Zik|Etd)\s+)?(\d+)\s+(Return|Attack|Defend)\s+(\d+)")
+statusre=re.compile(r"(\d+):(\d+):(\d+)\*?\s+(\d+):(\d+):(\d+)\*?\s+(R|A|D)\s+(.*?)\s+((Xan|Ter|Cat|Zik|Etd)\s+)?(\d+)\s+(\d+)")
 
 @system('PRIVMSG')
 def catcher(message):
@@ -53,11 +53,18 @@ class parse(object):
 
 
 
-        fleetname=m.group(7)
-#        race=m.group(9)
-        fleetsize=m.group(10)
-        mission=m.group(11)
+        mission=m.group(7)
+        fleetname=m.group(8)
+#        race=m.group(10)
+        fleetsize=m.group(11)
         eta=m.group(12)
+
+        if mission == "A":
+            mission = "Attack"
+        elif mission == "D":
+            mission = "Defend"
+        elif mission == "R":
+            mission = "Return"
 
         print "%s:%s:%s %s:%s:%s '%s' %s m:%s e:%s"%(owner_x,owner_y,owner_z,target_x,target_y,target_z,fleetname,fleetsize,mission,eta)
 
