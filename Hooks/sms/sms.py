@@ -269,7 +269,7 @@ class sms(loadable):
             
             try:
                  smtp.sendmail(Config.get("smtp", "frommail"), email, 
-                              "To:%s\nFrom:%s\nSubject:%s\n%s\n" % (email,
+                              "To:%s\nFrom:%s\nSubject:%s\n\n%s\n" % (email,
                                                                     Config.get("smtp", "frommail"),
                                                                     Config.get("Alliance", "name"),
                                                                     message,))
