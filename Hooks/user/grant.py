@@ -65,6 +65,7 @@ class grant(loadable):
                     session.rollback()
                     return
                 g.commands.append(c)
+        session.commit()
 
         message.reply("%s granted to %s%s" % (", ".join(commands), ", ".join(groups), " except..." if len(exists) else "."))
         for group in exists.keys():
