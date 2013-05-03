@@ -65,6 +65,7 @@ class revoke(loadable):
                     session.rollback()
                     return
                 g.commands.remove(c)
+        session.commit()
 
         message.reply("%s revoked from %s%s" % (", ".join(commands), ", ".join(groups), " except..." if len(exists) else "."))
         for group in exists.keys():
