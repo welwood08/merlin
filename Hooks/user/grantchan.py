@@ -77,7 +77,7 @@ class grantchan(loadable):
                     session.add(ChannelAdd(channel_id=c.id, group_id=g.id, level=level))
                     nicks = []
                     for u in g.users:
-                        nicks += u.name
+                        nicks += [u.name]
                     message.privmsg("adduser %s %s %s" %(channel, ",".join(nicks), level), Config.get("Services", "nick"))
         session.commit()
 
