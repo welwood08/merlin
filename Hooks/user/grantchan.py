@@ -83,4 +83,4 @@ class grantchan(loadable):
 
         message.reply("access to %s granted to %s%s" % (", ".join(channels), ", ".join(groups), " except..." if len(exists) else "."))
         for group in exists.keys():
-            message.reply("Group %s already has access to: %s" % (group, ", ".join(exists[group])))
+            message.reply("Group %s already has access to: %s" % (group, exists[group]))

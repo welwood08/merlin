@@ -75,4 +75,4 @@ class revokechan(loadable):
 
         message.reply("access to %s revoked from %s%s" % (", ".join(channels), ", ".join(groups), " except..." if len(exists) else "."))
         for group in exists.keys():
-            message.reply("Group %s didn't have access to: %s" % (group, ", ".join(exists[group])))
+            message.reply("Group %s didn't have access to: %s" % (group, exists[group]))
