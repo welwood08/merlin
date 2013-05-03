@@ -1242,7 +1242,7 @@ class User(Base):
 #            self.access = Config.getint("Access", value)
 
     def has_access(self, access_id):
-        return self.group.has_access(access_id)
+        return self.group.has_access(access_id) if self.group else False
     
     @property
     def smsmode(self):
