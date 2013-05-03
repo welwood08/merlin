@@ -1181,6 +1181,8 @@ class Group(Base):
     def has_access(self, access):
         if self.id == 1:
             return True
+        elif access is None:
+            return True
         else:
             access = access.lower()
             return self.commands.filter_by(name=access).count()
