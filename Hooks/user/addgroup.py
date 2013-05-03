@@ -36,8 +36,8 @@ class addgroup(loadable):
         
         name = params.group(1).lower()
         desc = params.group(2)
-        admin_only = params.group(3).lower() == "t"
-        parent = params.group(4).lower()
+        admin_only = params.group(3) and params.group(3).lower() == "t"
+        parent = params.group(4) and params.group(4).lower()
 
         g = Group.load(name)
         if g:
