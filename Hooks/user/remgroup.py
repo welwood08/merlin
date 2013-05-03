@@ -39,7 +39,7 @@ class remgroup(loadable):
 
         g = Group.load(name)
         if not g:
-            message.reply("Group '%s' does not exist." % (parent))
+            message.reply("Group '%s' does not exist." % (name))
             return
         if g.id in [1,2,3]:
             message.reply("Can't remove the %s group" % (g.name))
