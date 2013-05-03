@@ -63,7 +63,7 @@ class revokechan(loadable):
                         haschan = True
                         break
                 if haschan:
-                    session.query(ChannelAdd).filter_by(channel_id=c.id).filter_by(group_id=g.id).first().delete()
+                    session.delete(session.query(ChannelAdd).filter_by(channel_id=c.id).filter_by(group_id=g.id).first())
                     for u in g.users:
                         message.privmsg("remuser %s %s" %(channel, u.name), Config.get("Services", "nick"))
                 else:
