@@ -52,9 +52,9 @@ class addgroup(loadable):
         session.add(g)
         if parent:
             if p.id == 1:
-                g.commands.extend(session.query(Access).all())
+                g.commands = session.query(Access).all()
             else:
-                g.commands.extend(p.commands.all())
+                g.commands = p.commands.all()
 
         session.commit()
         message.reply("'%s' group created%s." % (g.name, " based on %s" % (p.name) if p else ""))
