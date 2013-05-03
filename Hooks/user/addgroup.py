@@ -57,4 +57,4 @@ class addgroup(loadable):
                 g.commands = p.commands.all()
 
         session.commit()
-        message.reply("'%s' group created%s." % (g.name, " based on %s" % (p.name) if p else ""))
+        message.reply("'%s' group created%s." % (g.name, " based on %s" % (p.name) if parent else ""))
