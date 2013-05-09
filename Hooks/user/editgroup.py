@@ -38,6 +38,9 @@ class editgroup(loadable):
         newname = params.group(2)
         if newname:
             newname = newname.lower()
+        if newname in "tf":
+            admin_only = newname
+            newname = None
         desc = params.group(3)
         admin_only = params.group(4)
 
