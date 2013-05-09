@@ -35,6 +35,7 @@ __all__ = [
            "addchan",
            "galchan",
            "remchan",
+           "editchan",
            "alias",
            "forcepref",
            "members",
