@@ -58,10 +58,11 @@ class editgroup(loadable):
         if desc is not None:
             g.desc = desc
 
-        if admin_only.lower() == "t":
-            g.admin_only = True
-        elif admin_only.lower() == "f":
-            g.admin_only = False
+        if admin_only:
+            if admin_only.lower() == "t":
+                g.admin_only = True
+            elif admin_only.lower() == "f":
+                g.admin_only = False
 
         session.commit()
         message.reply("'%s' group updated." % (g.name))
