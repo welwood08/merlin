@@ -26,12 +26,12 @@ from Core.maps import Group
 from Core.loadable import loadable, route, require_user
 
 class remgroup(loadable):
-    """Remove a user group."""
-    usage = " <name>"
+    """Remove a user group. Moves users to Public unless an alternative is specified."""
+    usage = " <name> [new group]"
     alias = "delgroup"
     access = 1 # Admin
     
-    @route(r"(\S+)", access = "remgroup")
+    @route(r"(\S+)(?:\s+(\S+)+)", access = "remgroup")
     @require_user
     def execute(self, message, user, params):
         
@@ -47,6 +47,21 @@ class remgroup(loadable):
         if g.admin_only and not user.is_admin:
             message.reply("You don't have access to delete the %s group." % (g.name,))
             return
+
+        newgroup = params.group(2)
+        if newgroup:
+            ng = Group.load(newgroup.lower())
+            if not ng:
+                message.reply("Group '%s' does not exist." % (newgroup))
+                return
+            if ng.admin_only and not user.is_admin:
+                message.reply("You don't have access to the %s group." % (ng.name,))
+                return
+        else:
+            ng = Group.load(id=2)
+
+        for u in g.users:
+            u.group = ng
 
         session.delete(g)
         session.commit()
