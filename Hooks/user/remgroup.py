@@ -22,7 +22,7 @@
 # Module by Martin Stone
 
 from Core.db import session
-from Core.maps import Group, Access
+from Core.maps import Group
 from Core.loadable import loadable, route, require_user
 
 class remgroup(loadable):
@@ -45,7 +45,7 @@ class remgroup(loadable):
             message.reply("Can't remove the %s group" % (g.name))
             return
         if g.admin_only and not user.is_admin:
-            message.reply("You don't have access to delete the %s group." % (group,))
+            message.reply("You don't have access to delete the %s group." % (g.name,))
             return
 
         session.delete(g)
