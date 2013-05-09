@@ -31,7 +31,7 @@ class remgroup(loadable):
     alias = "delgroup"
     access = 1 # Admin
     
-    @route(r"(\S+)(?:\s+(\S+)+)", access = "remgroup")
+    @route(r"(\S+)(?:\s+(\S+))?", access = "remgroup")
     @require_user
     def execute(self, message, user, params):
         
