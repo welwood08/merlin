@@ -48,6 +48,9 @@ class editgroup(loadable):
         if not g:
             message.reply("There is no %s group." % (name))
             return
+        if g.id in [1,2,3]:
+            message.reply("Can't edit the %s group" % (g.name))
+            return
 
         if (not user.is_admin) and g.admin_only:
             message.reply("You don't have access to delete the %s group." % (name,))
