@@ -46,6 +46,7 @@ __all__ = [
            "show",
            "addgroup",
            "remgroup",
+           "editgroup",
            "grantchan",
            "revokechan",
            ]
