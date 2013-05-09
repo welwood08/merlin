@@ -35,7 +35,9 @@ class editgroup(loadable):
     def execute(self, message, user, params):
         
         name = params.group(1).lower()
-        newname = params.group(2).lower()
+        newname = params.group(2)
+        if newname:
+            newname = newname.lower()
         desc = params.group(3)
         admin_only = params.group(4)
 
