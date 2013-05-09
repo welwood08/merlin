@@ -27,7 +27,7 @@ from Core.loadable import loadable, route, require_user
 
 class editgroup(loadable):
     """Edit an existing user group."""
-    usage = " <name> \"<description>\" [T/F - only admins can change]"
+    usage = " <name> [newname] [\"<description>\"] [T/F - only admins can change]"
     access = 1 # Admin
     
     @route(r"(\S+)\s+([^\s\"']+)?(?:\s*[\"']([^\"']*)[\"'])?(?:\s+([TtFf]))?", access = "editgroup")
