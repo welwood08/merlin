@@ -53,7 +53,7 @@ class connection(object):
             self.write("PASS %s" % (passwd,))
         
         self.write("NICK %s" % (nick,))
-        self.write("USER %s 0 * : %s" % (nick, nick,))
+        self.write("USER %s 0 * : %s bot. Admin: %s" % (nick, Config.get("Alliance", "name"), Config.items("Admins")[0][0],))
         return self.sock
     
     def attach(self, sock=None, nick=None):
