@@ -30,7 +30,7 @@ class showchan(loadable):
     usage = " <chan>"
     access = 1 # Admin
     
-    @route(r"([^\*]\S+)", access = "showchan")
+    @route(r"([^\*\s]\S+)", access = "showchan")
     @require_user
     def execute(self, message, user, params):
         
