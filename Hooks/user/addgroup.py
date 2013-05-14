@@ -55,6 +55,7 @@ class addgroup(loadable):
                 g.commands = session.query(Access).all()
             else:
                 g.commands = p.commands.all()
+            g.autochannels = p.autochannels.all()
 
         session.commit()
         message.reply("'%s' group created%s." % (g.name, " based on %s" % (p.name) if parent else ""))
