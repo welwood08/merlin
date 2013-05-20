@@ -107,10 +107,7 @@ All of Merlin's functionality is stored in /Hooks/
 
 Merlin's system hooks use the list of admins defined in merlin.cfg to control access. System hooks can be identified by the system modifier:@system(..)
 
-Merlin's non-system hooks (the majority of the functionality) are split into different routes and utilise a two-level access system. The access requirement of a route is provided in the modifier: @route(.. access = "member")
-
-The hook can also be given a default access level for all of its routes by defining the access variable at class level.
-This parameter can be changed to any of the access levels defined in merlin.cfg, or instead of passing a string you can provide an actual number, though this is not recommended!
+Access control for other commands is set using !grant, !revoke (and !show) for specifiy groups, which in turn can be controlled using !addgroup, !editgroup, !remgroup. Use the bot's !help command for more details.
 
 If a command is executed in a channel Merlin first checks the channel's min and max levels. If the channel's max level is higher than the command's requirement the command is denied. If the user's access level or the channel's min level match or exceed the requirement the command is executed.
 
@@ -183,9 +180,7 @@ All of Arthur's functionality is stored in /Arthur/
 
 Arthur's hooks use a similar but simpler access model to Merlin. The hooks all have an access level defined at the class level, similar to Merlin's default route access.
 
-This parameter can be changed to any of the access levels defined in merlin.cfg, or instead of passing a string you can provide an actual number, though this is not recommended!
-
-These access levels not only control the access but also the items in the dynamic menu.
+These can be edited manually, provide fine-grained control over access and the items in the dynamic menu. The recommended method of controlling Arthur access is with the "arthur_intel", "arthur_scans" and "arthur_attacks" privileges, which can be granted using !grant.
 
 Anyone with an active user account is able to login to the website. This means galmates as well as members, though obviously there is very little for galmates to see! You have the option of making tools open for public use or the opposite, restricting what your members can see.
 
