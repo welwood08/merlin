@@ -198,12 +198,12 @@ You should disable your task scheduler from running Excalibur when the round is 
 Make sure you have the latest source code! (see #4)
 Run createdb.py with the --migrate switch and the old round number. For example, just before the start of round 37:
             
-	python createdb.py --migrate 36
+    python createdb.py --migrate 36
        
 This will store the old database in an alternate schema for archiving, and copy your user list (among other things) to a new schema.
 The migration tool will automatically pull the ship stats from PA. If the stats change before tick start or if you want to load beta stats, you can run shipstats.py manually:
             
-	python shipstats.py [optional_url_to_stats]
+    python shipstats.py [optional_url_to_stats]
 
 Avoid running this midround, it will delete stored unit/au scans.
 Don't forget to enable your task scheduler again once ticks start!
@@ -269,3 +269,16 @@ Notes:
 + FluxBB must be set up to use the same database as merlin, and the merlin user must have SELECT, UPDATE and INSERT privileges to the FluxBB users table.
 + To avoid conflicts, FluxBB should be set up using the table prefix option. This can then be set in merlin.cfg.
 + Passwords updated from within FluxBB will not be updated on arthur.
+
+
+### Multiple Bots on One Database
+This version of merlin allows multiple bots to share a single ticker, saving bandwidth, disk space and processing power.
+
+Notes:
+
++ Each bot must have its own prefix set in merlin.cfg
++ The ticker (excalibur.pg.py) called by cron should refer to *all* merlin.cfg paths.
++ Only one ticker should be used. If more than one are called, only the first will work each tick.
++ When migrating data for a new round, do *not* use the "temp" option. This will erase settings for all but the current bot.
++ When migrating data for a new round, migrate the first bot normally. For each other bot, use the "--noschema" option, i.e. `python createdb.py --migrate 36 --noschema`
+
