@@ -36,15 +36,17 @@ if len(sys.argv) > 2 and sys.argv[1] == "--migrate":
     round = sys.argv[2]
     if round.isdigit():
         round = "r"+round
+    noschema= (len(sys.argv) > 3 and sys.argv[3] == "--noschema")
 elif len(sys.argv) > 1 and sys.argv[1] == "--new":
     round = None
 else:
     print "To setup a database for a new Merlin install: createdb.py --new"
     print "To migrate without saving previoud round data: createdb.py --migrate temp"
     print "To migrate from an old round use: createdb.py --migrate <previous_round>"
+    print "For multiple bots sharing a DB, after the first migration use: createdb.py --migrate <previous_round> --noschema"
     sys.exit()
 
-if round and not mysql:
+if round and not mysql and not noschema:
     print "Moving tables to '%s' schema"%(round,)
     try:
         session.execute(text("ALTER SCHEMA public RENAME TO %s;" % (round,)))
