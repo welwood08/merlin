@@ -91,7 +91,7 @@ Create a branch for your bot
 
     git checkout -b my_branch
 
-Edit merlin.cfg. This is a good time to alter any access levels in Hooks/. If necessary, you should also change the path in excalibur.sh and/or add other bots to excalibur.pg.py  
+Edit merlin.cfg. If necessary, you should also change the path in excalibur.sh and/or add other bots to excalibur.pg.py  
 For more details, `less README.md`
 
     vi merlin.cfg
