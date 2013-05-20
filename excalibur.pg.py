@@ -80,14 +80,15 @@ while True:
             req.feedRequest.add_header('If-Modified-Since', u.modified)
         opener = urllib2.build_opener(DefaultErrorHandler())
         planets = opener.open(req)
-        if planets.status == 304:
-            excaliburlog("Dump files not modified. Waiting...")
-            time.sleep(60)
-            continue
-        elif planets.status != 200:
-            excaliburlog("Error: %s" % planets.status)
-            time.sleep(120)
-            continue
+        if planets.status:
+            if planets.status == 304:
+                excaliburlog("Dump files not modified. Waiting...")
+                time.sleep(60)
+                continue
+            else:
+                excaliburlog("Error: %s" % planets.status)
+                time.sleep(120)
+                continue
 
         # Open the dump files
         try:
