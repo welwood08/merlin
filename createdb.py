@@ -46,6 +46,7 @@ else:
     print "To migrate from an old round use: createdb.py --migrate <previous_round>"
     print "For multiple bots sharing a DB, after the first migration use: createdb.py --migrate <previous_round> --noschema"
     print "To upgrade from a legacy version of merlin, use: createdb.py --migrate <previous_round> [--noschema] --from-legacy"
+    print "When upgrading, users with access 100-299 will be added as members, 300-999 as scanners and 1000+ as admins."
     sys.exit()
 
 if round and not mysql and not noschema:
