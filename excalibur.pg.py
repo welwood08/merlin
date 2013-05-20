@@ -76,8 +76,8 @@ while True:
         req = urllib2.Request(Config.get("URL", "planets"))
         if last_tick > 0:
             u = Updates.load()
-            req.feedRequest.add_header('If-None-Match', u.etag)
-            req.feedRequest.add_header('If-Modified-Since', u.modified)
+            req.add_header('If-None-Match', u.etag)
+            req.add_header('If-Modified-Since', u.modified)
         opener = urllib2.build_opener(DefaultErrorHandler())
         planets = opener.open(req)
         try:
