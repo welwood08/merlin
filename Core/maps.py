@@ -42,6 +42,8 @@ from Core.db import Base, session
 class Updates(Base):
     __tablename__ = 'updates'
     id = Column(Integer, primary_key=True, autoincrement=False)
+    etag = Column(String(255))
+    modified = Column(String(255))
     galaxies = Column(Integer)
     planets = Column(Integer)
     alliances = Column(Integer)
