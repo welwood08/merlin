@@ -36,7 +36,8 @@ if len(sys.argv) > 2 and sys.argv[1] == "--migrate":
     round = sys.argv[2]
     if round.isdigit():
         round = "r"+round
-    noschema= (len(sys.argv) > 3 and sys.argv[3] == "--noschema")
+    noschema = "--noschema" in sys.argv
+    fromlegacy = "--from-legacy" in sys.argv
 elif len(sys.argv) > 1 and sys.argv[1] == "--new":
     round = None
 else:
@@ -44,6 +45,7 @@ else:
     print "To migrate without saving previoud round data: createdb.py --migrate temp"
     print "To migrate from an old round use: createdb.py --migrate <previous_round>"
     print "For multiple bots sharing a DB, after the first migration use: createdb.py --migrate <previous_round> --noschema"
+    print "To upgrade from a legacy version of merlin, use: createdb.py --migrate <previous_round> [--noschema] --from-legacy"
     sys.exit()
 
 if round and not mysql and not noschema:
@@ -150,12 +152,19 @@ if round and not mysql:
     print "Migrating data:"
     try:
         print "  - users/friends"
+        if fromlegacy:
+            session.execute(text("ALTER TABLE %susers ADD COLUMN group_id INTEGER;" % (old_prefix)))
+            session.execute(text("UPDATE %susers SET group_id=2;" % (old_prefix)))
+            session.execute(text("UPDATE %susers SET group_id=3 WHERE access > 100;" % (old_prefix)))
+            session.execute(text("UPDATE %susers SET group_id=4 WHERE access > 300;" % (old_prefix)))
+            session.execute(text("UPDATE %susers SET group_id=1 WHERE access > 1000;" % (old_prefix)))
         session.execute(text("INSERT INTO %susers (id, name, alias, passwd, active, group_id, url, email, phone, pubphone, _smsmode, sponsor, quits, available_cookies, carebears, last_cookie_date, fleetcount) SELECT id, name, alias, passwd, active, group_id, url, email, phone, pubphone, _smsmode::varchar::smsmode, sponsor, quits, available_cookies, carebears, last_cookie_date, 0 FROM %s.%susers;" % (prefix, round, old_prefix)))
+        if not fromlegacy:
+            session.execute(text("INSERT INTO %sgroups (id, name, desc, admin_only) SELECT id, name, desc, admin_only FROM %s.%sgroups;" % (prefix, round, old_prefix)))
+            session.execute(text("INSERT INTO %saccess (id, name) SELECT id, name FROM %s.%saccess;" % (prefix, round, old_prefix)))
+            session.execute(text("INSERT INTO %sgrants (access_id, group_id) SELECT access_id, group_id FROM %s.%sgrants;" % (prefix, round, old_prefix)))
         session.execute(text("SELECT setval('%susers_id_seq',(SELECT max(id) FROM %susers));" % (prefix, prefix)))
         session.execute(text("INSERT INTO %sphonefriends (user_id, friend_id) SELECT user_id, friend_id FROM %s.%sphonefriends;" % (prefix, round, old_prefix)))
-        session.execute(text("INSERT INTO %sgroups (id, name, desc, admin_only) SELECT id, name, desc, admin_only FROM %s.%sgroups;" % (prefix, round, old_prefix)))
-        session.execute(text("INSERT INTO %saccess (id, name) SELECT id, name FROM %s.%saccess;" % (prefix, round, old_prefix)))
-        session.execute(text("INSERT INTO %sgrants (access_id, group_id) SELECT access_id, group_id FROM %s.%sgrants;" % (prefix, round, old_prefix)))
         print "  - slogans/quotes"
         session.execute(text("INSERT INTO %sslogans (text) SELECT text FROM %s.%sslogans;" % (prefix, round, old_prefix)))
         session.execute(text("INSERT INTO %squotes (text) SELECT text FROM %s.%squotes;" % (prefix, round, old_prefix)))
