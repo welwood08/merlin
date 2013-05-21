@@ -1,20 +1,17 @@
 Merlin
 ========
-
 Merlin is the Copyright &copy; 2012 of Robin K. Hansen, Elliot Rosemarine, Andreas Jacobsen.  
 This version was modified and added to by Martin Stone 2012-2013.  
 Please read the included LICENSE.
 
 Here Be Dragons
 ----------------------------
-
 This version of merlin breaks database and config compatibility with ellonweb's original branch, and pretty much anything not forked from here. Additionally, it breaks compatibility with itself occasionally (well, actually quite frequently...).
 
 For support, use github or (preferably) try #munin on netgamers IRC.
 
 Installation Requirements
 ----------------------------
-
 Requirements (tested on):
 
 + Git 
@@ -51,7 +48,6 @@ Create and chmod 666 these files:
 
 Installation Instructions
 ----------------------------
-
 Use Git to download the code and create a branch to track your changes:
 
 	git clone git://github.com/d7415/merlin.git
@@ -75,7 +71,6 @@ If you would like to contribute to merlin see [Setting up git](http://help.githu
 
 Postgres Setup
 ----------------------------
-
 All of the data your bot uses is stored in a postgresql database, see [Postgres Docs](http://www.postgresql.org/docs/)
 or the relevant documentation for your OS/Distro.
 
@@ -89,7 +84,6 @@ with client encoding LATIN1
     
 Preparing merlin
 ----------------------------
-
 Inspect and modify merlin.cfg in an editor as required.
 
 >Note Graphing can be completely disabled in the config, look for - graphing  : and append "cached", "enabled", or "disabled" depending on which you want!
@@ -102,7 +96,6 @@ Inspect and modify /Hooks/\_\_init\_\_.py as needed. This controls which groups 
        
 Merlin Access Settings
 ----------------------------
-
 All of Merlin's functionality is stored in /Hooks/
 
 Merlin's system hooks use the list of admins defined in merlin.cfg to control access. System hooks can be identified by the system modifier:@system(..)
@@ -117,7 +110,6 @@ This can be changed to any channels defined in merlin.cfg or simply "PM",or you 
 
 Running Merlin
 ----------------------------
-
 Run merlin.py. Again, there is no shebang line.
 
 	python merlin.py
@@ -136,7 +128,6 @@ Any time you make changes to any of Merlin's code, you will need to use
 
 Configuring Excalibur
 ----------------------------
-
 You need to use a task scheduler to run excalibur.py one minute after every tick. If you're using crontab, you might use a command like this, which uses the supplied excalibur.sh
 
 	1 * * * * /path/to/merlin/excalibur.sh >> /path/to/merlin/dumplog.txt 2>&1
@@ -145,7 +136,6 @@ excalibur.sh will need updating with the path to your bot, and if you want to us
 
 Configuring Apache and running Arthur
 ----------------------------
-
 At the bottom of your httpd.conf, add the following lines
             
 	WSGIScriptAlias / /path/to/merlin/arthur.wsgi
@@ -175,7 +165,6 @@ Open the arthur.wsgi file and edit the two paths in that file. Open Arthur/__ini
 
 Arthur Access Settings
 ----------------------------
-    
 All of Arthur's functionality is stored in /Arthur/
 
 Arthur's hooks use a similar but simpler access model to Merlin. The hooks all have an access level defined at the class level, similar to Merlin's default route access.
@@ -184,11 +173,8 @@ These can be edited manually, provide fine-grained control over access and the i
 
 Anyone with an active user account is able to login to the website. This means galmates as well as members, though obviously there is very little for galmates to see! You have the option of making tools open for public use or the opposite, restricting what your members can see.
 
-
-
 Updating for a new round
 ----------------------------
-
 You should disable your task scheduler from running Excalibur when the round is over, it is not guaranteed to function correctly during havoc.
 Make sure you have the latest source code! (see #4)
 Run createdb.py with the --migrate switch and the old round number. For example, just before the start of round 37:
@@ -203,6 +189,14 @@ The migration tool will automatically pull the ship stats from PA. If the stats 
 Avoid running this midround, it will delete stored unit/au scans.
 Don't forget to enable your task scheduler again once ticks start!
 
+See Also
+----------------------------
+Other useful sources:
+
++ Installation walkthrough: walkthrough.md
++ Command list: commandlist.md
++ Posix tips: README.Posix
++ Branch explanation on the wiki: <https://github.com/d7415/merlin/wiki/Branches>
 
 Extra Features and Requirements
 ----------------------------
