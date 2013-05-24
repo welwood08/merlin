@@ -96,7 +96,7 @@ def addaccess(name, access):
     elif access != 1:
         command.groups.append(session.merge(Group.load(id=access)))
 
-if not round:
+if (not round) or noschema:
     print "Setting up default access groups"
     session.add(Group(id=1, name="admin", desc="Administrators", admin_only=True))
     session.add(Group(id=2, name="public", desc="Public commands"))
@@ -154,11 +154,11 @@ if round and not mysql:
     try:
         print "  - users/friends"
         if fromlegacy:
-            session.execute(text("ALTER TABLE %susers ADD COLUMN group_id INTEGER;" % (old_prefix)))
-            session.execute(text("UPDATE %susers SET group_id=2;" % (old_prefix)))
-            session.execute(text("UPDATE %susers SET group_id=3 WHERE access >= 100;" % (old_prefix)))
-            session.execute(text("UPDATE %susers SET group_id=4 WHERE access >= 300;" % (old_prefix)))
-            session.execute(text("UPDATE %susers SET group_id=1 WHERE access >= 1000;" % (old_prefix)))
+            session.execute(text("ALTER TABLE %s.%susers ADD COLUMN group_id INTEGER;" % (round, old_prefix)))
+            session.execute(text("UPDATE %s.%susers SET group_id=2;" % (round, old_prefix)))
+            session.execute(text("UPDATE %s.%susers SET group_id=3 WHERE access >= 100;" % (round, old_prefix)))
+            session.execute(text("UPDATE %s.%susers SET group_id=4 WHERE access >= 300;" % (round, old_prefix)))
+            session.execute(text("UPDATE %s.%susers SET group_id=1 WHERE access >= 1000;" % (round, old_prefix)))
         session.execute(text("INSERT INTO %susers (id, name, alias, passwd, active, group_id, url, email, phone, pubphone, _smsmode, sponsor, quits, available_cookies, carebears, last_cookie_date, fleetcount) SELECT id, name, alias, passwd, active, group_id, url, email, phone, pubphone, _smsmode::varchar::smsmode, sponsor, quits, available_cookies, carebears, last_cookie_date, 0 FROM %s.%susers;" % (prefix, round, old_prefix)))
         if not fromlegacy:
             session.execute(text("INSERT INTO %sgroups (id, name, desc, admin_only) SELECT id, name, desc, admin_only FROM %s.%sgroups;" % (prefix, round, old_prefix)))
