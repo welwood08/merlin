@@ -243,13 +243,13 @@ class parse(Thread):
         devscan.security_centre = m.group(11)
 
         m = re.search("""
-            <tr><td[^>]*>Space\s+Travel</td><td[^>]*>(\d+)</td></tr>\s*
-            <tr><td[^>]*>Infrastructure</td><td[^>]*>(\d+)</td></tr>\s*
-            <tr><td[^>]*>Hulls</td><td[^>]*>(\d+)</td></tr>\s*
-            <tr><td[^>]*>Waves</td><td[^>]*>(\d+)</td></tr>\s*
-            <tr><td[^>]*>Core\s+Extraction</td><td[^>]*>(\d+)</td></tr>\s*
-            <tr><td[^>]*>Covert\s+Ops</td><td[^>]*>(\d+)</td></tr>\s*
-            <tr><td[^>]*>Asteroid\s+Mining</td><td[^>]*>(\d+)</td></tr>
+            <tr><td[^>]*>Space\s+Travel</td><td[^>]*>(\d+)<span[^<]*</span></td></tr>\s*
+            <tr><td[^>]*>Infrastructure</td><td[^>]*>(\d+)<span[^<]*</span></td></tr>\s*
+            <tr><td[^>]*>Hulls</td><td[^>]*>(\d+)<span[^<]*</span></td></tr>\s*
+            <tr><td[^>]*>Waves</td><td[^>]*>(\d+)<span[^<]*</span></td></tr>\s*
+            <tr><td[^>]*>Core\s+Extraction</td><td[^>]*>(\d+)<span[^<]*</span></td></tr>\s*
+            <tr><td[^>]*>Covert\s+Ops</td><td[^>]*>(\d+)<span[^<]*</span></td></tr>\s*
+            <tr><td[^>]*>Asteroid\s+Mining</td><td[^>]*>(\d+)<span[^<]*</span></td></tr>
         """, page,re.VERBOSE)
 
         devscan.travel = m.group(1)
