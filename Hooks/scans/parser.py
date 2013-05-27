@@ -108,12 +108,15 @@ class parse(Thread):
         y = int(m.group(3))
         z = int(m.group(4))
         tick = int(m.group(5))
+
+        m = re.search("<p class=\"right scan_time\">Scan time: ([^<]*)</p>", page)
+        scantime = m.group(1)
         
         planet = PlanetHistory.load(x,y,z,tick).current
         if planet is None:
             return
         try:
-            scan = Scan(pa_id=pa_id, scantype=scantype, tick=tick, group_id=gid, scanner_id=uid)
+            scan = Scan(pa_id=pa_id, scantype=scantype, tick=tick, time=scantime, group_id=gid, scanner_id=uid)
             planet.scans.append(scan)
             session.commit()
             scan_id = scan.id

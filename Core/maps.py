@@ -1554,6 +1554,7 @@ class Scan(Base):
     planet_id = Column(Integer, ForeignKey(Planet.id, ondelete='cascade'), index=True)
     scantype = Column(Enum(*_scan_types, name="scantype"))
     tick = Column(Integer)
+    time = Column(String(255))
     pa_id = Column(String(255), index=True)
     group_id = Column(String(255), index=True)
     scanner_id = Column(Integer, ForeignKey(User.id, ondelete='cascade'))
