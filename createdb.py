@@ -129,6 +129,12 @@ if round and not mysql:
         session.commit()
     finally:
         session.close()
+    if Config.has_section("FluxBB") and Config.getboolean("FluxBB", "enabled"):
+        tables = session.execute(text("SELECT table_name FROM information_schema.tables WHERE table_schema='%s' AND table_name LIKE '%s%%';" % (round, Config.get("FluxBB", "prefix"))))
+        for t in tables:
+            session.execute(text("CREATE TABLE %s AS SELECT * FROM %s.%s;" % (t[0], round, t[0])))
+        session.commit()
+        session.close()
 
     if round == "temp":
         print "Deleting temporary schema"
