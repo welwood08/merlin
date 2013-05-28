@@ -29,19 +29,26 @@ from Core.loadable import loadable, route
 
 class topscanners(loadable):
     """List top scanners in the last x ticks. Shows requested scans by default. Use the "all" option to show all parsed scans."""
-    usage = " <age> <number> [all]"
+    usage = " [<age> <number>] [all]"
     access = "admin"
     alias = "topscan"
     
-    @route(r"([0-9]+)\s*([0-9]+)\s*(all)?")
-    def execute(self, message, user, params):
+    @route(r"(all)?")
+    def nooptions(self, message, user, params):
+        tick=Updates.current_tick()
+        self.execute(message, tick, 5, params.group(1) is not None)
+
+    @route(r"([0-9]+)\s+([0-9]+)\s*(all)?")
+    def withoptions(self, message, user, params):
+        self.execute(message, int(params.group(1)), int(params.group(2)), params.group(3) is not None)
+
+
+    def execute(self, message, age, num, showall):
         reply = ""
         tick=Updates.current_tick()
-        age = int(params.group(1))
-        num = int(params.group(2))
 
         totals = session.query(Scan.scanner_id, count('*').label('s_count'))
-        if params.group(3) is None:
+        if not showall:
             totals = totals.join((Request, Scan.id == Request.scan_id))
         totals = totals.filter(Scan.tick >= ((tick-age) if age > 0 else 0)).group_by(Scan.scanner_id).subquery()
 
@@ -52,6 +59,7 @@ class topscanners(loadable):
         result = Q.all()
         if len(result) < 1:
             message.reply("No scans found in the last %d ticks" % (age))
+            return
         printable=map(lambda (name, alias, c): "%s%s: %s" % (name,' ('+alias +')' if alias else '', c),result[:num])
         reply += ', '.join(printable)
         message.reply(reply)

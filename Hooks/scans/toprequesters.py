@@ -29,16 +29,24 @@ from Core.loadable import loadable, route
 
 class toprequesters(loadable):
     """List top scan requesters in the last x ticks."""
-    usage = " <age> <number>"
+    usage = " [<age> <number>] [all]"
     access = "admin"
     alias = "topreq"
-    
-    @route(r"([0-9]+) ([0-9]+)")
-    def execute(self, message, user, params):
+
+    @route(r"")
+    def nooptions(self, message, user, params):
+        tick=Updates.current_tick()
+        self.execute(message, tick, 5)
+
+    @route(r"([0-9]+)\s+([0-9]+)")
+    def withoptions(self, message, user, params):
+        self.execute(message, int(params.group(1)), int(params.group(2)))
+
+
+    def execute(self, message, age, num):
         reply = ""
         tick=Updates.current_tick()
-        age = int(params.group(1))
-        num = int(params.group(2))
+    
         totals = session.query(Request.requester_id, count('*').label('req_count')).filter(Request.tick >= ((tick-age) if age > 0 else 0)).group_by(Request.requester_id).subquery()
 
         Q = session.query(User.name, User.alias, totals.c.req_count)
@@ -48,6 +56,7 @@ class toprequesters(loadable):
         result = Q.all()
         if len(result) < 1:
            message.reply("No scan requests found in the last %d ticks" % (age))
+           return
         printable=map(lambda (name, alias, c): "%s%s: %s" % (name,' ('+alias +')' if alias else '', c),result[:num])
         reply += ', '.join(printable)
         message.reply(reply)
