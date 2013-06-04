@@ -57,9 +57,9 @@ class forcepref(loadable):
             if user.smsmode is not None:
                 reply += " smsmode=%s" % (user.smsmode,)
         if len(reply) > 0:
-            message.reply("Your preferences are:" + reply)
+            message.reply("Preferences for %s:" % (user.name,) + reply)
         else:
-            message.reply("You haven't set any preferences, use !help pref to view the options")
+            message.reply("%s hasn't set any preferences" % (user.name,))
     
     @route(r"(\S+)\s(.+)", access="admin")
     @require_user
@@ -97,7 +97,7 @@ class forcepref(loadable):
                     reply += " planet=None"
             if opt == "password":
                 if message.in_chan():
-                    message.reply("Don't set your password in public you shit")
+                    message.reply("Don't set passwords in public you shit")
                     continue
                 user.passwd = val
                 reply += " password=%s"%(val)
@@ -152,4 +152,4 @@ class forcepref(loadable):
         
         session.commit()
         if len(reply) > 0:
-            message.reply("Updated your preferences:"+reply)
+            message.reply("Updated preferences for %s:" % (user.name) + reply)
