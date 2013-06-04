@@ -142,7 +142,6 @@ class victim(loadable):
                 if not alliance.name and intel.alliance:
                     reply+=" Alliance: %s" % (intel.alliance.name,)
             replies.append(reply)
-            print(len(replies))
             if len(replies) == 5:
                 message.reply("\n".join(replies))
                 replies = []
