@@ -1050,13 +1050,16 @@ session.execute(text("INSERT INTO apenis (alliance_id, penis) SELECT alliance.id
 t2=time.time()-t1
 excaliburlog("apenis in %.3f seconds" % (t2,))
 t1=time.time()
-for prefix in prefixes:
+for i in range(len(bots)):
     t2=time.time()
-    session.execute("DELETE FROM %sepenis;" % (prefix))
-    session.execute(text("SELECT setval('%sepenis_rank_seq', 1, :false);" % (prefix), bindparams=[false]))
-    session.execute(text("INSERT INTO %sepenis (user_id, penis) SELECT %susers.id, planet.score - planet_history.score FROM %susers, planet, planet_history WHERE %susers.active = :true AND %susers.group != 2 AND planet.active = :true AND %susers.planet_id = planet.id AND planet.id = planet_history.id AND planet_history.tick = :tick ORDER BY planet.score - planet_history.score DESC;" % (prefix, prefix, prefix, prefix, prefix, prefix), bindparams=[history_tick, true]))
+    session.execute("DELETE FROM %sepenis;" % (prefixes[i]))
+    session.execute(text("SELECT setval('%sepenis_rank_seq', 1, :false);" % (prefixes[i]), bindparams=[false]))
+    if bots[i].getboolean("Misc", "acl"):
+        session.execute(text("INSERT INTO %sepenis (user_id, penis) SELECT %susers.id, planet.score - planet_history.score FROM %susers, planet, planet_history WHERE %susers.active = :true AND %susers.group_id != 2 AND planet.active = :true AND %susers.planet_id = planet.id AND planet.id = planet_history.id AND planet_history.tick = :tick ORDER BY planet.score - planet_history.score DESC;" % (prefixes[i], prefixes[i], prefixes[i], prefixes[i], prefixes[i], prefixes[i]), bindparams=[history_tick, true]))
+    else:
+        session.execute(text("INSERT INTO %sepenis (user_id, penis) SELECT %susers.id, planet.score - planet_history.score FROM %susers, planet, planet_history WHERE %susers.active = :true AND %susers.access >= :member AND planet.active = :true AND %susers.planet_id = planet.id AND planet.id = planet_history.id AND planet_history.tick = :tick ORDER BY planet.score - planet_history.score DESC;" % (prefixes[i], prefixes[i], prefixes[i], prefixes[i], prefixes[i], prefixes[i]), bindparams=[bindparam("member",bots[i].getint("Access","member")), history_tick, true]))
     t3=time.time()-t2
-    excaliburlog("epenis for %s in %.3f seconds" % (prefix,t2,))
+    excaliburlog("epenis for %s in %.3f seconds" % (prefixes[i],t3,))
 t2=time.time()-t1
 excaliburlog("epenis in %.3f seconds" % (t2,))
 session.commit()
