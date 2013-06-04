@@ -173,7 +173,7 @@ def penis():
     excaliburlog("Total penis time: %.3f seconds" % (t1,))
     session.close()
 
-def closereqs():
+def closereqs(planet_tick):
     # Close old scan requests
     t_start = time.time()
     for i in range(len(bots)):
@@ -1120,7 +1120,7 @@ def ticker(alt=False):
 
     session.close()
     penis()
-    closereqs()
+    closereqs(planet_tick)
     clean_cache()
 
     t1=time.time()-t_start
