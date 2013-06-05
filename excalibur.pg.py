@@ -232,9 +232,9 @@ def ticker(alt=False):
     
             if savedumps:
                 # Open dump files
-                pf = file.open("dumps/%s/planet_listing.txt" % (last_tick+1,), "w+")
-                gf = file.open("dumps/%s/galaxy_listing.txt" % (last_tick+1,), "w+")
-                af = file.open("dumps/%s/alliance_listing.txt" % (last_tick+1,), "w+")
+                pf = open("dumps/%s/planet_listing.txt" % (last_tick+1,), "w+")
+                gf = open("dumps/%s/galaxy_listing.txt" % (last_tick+1,), "w+")
+                af = open("dumps/%s/alliance_listing.txt" % (last_tick+1,), "w+")
                 # Copy dump contents
                 shutil.copyfileobj(planets, pf)
                 shutil.copyfileobj(galaxies, gf)
