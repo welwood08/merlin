@@ -1119,12 +1119,10 @@ def ticker(alt=False):
             continue
 
     session.close()
-    penis()
-    closereqs(planet_tick)
-    clean_cache()
 
     t1=time.time()-t_start
     excaliburlog("Total time taken: %.3f seconds" % (t1,))
+    return planet_tick
 
 
 bots = []
@@ -1140,7 +1138,11 @@ if len(sys.argv) > 1:
     Config.set("URL", "dumps", sys.argv[1])
 excaliburlog("Dumping from %s" %(Config.get("URL", "dumps"),))
 
-ticker()
+planet_tick = ticker()
+
+penis()
+closereqs(planet_tick)
+clean_cache()
     
 # Add a newline at the end
 excaliburlog("\n")
