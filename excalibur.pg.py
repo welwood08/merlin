@@ -19,7 +19,7 @@
 # along with this program; if not, write to the Free Software
 # Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA 02110-1301 USA
  
-import datetime, re, sys, time, traceback, urllib2, shutil
+import datetime, re, sys, time, traceback, urllib2, shutil, os
 from sqlalchemy.sql import text, bindparam
 from Core.config import Config
 from Core.paconf import PA
@@ -231,6 +231,7 @@ def ticker(alt=False):
             modified = planets.headers.get("Last-Modified")
     
             if savedumps:
+                os.makedirs("dumps/%s" % (last_tick+1,))
                 # Open dump files
                 pf = open("dumps/%s/planet_listing.txt" % (last_tick+1,), "w+")
                 gf = open("dumps/%s/galaxy_listing.txt" % (last_tick+1,), "w+")
