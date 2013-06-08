@@ -35,7 +35,7 @@ import re, sys, time, urllib2, shutil, os, errno
 # ########################################################################### #
 
 base_url = "http://game.planetarion.com/botfiles/"
-alt_base = "http://dumps.pa.howlingrain.tk/"
+alt_base = "http://dumps.dfwtk.com/"
 
 # ########################################################################### #
 # ########################################################################### #
