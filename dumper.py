@@ -138,15 +138,30 @@ def checktick(planets, galaxies, alliances):
     return planet_tick
 
 
-def ticker(alt=False):
+def load_config():
+    if os.path.isfile("dump_info"):
+        info = open("dump_info", "r+")
+        last_tick = int(info.readline()[:-1] or 0)
+        etag = info.readline()[:-1]
+        if etag == "None":
+            etag = None
+        modified = info.readline()[:-1]
+        if modified == "None":
+            modified = None
+        info.seek(0)
+    else:
+        info = open("dump_info", "w")
+        last_tick = 0
+        etag = None
+        modified = None
+    return (info, last_tick, etag, modified)
+
+def ticker(alt=False, target_tick=None):
 
     t_start=time.time()
     t1=t_start
 
-    info = open("dump_info", "w+")
-    last_tick = info.readline()
-    etag = info.readline()
-    modified = info.readline()
+    (info, last_tick, etag, modified) = load_config()
 
     while True:
         try:
@@ -204,18 +219,20 @@ def ticker(alt=False):
                 if alt:
                     print "Something is very, very wrong..."
                 else:
-                    ticker(True) ################################### Make this an option?
+                    print "Missing ticks. Switching to alternative url.... (waiting 10 seconds)"
+                    time.sleep(10)
+                    ticker(True, planet_tick-1)
+                    (info, last_tick, etag, modified) = load_config()
                 continue
-    
-    
-            info.seek(0)
-            info.write(str(planet_tick))
-            info.write(etag)
-            info.write(modified)
-    
-            t2=time.time()-t1
-            print "Final update in %.3f seconds" % (t2,)
-            t1=time.time()
+            elif target_tick and planet_tick < target_tick:
+                info.write(str(planet_tick)+"\n"+str(etag)+"\n"+str(modified)+"\n")
+                info.flush()
+                info.seek(0)
+                print "Still some missing... (waiting 20 seconds)"
+                time.sleep(20)
+                ticker(True, target_tick)
+            else:
+                info.write(str(planet_tick)+"\n"+str(etag)+"\n"+str(modified)+"\n")
     
             break
         except Exception, e:
