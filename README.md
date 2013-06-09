@@ -249,7 +249,6 @@ For accounts set up using yowsup, "password" is the password given by yowsup, ba
 
     "your password".decode("base64")
 
-
 ### FluxBB Integration
 Merlin can integrate with FluxBB, creating user accounts and updating passwords when the arthur password is updated in !pref.
 
@@ -258,7 +257,6 @@ Notes:
 + FluxBB must be set up to use the same database as merlin, and the merlin user must have SELECT, UPDATE and INSERT privileges to the FluxBB users table.
 + To avoid conflicts, FluxBB should be set up using the table prefix option. This can then be set in merlin.cfg.
 + Passwords updated from within FluxBB will not be updated on arthur.
-
 
 ### Multiple Bots on One Database
 This version of merlin allows multiple bots to share a single ticker, saving bandwidth, disk space and processing power.
@@ -270,4 +268,25 @@ Notes:
 + Only one ticker should be used. If more than one are called, only the first will work each tick.
 + When migrating data for a new round, do *not* use the "temp" option. This will erase settings for all but the current bot.
 + When migrating data for a new round, migrate the first bot normally. For each other bot, use the "--noschema" option, i.e. `python createdb.py --migrate 36 --noschema`
+
+### Botfile saving
+To save the PA botfiles every tick, change `savedumps` to `True` in excalibur.pg.py and make sure that the merlin folder itself, or a subdirectory called "dumps", is writable by the account running excalibur.
+
+To share the dumps with others, add a section to your apache or nginx config, e.g.
+
+##### Apache
+
+    Alias /dumps/ /path/to/merlin/dumps/
+    <Directory /path/to/merlin/dumps/>
+        Options +Indexes
+        Order allow,deny
+        Allow from all
+    </Directory>
+    
+##### nginx
+
+    location /dumps/ {
+        alias /path/to/merlin/dumps/
+        autoindex on;
+    }
 
