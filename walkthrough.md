@@ -162,6 +162,12 @@ Once you're done, it should look like this
             expires 30d;
         }
 
+    #    Uncomment this section to enable sharing of dump files
+    #    location /dumps/ {
+    #        alias /home/merlin/dumps/;
+    #        autoindex on;
+    #    }
+
         location /favicon.ico {
             alias /home/merlin/Arthur/static/favicon.ico;
             expires 30d;
