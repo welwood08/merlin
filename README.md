@@ -286,7 +286,7 @@ To share the dumps with others, add a section to your Apache or nginx config, e.
 ##### nginx
 
     location /dumps/ {
-        alias /path/to/merlin/dumps/
+        alias /path/to/merlin/dumps/;
         autoindex on;
     }
 
