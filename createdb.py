@@ -146,7 +146,13 @@ print "Inserting ship stats"
 shipstats.main()
 
 if round:
-    import os, shutil
+    import os, shutil, errno, glob
     if os.path.exists("dumps"):
         print "Archiving dump files"
-        shutil.move("dumps","archive/%s" % round)
+        try:
+            os.makedirs("dumps/archive/%s" % round)
+        except OSError as e:
+            if e.errno != errno.EEXIST:
+                raise
+        for tdir in glob.glob("dumps/[0-9]*"):
+            shutil.move(tdir,"dumps/archive/%s/" % round)
