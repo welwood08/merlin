@@ -277,7 +277,7 @@ Notes:
 ### Botfile saving
 To save the PA botfiles every tick, change `savedumps` to `True` in excalibur.pg.py and make sure that the merlin folder itself, or a subdirectory called "dumps", is writable by the account running excalibur.
 
-To share the dumps with others, add a section to your apache or nginx config, e.g.
+To share the dumps with others, add a section to your Apache or nginx config, e.g.
 
 ##### Apache
 
@@ -295,3 +295,4 @@ To share the dumps with others, add a section to your apache or nginx config, e.
         autoindex on;
     }
 
+Note: If you are using one excalibur for multiple bots, the dump files will only be saved for the "main" bot. To share these, use the "main" merlin path in all dump-related Apache/nginx config.
