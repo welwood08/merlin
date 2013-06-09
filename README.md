@@ -35,8 +35,8 @@ Additional POSIX environment (e.g. Linux) requirements:
 Create and chmod 777 these directories:
 
 + /var/www/.matplotlib
++ /merlin/Arthur/graphs
 
-/merlin/Arthur/graphs
 Create and chmod 666 these files:
 
 + /merlin/dumplog.txt
@@ -152,8 +152,8 @@ At the bottom of your httpd.conf, add the following lines
         Allow from all
     </Directory>
     
-    Alias /graphs/ F:/Code/Git/merlin/Arthur/graphs/
-    <Directory F:/Code/Git/merlin/Arthur/graphs/>
+    Alias /graphs/ /path/to/merlin/Arthur/graphs/
+    <Directory /path/to/merlin/Arthur/graphs/>
         Order allow,deny
         Allow from all
         ErrorDocument 404 /draw
@@ -214,11 +214,11 @@ To listen for new emails:
 If this proves unstable, these crontab lines will kill and restart the process every hour
 
     39 *    * * *   root    kill `ps aux | grep IMAPPush.py | grep -v grep | sed -r 's/merlin[ tab]+([0-9]+).*/\1/g'`
-    40 *    * * *   merlin  /merlin/imappush.sh
-Where the bot is run as user "merlin" and stored in /merlin/. imappush.sh should contain
+    40 *    * * *   merlin  /path/to/merlin/imappush.sh
+Where the bot is run as user "merlin" and stored in /path/to/merlin/. imappush.sh should contain
 
     #!/bin/bash
-    cd /merlin/
+    cd /path/to/merlin/
     python IMAPPush.py >> IMAPLog.txt
 
 
