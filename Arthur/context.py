@@ -94,7 +94,7 @@ def base_context(request):
             context["dumpurl"] = "&nbsp;&nbsp;"
         else:
             context["dumpurl"] = "<br><br>"
-        context["dumpurl"] += "<a href=\"dumps/\">Dumps</a>"
+        context["dumpurl"] += "<a href=\"/dumps/\">Dumps</a>"
     return context
 
 def render(template, request, **context):
