@@ -144,3 +144,9 @@ if round and not mysql:
 
 print "Inserting ship stats"
 shipstats.main()
+
+if round:
+    import os, shutil
+    if os.path.exists("dumps"):
+        print "Archiving dump files"
+        shutil.move("dumps","archive/%s" % round)
