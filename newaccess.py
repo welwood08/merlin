@@ -49,6 +49,7 @@ for callback in Callbacks.callbacks['PRIVMSG']:
     if not callback.access:
         continue
     addaccess(callback.name, callback.access)
+    session.commit()
     try:
        if callback.subcommands:
            i = 0
@@ -56,8 +57,9 @@ for callback in Callbacks.callbacks['PRIVMSG']:
                addaccess(callback.subcommands[i], callback.subaccess[i])
                i += 1
     except:
-        pass
-    session.commit()
+        session.rollback()
+    else:
+        session.commit()
 
 session.close()
 print "Done!"
