@@ -1187,7 +1187,7 @@ class Group(Base):
             return True
         else:
             access = access.lower()
-            return self.commands.filter_by(name=access).count()
+            return bool(self.commands.filter_by(name=access).count())
 
     @staticmethod
     def load(name=None, id=None):
