@@ -216,7 +216,7 @@ class loadable(_base):
         access = access or self.name
         if message.in_chan():
             channel = channel or Channel.load(message.get_chan()) or Channel()
-            if (not channel.can_access(self.name)) and message.reply_type() == PUBLIC_REPLY:
+            if (not channel.can_access(access)) and message.reply_type() == PUBLIC_REPLY:
                 raise UserError
         else:
             channel = Channel()
