@@ -36,7 +36,7 @@ class apenis(loadable):
             if alliance is None:
                 message.alert("No alliances match %s" % (params.group(1),))
                 return
-        elif self.is_user(user) and user.is_member():
+        elif self.is_user(user) and user.group_id != 2:
             alliance = Alliance.load(Config.get("Alliance","name"))
             if alliance is None:
                 message.alert("No alliances match %s" % (Config.get("Alliance","name"),))

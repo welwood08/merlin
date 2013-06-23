@@ -65,7 +65,7 @@ class cancel(loadable):
         req = Request.load(id)
         if req is None:
             return requests.execute(request, user, message="No open request number %s exists (idiot)."%(id,))
-        if req.user is not user and not user.is_member():
+        if req.user is not user and not user.has_access("req_cancel"):
             return requests.execute(request, user, message="Scan request %s isn't yours and you're not a scanner!"%(id,))
         
         req.active = False
@@ -83,7 +83,7 @@ class blocks(loadable):
         req = Request.load(id)
         if req is None:
             return requests.execute(request, user, message="No open request number %s exists (idiot)."%(id,))
-        if req.user is not user and not user.is_member():
+        if req.user is not user and not user.has_access("req_update"):
             return requests.execute(request, user, message="Scan request %s isn't yours and you're not a scanner!"%(id,))
         
         req.dists = max(req.dists, int(dists)+1)

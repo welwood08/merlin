@@ -26,6 +26,8 @@ from Core.loadable import loadable, route, require_planet
 class lookup(loadable):
     usage = " [x:y[:z]|alliance|user]"
     access = 2 # Public
+    subcommands = ["lookup_member"]
+    subaccess = [3]
     
     @route(loadable.coord)
     def planet_galaxy(self, message, user, params):
@@ -63,7 +65,7 @@ class lookup(loadable):
         # User
         if not self.is_user(user):
             raise PNickParseError
-        elif not user.is_member():
+        elif not self.check_access(message, "lookup_member"):
             message.reply("No alliance matching '%s' found" % (params.group(1),))
             return
         else:

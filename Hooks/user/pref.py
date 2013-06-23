@@ -68,7 +68,7 @@ class pref(loadable):
                         continue
                     user.planet = planet
                     reply += " planet=%s:%s:%s"%(planet.x,planet.y,planet.z)
-                    if user.is_member():
+                    if user.group_id != 2:
                         alliance = Alliance.load(Config.get("Alliance","name"))
                         if planet.intel is None:
                             planet.intel = Intel(nick=user.name, alliance=alliance)
@@ -149,7 +149,7 @@ class pref(loadable):
         if session.execute("SELECT username FROM %susers WHERE LOWER(username) LIKE '%s';" % (Config.get("FluxBB", "prefix"), user.name.lower())).rowcount > 0:
             return session.execute("UPDATE %susers SET password='%s' WHERE LOWER(username) LIKE '%s';" % (Config.get("FluxBB", "prefix"), user.passwd, user.name.lower())).rowcount
         else:
-            group = Config.get("FluxBB", "memgroup") if user.is_member() else Config.get("FluxBB", "galgroup")
+            group = Config.get("FluxBB", "memgroup") if user.group_id != 2 else Config.get("FluxBB", "galgroup")
             if group == 0:
                 return -1
             return session.execute("INSERT INTO %susers (group_id, username, password, email, title) VALUES ('%s', '%s', '%s', '%s', '%s');" % (

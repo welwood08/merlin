@@ -59,7 +59,7 @@ class lookup(loadable):
             if alliance:
                 return HttpResponseRedirect(reverse("alliance", kwargs={"name":alliance.name}))
             
-            elif not user.is_member():
+            elif not user.has_access("lookup_member"):
                 return HttpResponseRedirect(reverse("alliance_ranks"))
             
             else:
