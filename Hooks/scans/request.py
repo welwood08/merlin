@@ -22,6 +22,7 @@
 # Request a scan
 
 from sqlalchemy.sql import asc
+from sqlalchemy import func, and_
 from Core.config import Config
 from Core.paconf import PA
 from Core.db import session
@@ -280,10 +281,13 @@ class request(loadable):
     
     @route(r"l(?:ist)?", access="req_list")
     def list(self, message, user, params):
-        Q = session.query(Request)
-        Q = Q.filter(Request.tick > Updates.current_tick() - 5)
-        Q = Q.filter(Request.active == True)
-        Q = Q.order_by(asc(Request.id))
+        SQ = session.query(func.max(Request.id).label('max_id'))
+        SQ = SQ.filter(Request.tick > Updates.current_tick() - 5)
+        SQ = SQ.filter(Request.active == True)
+        SQ = SQ.group_by(Request.planet_id, Request.scantype)
+        SQ = SQ.order_by(asc('max_id'))
+        SQ = SQ.subquery()
+        Q = session.query(Request).join(SQ, and_(Request.id == SQ.c.max_id))
         
         if Q.count() < 1:
             message.reply("There are no open scan requests")
@@ -302,10 +306,13 @@ class request(loadable):
         except:
             i=5
             
-        Q = session.query(Request)
-        Q = Q.filter(Request.tick > Updates.current_tick() - 5)
-        Q = Q.filter(Request.active == True)
-        Q = Q.order_by(asc(Request.id))
+        SQ = session.query(func.max(Request.id).label('max_id'))
+        SQ = SQ.filter(Request.tick > Updates.current_tick() - 5)
+        SQ = SQ.filter(Request.active == True)
+        SQ = SQ.group_by(Request.planet_id, Request.scantype)
+        SQ = SQ.order_by(asc('max_id'))
+        SQ = SQ.subquery()
+        Q = session.query(Request).join(SQ, and_(Request.id == SQ.c.max_id))
         
         if Q.count() < 1:
             message.reply("There are no open scan requests")
