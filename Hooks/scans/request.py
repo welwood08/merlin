@@ -285,20 +285,20 @@ class request(loadable):
     
     @route(r"l(?:ist)?", access = "member")
     def list(self, message, user, params):
-        SQ = session.query(func.max(Request.id).label('max_id'))
-        SQ = SQ.filter(Request.tick > Updates.current_tick() - 5)
-        SQ = SQ.filter(Request.active == True)
-        SQ = SQ.group_by(Request.planet_id, Request.scantype)
-        SQ = SQ.order_by(asc('max_id'))
-        SQ = SQ.subquery()
-        Q = session.query(Request).join(SQ, and_(Request.id == SQ.c.max_id))
+        Q = session.query(func.count().label('count'), func.max(Request.id).label('max_id'))
+        Q = Q.filter(Request.tick > Updates.current_tick() - 5)
+        Q = Q.filter(Request.active == True)
+        Q = Q.group_by(Request.planet_id, Request.scantype)
+        Q = Q.order_by(asc('max_id'))
+        SQ = Q.subquery()
+        Q = session.query(Request, SQ.c.count).join(SQ, and_(Request.id == SQ.c.max_id))
         
         if Q.count() < 1:
             message.reply("There are no open scan requests")
             return
         
-        message.reply(" ".join(map(lambda request: Config.get("Misc", "reqlist").decode("string_escape") % (request.id, request.target.intel.dists if request.target.intel else "0",
-                "/%s" % request.dists if request.dists > 0 else "", request.scantype, request.target.x, request.target.y, request.target.z,), Q.all())))
+        message.reply(" ".join(map(lambda (request, count): Config.get("Misc", "reqlist").decode("string_escape") % (request.id, request.target.intel.dists if request.target.intel else "0",
+                      "/%s" % request.dists if request.dists > 0 else "", request.scantype, request.target.x, request.target.y, request.target.z,), Q.all())))
     
     @route(r"links? ?(.*)", access = "member")
     def links(self, message, user, params):
@@ -310,20 +310,20 @@ class request(loadable):
         except:
             i=5
             
-        SQ = session.query(func.max(Request.id).label('max_id'))
-        SQ = SQ.filter(Request.tick > Updates.current_tick() - 5)
-        SQ = SQ.filter(Request.active == True)
-        SQ = SQ.group_by(Request.planet_id, Request.scantype)
-        SQ = SQ.order_by(asc('max_id'))
-        SQ = SQ.subquery()
-        Q = session.query(Request).join(SQ, and_(Request.id == SQ.c.max_id))
+        Q = session.query(func.count().label('count'), func.max(Request.id).label('max_id'))
+        Q = Q.filter(Request.tick > Updates.current_tick() - 5)
+        Q = Q.filter(Request.active == True)
+        Q = Q.group_by(Request.planet_id, Request.scantype)
+        Q = Q.order_by(asc('max_id'))
+        SQ = Q.subquery()
+        Q = session.query(Request, SQ.c.count).join(SQ, and_(Request.id == SQ.c.max_id))
         
         if Q.count() < 1:
             message.reply("There are no open scan requests")
             return
 
-        message.reply(self.url(" ".join(map(lambda request: Config.get("Misc", "reqlinks").decode("string_escape") % (request.id, request.target.intel.dists if request.target.intel else "0", 
-                    "/%s" % request.dists if request.dists > 0 else "", request.link), Q[:i] if i>0 else Q.all())), user))
+        message.reply(self.url(" ".join(map(lambda (request, count): Config.get("Misc", "reqlinks").decode("string_escape") % (request.id, 
+                      request.target.intel.dists if request.target.intel else "0", "/%s" % request.dists if request.dists > 0 else "", request.link), Q[:i] if i>0 else Q.all())), user))
     
     def scanchan(self):
         return Config.get("Channels", "scans") if "scans" in Config.options("Channels") else Config.get("Channels", "home")
