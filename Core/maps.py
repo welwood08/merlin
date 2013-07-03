@@ -784,6 +784,9 @@ class PlanetHistory(Base):
             return None
         Q = session.query(PlanetHistory)
         Q = Q.filter_by(x=x, y=y, z=z, tick=tick)
+        planet = Q.filter_by(active=True).first()
+        if planet is not None or active == True:
+            return planet
         planet = Q.first()
         return planet
     
