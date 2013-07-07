@@ -112,9 +112,14 @@ class parse(Thread):
         m = re.search("<p class=\"right scan_time\">Scan time: ([^<]*)</p>", page)
         scantime = m.group(1)
         
-        planet = PlanetHistory.load(x,y,z,tick).current
+        try:
+            planet = PlanetHistory.load(x,y,z,tick).current
+        except AttributeError:
+            planet = None
+
         if planet is None:
             return
+            scanlog("No planet found. Check the bot is ticking, and try again after the tick.")
         try:
             scan = Scan(pa_id=pa_id, scantype=scantype, tick=tick, time=scantime, group_id=gid, scanner_id=uid)
             planet.scans.append(scan)
