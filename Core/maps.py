@@ -779,7 +779,7 @@ class PlanetHistory(Base):
     xp_lowest_rank_tick = Column(Integer)
 
     @staticmethod
-    def load(x,y,z,tick):
+    def load(x,y,z,tick,active=True):
         if not x or not y or not z or not tick:
             return None
         Q = session.query(PlanetHistory)
