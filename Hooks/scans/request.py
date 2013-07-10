@@ -291,7 +291,7 @@ class request(loadable):
         Q = Q.group_by(Request.planet_id, Request.scantype)
         Q = Q.order_by(asc('max_id'))
         SQ = Q.subquery()
-        Q = session.query(Request, SQ.c.count).join(SQ, and_(Request.id == SQ.c.max_id))
+        Q = session.query(Request, SQ.c.count).join((SQ, and_(Request.id == SQ.c.max_id)))
         
         if Q.count() < 1:
             message.reply("There are no open scan requests")
@@ -316,7 +316,7 @@ class request(loadable):
         Q = Q.group_by(Request.planet_id, Request.scantype)
         Q = Q.order_by(asc('max_id'))
         SQ = Q.subquery()
-        Q = session.query(Request, SQ.c.count).join(SQ, and_(Request.id == SQ.c.max_id))
+        Q = session.query(Request, SQ.c.count).join((SQ, and_(Request.id == SQ.c.max_id)))
         
         if Q.count() < 1:
             message.reply("There are no open scan requests")
