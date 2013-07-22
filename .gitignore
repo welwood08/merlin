@@ -6,6 +6,7 @@ dumplog.txt
 errorlog.txt
 scanlog.txt
 arthurlog.txt
+debuglog.txt
 .bashrc
 .bash_logout
 .profile

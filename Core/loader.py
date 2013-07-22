@@ -33,6 +33,7 @@ mods = ["Core",
         "Core.messages", "Core.actions",
         "Core.loadable", "Core.robocop",
         "Core.callbacks", "Core.router",
+        "Core.logger",
         ]
 
 class loader(object):
