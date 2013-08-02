@@ -36,6 +36,7 @@ from ConfigParser import ConfigParser as CP
 # Config files (absolute or relative paths) for all bots to be updated by this excalibur
 configs = ['merlin.cfg']
 savedumps = False
+useragent = "Python-urllib/%s; Alliance/%s; BotNick/%s; Admin/%s" % (urllib2.__version__, Config.get("Alliance", "name"), Config.get("Connection", "nick"), Config.items("Admins")[0][0])
 
 # ########################################################################### #
 # ########################################################################### #
@@ -48,7 +49,7 @@ class DefaultErrorHandler(urllib2.HTTPDefaultErrorHandler):
         return result 
 
 
-def get_dumps(last_tick, alt=False):
+def get_dumps(last_tick, alt=False, useragent=None):
     if alt:
        purl = Config.get("URL", "alt_plan") % (last_tick+1)
        gurl = Config.get("URL", "alt_gal") % (last_tick+1)
@@ -64,6 +65,8 @@ def get_dumps(last_tick, alt=False):
         u = Updates.load()
         req.add_header('If-None-Match', u.etag)
         req.add_header('If-Modified-Since', u.modified)
+        if useragent:
+            req.add_header('User-Agent', useragent)
     opener = urllib2.build_opener(DefaultErrorHandler())
     planets = opener.open(req)
     try:
@@ -203,6 +206,7 @@ def clean_cache():
 
 def ticker(alt=False):
     global savedumps
+    global useragent
 
     t_start=time.time()
     t1=t_start
@@ -222,7 +226,7 @@ def ticker(alt=False):
                 session.close()
                 sys.exit()
     
-            (planets, galaxies, alliances) = get_dumps(last_tick, alt)
+            (planets, galaxies, alliances) = get_dumps(last_tick, alt, useragent)
             if not planets:
                 continue
 
