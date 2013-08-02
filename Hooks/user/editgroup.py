@@ -41,7 +41,7 @@ class editgroup(loadable):
             if newname in "tf":
                 admin_only = newname
                 newname = None
-        desc = params.group(3)
+        descr = params.group(3)
         admin_only = params.group(4)
 
         g = Group.load(name)
@@ -63,8 +63,8 @@ class editgroup(loadable):
             else:
                 g.name = newname
 
-        if desc is not None:
-            g.desc = desc
+        if descr is not None:
+            g.descr = descr
 
         if admin_only:
             if admin_only.lower() == "t":

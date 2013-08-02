@@ -35,7 +35,7 @@ class addgroup(loadable):
     def execute(self, message, user, params):
         
         name = params.group(1).lower()
-        desc = params.group(2)
+        descr = params.group(2)
         admin_only = params.group(3) and params.group(3).lower() == "t"
         parent = params.group(4) and params.group(4).lower()
 
@@ -48,7 +48,7 @@ class addgroup(loadable):
             if not p:
                 message.reply("Group '%s' does not exist." % (parent))
                 return
-        g = Group(name=name, desc=desc, admin_only=admin_only)
+        g = Group(name=name, descr=descr, admin_only=admin_only)
         session.add(g)
         if parent:
             if p.id == 1:

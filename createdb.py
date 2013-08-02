@@ -98,10 +98,10 @@ def addaccess(name, access):
 
 if (not round) or fromlegacy:
     print "Setting up default access groups"
-    session.add(Group(id=1, name="admin", desc="Administrators", admin_only=True))
-    session.add(Group(id=2, name="public", desc="Public commands"))
-    session.add(Group(id=3, name="member", desc="Normal alliance members"))
-    session.add(Group(id=4, name="scanner", desc="Alliance scanners"))
+    session.add(Group(id=1, name="admin", descr="Administrators", admin_only=True))
+    session.add(Group(id=2, name="public", descr="Public commands"))
+    session.add(Group(id=3, name="member", descr="Normal alliance members"))
+    session.add(Group(id=4, name="scanner", descr="Alliance scanners"))
     session.commit()
 
     print "Setting up default access levels"
@@ -154,7 +154,7 @@ if round and not mysql:
     try:
         print "  - groups/grants"
         if not fromlegacy:
-            session.execute(text("INSERT INTO %sgroups (id, name, desc, admin_only) SELECT id, name, desc, admin_only FROM %s.%sgroups;" % (prefix, round, old_prefix)))
+            session.execute(text("INSERT INTO %sgroups (id, name, descr, admin_only) SELECT id, name, descr, admin_only FROM %s.%sgroups;" % (prefix, round, old_prefix)))
             session.execute(text("INSERT INTO %saccess (id, name) SELECT id, name FROM %s.%saccess;" % (prefix, round, old_prefix)))
             session.execute(text("INSERT INTO %sgrants (access_id, group_id) SELECT access_id, group_id FROM %s.%sgrants;" % (prefix, round, old_prefix)))
         print "  - users/friends"
