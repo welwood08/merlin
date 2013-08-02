@@ -96,7 +96,7 @@ def addaccess(name, access):
     elif access != 1:
         command.groups.append(session.merge(Group.load(id=access)))
 
-if (not round) or noschema:
+if (not round) or fromlegacy:
     print "Setting up default access groups"
     session.add(Group(id=1, name="admin", desc="Administrators", admin_only=True))
     session.add(Group(id=2, name="public", desc="Public commands"))
