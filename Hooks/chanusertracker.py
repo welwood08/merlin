@@ -141,6 +141,7 @@ def op(message):
         return
     modes = message.line.split(None,4)[3:]
     if "o" in modes[0] and Merlin.nick in modes[1].split():
+        print "getting there"
         # The change in mode involves ops, and the ops might involve us
         modes, args = modes[0], modes[1].split()
         if modes[0] not in "+-":
