@@ -53,10 +53,18 @@ class Action(Message):
     
     def privmsg(self, text, target=None):
         # Privmsg someone. Target defaults to the person who triggered this line
+        # Should we send colours?
         if (Config.has_option("Connection", "color") and not Config.has_option("NoColor", target) and not (target[0] in ['#','&'] and Config.has_option("NoColorChan", target[1:]))):
-            self.write("PRIVMSG %s :%s" % (target or self.get_nick(), "\x03"+Config.get("Connection", "color")+text+"\x0F"), True)
+            text = "\x03"+Config.get("Connection", "color")+text+"\x0F"
+            color = True
         else:
-            self.write("PRIVMSG %s :%s" % (target or self.get_nick(), text))
+            color = False
+        # If we're opped in a channel in common with the user, we can reply with
+        #  CPRIVMSG instead of PRIVMSG which doesn't count towards the flood limit.
+        if target[0] not in "#&" and hasattr(self, "_channel") and CUT.opped(self.get_chan()) and CUT.nick_in_chan(target or self.get_nick(), self.get_chan()):
+            self.write("CPRIVMSG %s %s :%s" % (target or self.get_nick(), self.get_chan(), text), color)
+        else:
+            self.write("PRIVMSG %s :%s" % (target or self.get_nick(), text), color)
     
     def notice(self, text, target=None):
         # If we're opped in a channel in common with the user, we can reply with
