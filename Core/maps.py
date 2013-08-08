@@ -1680,7 +1680,7 @@ class Scan(Base):
             return head + id_age_value + " " + " | ".join(map(str,self.units))
         if self.scantype == "J":
             return head + id_tick + " " + " | ".join(map(str,self.fleets))
-        if self.scantype == "N":
+        if self.scantype in "NM":
             return head + Config.get("URL","viewscan") % (self.pa_id,)
 Planet.scans = dynamic_loader(Scan, backref="planet")
 Scan.scanner = relation(User, backref="scans")
