@@ -28,6 +28,9 @@ from Core.paconf import PA
 from Core.db import true, false, session
 from Core.maps import Ship
 
+useragent = "Merlin (Python-urllib/%s); Alliance/%s; BotNick/%s; Admin/%s" % (urllib2.__version__, Config.get("Alliance", "name"), 
+                                                                              Config.get("Connection", "nick"), Config.items("Admins")[0][0])
+
 regex = r'^<tr class="('
 races = []
 for race in PA.options("races"):
@@ -59,7 +62,9 @@ keys = ['race', 'name', 'class_', 't1', 't2', 't3', 'type', 'init',
         'guns', 'armor', 'damage', 'empres', 'metal', 'crystal', 'eonium']
 
 def main(url = Config.get("URL", "ships"), debug=False):
-    stats = urllib2.urlopen(url).read()
+    req = urllib2.Request(url)
+    req.add_header('User-Agent', useragent)
+    stats = urllib2.urlopen(req).read()
     session.execute(Ship.__table__.delete())
     if Config.get("DB", "dbms") == "mysql":
         session.execute(text("ALTER TABLE ships AUTO_INCREMENT=1;", bindparams=[false]))
