@@ -36,7 +36,7 @@ from ConfigParser import ConfigParser as CP
 # Config files (absolute or relative paths) for all bots to be updated by this excalibur
 configs = ['merlin.cfg']
 savedumps = False
-useragent = "Python-urllib/%s (Merlin); Alliance/%s; BotNick/%s; Admin/%s" % (urllib2.__version__, Config.get("Alliance", "name"), 
+useragent = "Merlin (Python-urllib/%s); Alliance/%s; BotNick/%s; Admin/%s" % (urllib2.__version__, Config.get("Alliance", "name"), 
                                                                               Config.get("Connection", "nick"), Config.items("Admins")[0][0])
 
 # ########################################################################### #
