@@ -66,8 +66,8 @@ def get_dumps(last_tick, alt=False, useragent=None):
         u = Updates.load()
         req.add_header('If-None-Match', u.etag)
         req.add_header('If-Modified-Since', u.modified)
-        if useragent:
-            req.add_header('User-Agent', useragent)
+    if useragent:
+        req.add_header('User-Agent', useragent)
     opener = urllib2.build_opener(DefaultErrorHandler())
     planets = opener.open(req)
     try:
@@ -84,8 +84,12 @@ def get_dumps(last_tick, alt=False, useragent=None):
 
     # Open the dump files
     try:
-        galaxies = urllib2.urlopen(gurl)
-        alliances = urllib2.urlopen(aurl)
+        req = urllib2.Request(gurl)
+        req.add_header('User-Agent', useragent)
+        galaxies = opener.open(req)
+        req = urllib2.Request(aurl)
+        req.add_header('User-Agent', useragent)
+        alliances = opener.open(req)
     except Exception, e:
         excaliburlog("Failed gathering dump files.\n%s" % (str(e),))
         time.sleep(300)
