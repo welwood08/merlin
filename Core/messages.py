@@ -104,7 +104,7 @@ class Message(object):
     
     def in_chan(self):
         # Return True if the message was in a channel (as opposed to PM)
-        return False if self.get_chan() == Merlin.nick else True
+        return False if self.get_chan().lower() == Merlin.nick.lower() else True
     
     def get_pnick(self):
         #Return the pnick. Raises ParseError on failure
