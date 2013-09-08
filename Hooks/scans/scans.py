@@ -76,6 +76,6 @@ class scans(loadable):
             reply+= "delivered to: "
             reply+= ", ".join(nicks) if not Config.getboolean("Misc", "anonscans") else "Anon"
             if Config.getboolean("Misc", "showurls"):
-                reply += Config.get("URL","viewscan") % (pa_id,)
+                reply += " (%s)" % (Config.get("URL","viewscan") % (pa_id,))
             from Hooks.scans.request import request
             message.privmsg(reply, request().scanchan())
