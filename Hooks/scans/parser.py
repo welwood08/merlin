@@ -22,7 +22,7 @@
 import re
 from threading import Thread
 from time import asctime, time
-from urllib2 import urlopen
+import urllib2
 from sqlalchemy.exc import IntegrityError
 from Core.exceptions_ import PNickParseError
 from Core.config import Config
@@ -54,6 +54,8 @@ def catcher(message):
             message.privmsg(m.group(0), Config.get("Channels", "share"))
 
 class parse(Thread):
+    useragent = "Merlin (Python-urllib/%s); Alliance/%s; BotNick/%s; Admin/%s" % (urllib2.__version__, Config.get("Alliance", "name"),
+                                                                              Config.get("Connection", "nick"), Config.items("Admins")[0][0])
     def __init__(self, uid, type, id):
         self.uid = uid
         self.type = type
@@ -81,7 +83,9 @@ class parse(Thread):
     
     def group(self, uid, gid):
         scanlog("Group scan: %s" %(gid,))
-        page = urlopen(Config.get("URL","viewgroup")%(gid,)+"&inc=1").read()
+        req = urllib2.Request(Config.get("URL","viewgroup")%(gid,)+"&inc=1")
+        req.add_header("User-Agent", self.useragent)
+        page = urllib2.urlopen(req).read()
         for scan in page.split("<hr>"):
             m = re.search('scan_id=([0-9a-zA-Z]+)',scan)
             if m:
@@ -91,7 +95,9 @@ class parse(Thread):
                     scanlog("Exception in scan: %s"%(str(e),), traceback=True)
     
     def scan(self, uid, pa_id, gid=None):
-        page = urlopen(Config.get("URL","viewscan")%(pa_id,)+"&inc=1").read()
+        req = urllib2.Request(Config.get("URL","viewscan")%(pa_id,)+"&inc=1")
+        req.add_header("User-Agent", self.useragent)
+        page = urllib2.urlopen(req).read()
         self.execute(page, uid, pa_id, gid)
     
     def execute(self, page, uid, pa_id, gid=None):
