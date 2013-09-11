@@ -47,11 +47,15 @@ def catcher(message):
     for m in scanre.finditer(message.get_msg()):
         parse(uid, "scan", m.group(1)).start()
         if Config.has_option("Channels", "share"):
-            message.privmsg(m.group(0), Config.get("Channels", "share"))
+            sharechan = Config.get("Channels", "share")
+            if message.get_chan().lower() != sharechan.lower():
+                message.privmsg(m.group(0), Config.get("Channels", "share"))
     for m in scangrpre.finditer(message.get_msg()):
         parse(uid, "group", m.group(1)).start()
         if Config.has_option("Channels", "share"):
-            message.privmsg(m.group(0), Config.get("Channels", "share"))
+            sharechan = Config.get("Channels", "share")
+            if message.get_chan().lower() != sharechan.lower():
+                message.privmsg(m.group(0), Config.get("Channels", "share"))
 
 class parse(Thread):
     useragent = "Merlin (Python-urllib/%s); Alliance/%s; BotNick/%s; Admin/%s" % (urllib2.__version__, Config.get("Alliance", "name"),
