@@ -99,6 +99,8 @@ class parse(Thread):
                     scanlog("Exception in scan: %s"%(str(e),), traceback=True)
     
     def scan(self, uid, pa_id, gid=None):
+        if session.query(Scan).filter_by(pa_id=pa_id).count() > 0:
+            return False
         req = urllib2.Request(Config.get("URL","viewscan")%(pa_id,)+"&inc=1")
         req.add_header("User-Agent", self.useragent)
         page = urllib2.urlopen(req).read()
