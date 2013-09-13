@@ -25,8 +25,9 @@ from Core.config import Config
 from Core.paconf import PA
 from Core.string import decode, excaliburlog
 from Core.db import true, false, session
-from Core.maps import Updates, galpenis, apenis
+from Core.maps import Updates, galpenis, apenis, Scan
 from Core.maps import galaxy_temp, planet_temp, alliance_temp, planet_new_id_search, planet_old_id_search
+from Hooks.scans.parser import parse
 from ConfigParser import ConfigParser as CP
 
 # ########################################################################### #
@@ -193,6 +194,13 @@ def closereqs(planet_tick):
     session.commit()
     excaliburlog("Expired requests removed in %.3f seconds" % (time.time() - t_start))
     session.close()
+
+
+def parsescans():
+    Q = session.query(Scan).filter(Scan.planet_id == None)
+    if Q.count() > 0:
+        for s in Q.all():
+            parse(s.scanner_id, "scan", s.pa_id).start()
 
 def clean_cache():
     # Clean tick dependant graph cache
@@ -1177,6 +1185,7 @@ if __name__ == "__main__":
     
     penis()
     closereqs(planet_tick)
+    parsescans()
     clean_cache()
     
     # Add a newline at the end
