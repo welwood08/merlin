@@ -228,8 +228,8 @@ def ticker(alt=False, target_tick=None):
                 info.write(str(planet_tick)+"\n"+str(etag)+"\n"+str(modified)+"\n")
                 info.flush()
                 info.seek(0)
-                print "Still some missing... (waiting 20 seconds)"
-                time.sleep(20)
+                print "Still some missing... (waiting 60 seconds)"
+                time.sleep(60)
                 ticker(True, target_tick)
             else:
                 info.write(str(planet_tick)+"\n"+str(etag)+"\n"+str(modified)+"\n")
