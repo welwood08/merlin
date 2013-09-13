@@ -22,6 +22,10 @@
 from sys import stdout
 from traceback import format_exc
 from Core.config import Config
+# For email
+import socket
+from smtplib import SMTP, SMTPException, SMTPSenderRefused, SMTPRecipientsRefused
+from ssl import SSLError
 
 CRLF = "\r\n"
 encoding = "latin1"
@@ -44,20 +48,64 @@ def encode(text):
     else:
         raise UnicodeError
 
-def log(file, log, traceback=True, spacing=True):
+def log(filename, log, traceback=True, spacing=True):
     def _log(file):
         file.write(encode(log) + "\n")
         if traceback is True:
             file.write(format_exc() + "\n")
         if spacing is True:
             file.write("\n\n")
-    if file == "stdout":
-        _log(stdout)
-    else:
-        with open(file, "a") as file:
-            _log(file)
+    try:
+        file = Config.get("Misc", filename)
+        if file == "stdout":
+            _log(stdout)
+        else:
+            with open(file, "a") as file:
+                _log(file)
+    finally:
+        if filename == "excalibur":
+            if "d" not in Config.get("Misc", "maillogs"):
+                return
+        elif filename[0] not in Config.get("Misc", "maillogs"):
+            return
+        if traceback:
+            sep = "\n\n" if spacing else "\n"
+            log = sep.join([log, format_exc()])
+        for addr in Config.get("Misc", "logmail").split():
+            send_email("%s: %s" % (Config.get("Connection", "nick"), filename), log, addr)
 
-errorlog = lambda text, traceback=True: log(Config.get("Misc","errorlog"), text, traceback=traceback)
-scanlog = lambda text, traceback=False, spacing=False: log(Config.get("Misc","scanlog"), text, traceback=traceback, spacing=spacing or traceback)
-arthurlog = lambda text, traceback=True: log(Config.get("Misc","arthurlog"), text, traceback=traceback)
-excaliburlog = lambda text, traceback=False, spacing=False: log(Config.get("Misc","excalibur"), text, traceback=traceback, spacing=spacing or traceback)
+errorlog = lambda text, traceback=True: log("errorlog", text, traceback=traceback)
+scanlog = lambda text, traceback=False, spacing=False: log("scanlog", text, traceback=traceback, spacing=spacing or traceback)
+arthurlog = lambda text, traceback=True: log("arthurlog", text, traceback=traceback)
+excaliburlog = lambda text, traceback=False, spacing=False: log("excalibur", text, traceback=traceback, spacing=spacing or traceback)
+
+def send_email(subject, message, addr):
+    try:
+        if (Config.get("smtp", "port") == "0"):
+            smtp = SMTP("localhost")
+        else:
+            smtp = SMTP(Config.get("smtp", "host"), Config.get("smtp", "port"))
+
+        if not ((Config.get("smtp", "host") == "localhost") or (Config.get("smtp", "host") == "127.0.0.1")):
+            try:
+                smtp.starttls()
+            except SMTPException as e:
+                raise SMSError("unable to shift connection into TLS: %s" % (str(e),))
+
+            try:
+                smtp.login(Config.get("smtp", "user"), Config.get("smtp", "pass"))
+            except SMTPException as e:
+                raise SMSError("unable to authenticate: %s" % (str(e),))
+
+        try:
+             smtp.sendmail(Config.get("smtp", "frommail"), addr, "To:%s\nFrom:%s\nSubject:%s\n%s\n" % (addr, "\"%s\" <%s>" % (
+                                                           Config.get("Connection", "nick"), Config.get("smtp", "frommail")), subject, message))
+        except SMTPSenderRefused as e:
+            raise SMSError("sender refused: %s" % (str(e),))
+        except SMTPRecipientsRefused as e:
+            raise SMSError("unable to send: %s" % (str(e),))
+
+        smtp.quit()
+
+    except (socket.error, SSLError, SMTPException, SMSError) as e:
+        return "Error sending message: %s" % (str(e),)
