@@ -36,6 +36,7 @@ import re, sys, time, urllib2, shutil, os, errno
 
 base_url = "http://game.planetarion.com/botfiles/"
 alt_base = "http://dumps.dfwtk.com/"
+useragent = "Dumper (Python-urllib/%s); Admin/YOUR_IRC_NICK_HERE" % (urllib2.__version__)
 
 # ########################################################################### #
 # ########################################################################### #
@@ -49,7 +50,7 @@ class DefaultErrorHandler(urllib2.HTTPDefaultErrorHandler):
 
 
 def get_dumps(last_tick, etag, modified, alt=False):
-    global base_url, alt_base
+    global base_url, alt_base, useragent
 
     if alt:
        purl = alt_base + str(last_tick+1) + "/planet_listing.txt"
@@ -66,8 +67,11 @@ def get_dumps(last_tick, etag, modified, alt=False):
         req.add_header('If-None-Match', etag)
     if modified:
         req.add_header('If-Modified-Since', modified)
+    if useragent:
+        req.add_header('User-Agent', useragent)
 
     opener = urllib2.build_opener(DefaultErrorHandler())
+
     planets = opener.open(req)
     try:
         if planets.status == 304:
@@ -83,8 +87,12 @@ def get_dumps(last_tick, etag, modified, alt=False):
 
     # Open the dump files
     try:
-        galaxies = urllib2.urlopen(gurl)
-        alliances = urllib2.urlopen(aurl)
+        req = urllib2.Request(gurl)
+        req.add_header('User-Agent', useragent)
+        galaxies = opener.open(req)
+        req = urllib2.Request(aurl)
+        req.add_header('User-Agent', useragent)
+        alliances = opener.open(req)
     except Exception, e:
         print "Failed gathering dump files.\n%s" % (str(e),)
         time.sleep(300)
