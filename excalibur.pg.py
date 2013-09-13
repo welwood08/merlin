@@ -23,7 +23,7 @@ import datetime, re, sys, time, traceback, urllib2, shutil, os, errno
 from sqlalchemy.sql import text, bindparam
 from Core.config import Config
 from Core.paconf import PA
-from Core.string import decode, excaliburlog
+from Core.string import decode, excaliburlog, errorlog
 from Core.db import true, false, session
 from Core.maps import Updates, galpenis, apenis, Scan
 from Core.maps import galaxy_temp, planet_temp, alliance_temp, planet_new_id_search, planet_old_id_search
@@ -1177,6 +1177,9 @@ if __name__ == "__main__":
         bots += [cp]
         prefixes += [cp.get("DB", "prefix")]
     
+    if session.query(Scan).filter(Scan.tick < Updates.current_tick()).filter(Scan.planet_id == None).count() > 0:
+        errorlog("Something broke the scan parser. There are unparsed scans.")
+
     if len(sys.argv) > 1:
         Config.set("URL", "dumps", sys.argv[1])
     excaliburlog("Dumping from %s" %(Config.get("URL", "dumps"),))
