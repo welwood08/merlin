@@ -99,7 +99,7 @@ class parse(Thread):
                     scanlog("Exception in scan: %s"%(str(e),), traceback=True)
     
     def scan(self, uid, pa_id, gid=None):
-        if session.query(Scan).filter_by(pa_id=pa_id).count() > 0:
+        if session.query(Scan).filter(Scan.pa_id == pa_id).filter(Scan.planet_id != None).count() > 0:
             return
         req = urllib2.Request(Config.get("URL","viewscan")%(pa_id,)+"&inc=1")
         req.add_header("User-Agent", self.useragent)
@@ -129,17 +129,24 @@ class parse(Thread):
         except AttributeError:
             planet = None
 
-        if planet is None:
-            return
-            scanlog("No planet found. Check the bot is ticking, and try again after the tick.")
         try:
-            scan = Scan(pa_id=pa_id, scantype=scantype, tick=tick, time=scantime, group_id=gid, scanner_id=uid)
-            planet.scans.append(scan)
+            Q = session.query(Scan).filter(Scan.pa_id == pa_id).filter(Scan.planet_id == None)
+            if Q.count() > 0:
+                scan = Q.first()
+            else:
+                scan = Scan(pa_id=pa_id, scantype=scantype, tick=tick, time=scantime, group_id=gid, scanner_id=uid)
+                session.add(scan)
+            if planet:
+                planet.scans.append(scan)
             session.commit()
             scan_id = scan.id
         except IntegrityError, e:
             session.rollback()
             scanlog("Scan %s may already exist: %s" %(pa_id,str(e),))
+            return
+
+        if planet is None:
+            scanlog("No planet found. Check the bot is ticking. Scan will be tried again at next tick.")
             return
         
         scanlog("%s %s:%s:%s" %(PA.get(scantype,"name"), x,y,z,))
