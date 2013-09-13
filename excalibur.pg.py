@@ -1159,25 +1159,25 @@ def ticker(alt=False):
     excaliburlog("Total time taken: %.3f seconds" % (t1,))
     return planet_tick
 
-
-bots = []
-prefixes = []
-for config in configs:
-    cp = CP()
-    cp.optionxform = str
-    cp.read(config)
-    bots += [cp]
-    prefixes += [cp.get("DB", "prefix")]
-
-if len(sys.argv) > 1:
-    Config.set("URL", "dumps", sys.argv[1])
-excaliburlog("Dumping from %s" %(Config.get("URL", "dumps"),))
-
-planet_tick = ticker()
-
-penis()
-closereqs(planet_tick)
-clean_cache()
+if __name__ == "__main__":
+    bots = []
+    prefixes = []
+    for config in configs:
+        cp = CP()
+        cp.optionxform = str
+        cp.read(config)
+        bots += [cp]
+        prefixes += [cp.get("DB", "prefix")]
     
-# Add a newline at the end
-excaliburlog("\n")
+    if len(sys.argv) > 1:
+        Config.set("URL", "dumps", sys.argv[1])
+    excaliburlog("Dumping from %s" %(Config.get("URL", "dumps"),))
+    
+    planet_tick = ticker()
+    
+    penis()
+    closereqs(planet_tick)
+    clean_cache()
+    
+    # Add a newline at the end
+    excaliburlog("\n")
