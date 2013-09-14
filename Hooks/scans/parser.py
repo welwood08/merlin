@@ -322,7 +322,7 @@ class parse(Thread):
 
         #<tr><td class="left">10:1:10</td><td class="left">Defend</td><td class="left">Pesticide IV</td><td class="right">1</td><td class="right">0</td></tr>
 
-        for m in re.finditer('<td[^>]*><a[^>]+>(\d+)\:(\d+)\:(\d+)</a></td><td[^>]*>([^<]+)</td><td[^>]*>([^<]+)</td><td[^>]*>(\d+)</td><td[^>]*>(\d+(?:,\d{3})*)</td>', page):
+        for m in re.finditer('<td[^>]*>(?:<a[^>]+>)?(\d+)\:(\d+)\:(\d+)(?:</a>)?</td><td[^>]*>([^<]+)</td><td[^>]*>([^<]+)</td><td[^>]*>(\d+)</td><td[^>]*>(\d+(?:,\d{3})*)</td>', page):
             scanlog("%s:%s:%s %s %s %s %s" %m.groups())
             
             fleetscan = FleetScan()
