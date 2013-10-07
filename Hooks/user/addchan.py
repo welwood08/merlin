@@ -45,7 +45,7 @@ class addchan(loadable):
             access = int(access)
         
         if access > user.access:
-            message.reply("You may not add a user with higher access to your own")
+            message.reply("You may not add a channel with higher access than you")
             return
         
         try:
