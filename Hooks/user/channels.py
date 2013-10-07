@@ -18,29 +18,28 @@
 # You should have received a copy of the GNU General Public License
 # along with this program; if not, write to the Free Software
 # Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA 02110-1301 USA
- 
-# List of package modules
-__all__ = [
-           "adduser",
-           "galmate",
-           "edituser",
-           "getanewdaddy",
-           "remuser",
-           "whois",
-           "aids",
-           "pref",
-           "phone",
-           "quitter",
-           "quits",
-           "addchan",
-           "galchan",
-           "remchan",
-           "editchan",
-           "showchan",
-           "channels",
-           "alias",
-           "forcepref",
-           "members",
-           "paranoidcunts",
-           "tell",
-           ]
+
+# Module by Martin Stone
+
+from Core.db import session
+from Core.maps import Channel
+from Core.loadable import loadable, route, require_user
+from Core.config import Config
+
+class channels(loadable):
+    """List existing channels. Optionally include galchans."""
+    usage = " [galchans]"
+    
+    @route(r"(.*)", access = "admin")
+    @require_user
+    def execute(self, message, user, params):
+
+        reply = []
+
+        Q = session.query(Channel)
+        if not params.group(1):
+            Q = Q.filter(Channel.userlevel > (Config.get("Access",  "galmate") if "galmate" in Config.options("Access") else 0))
+        for c in Q.all():
+            reply.append(c.name)
+        
+        message.reply("Stored channels: %s" % (", ".join(reply)))

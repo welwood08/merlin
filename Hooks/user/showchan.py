@@ -18,29 +18,38 @@
 # You should have received a copy of the GNU General Public License
 # along with this program; if not, write to the Free Software
 # Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA 02110-1301 USA
+
+# Module by Martin Stone
  
-# List of package modules
-__all__ = [
-           "adduser",
-           "galmate",
-           "edituser",
-           "getanewdaddy",
-           "remuser",
-           "whois",
-           "aids",
-           "pref",
-           "phone",
-           "quitter",
-           "quits",
-           "addchan",
-           "galchan",
-           "remchan",
-           "editchan",
-           "showchan",
-           "channels",
-           "alias",
-           "forcepref",
-           "members",
-           "paranoidcunts",
-           "tell",
-           ]
+from Core.db import session
+from Core.maps import Channel
+from Core.loadable import loadable, route
+
+class showchan(loadable):
+    """Show details of an existing channel."""
+    usage = " <chan>"
+    
+    @route(r"([^\*\s]\S+)", access = "admin")
+    def execute(self, message, user, params):
+        
+        chan = params.group(1)
+        if chan[0] != "#":
+            chan = "#" + chan
+
+        c = Channel.load(chan)
+        if c is None:
+            message.reply("No such channel: '%s'" % (chan,))
+            return
+        
+        message.reply("%s: %s (Max: %s)" % (c.name, c.userlevel, c.maxlevel))
+
+
+    @route(r"\*", access = "admin")
+    def showall(self, message, user, params):
+
+        reply = []
+        
+        for c in session.query(Channel).all():
+            reply.append("%s: %s (Max: %s)" % (c.name, c.userlevel, c.maxlevel))
+        
+        message.reply("\n".join(reply))
