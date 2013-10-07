@@ -85,7 +85,7 @@ def loggedin(message):
 @system('INVITE')
 def pinvite(message):
     # P invites us to a channel
-    if message.get_hostmask().lower() == Config.get("Services", "host").lower() and Channel.load(message.get_msg()) is not None:
+    if (message.get_hostmask().lower() == Config.get("Services", "host").lower() or message.get_pnick() in Config.options("Admins")) and Channel.load(message.get_msg()) is not None:
         message.join(message.get_msg())
 
 @system('PRIVMSG', admin=True)
