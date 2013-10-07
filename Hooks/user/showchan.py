@@ -49,7 +49,6 @@ class showchan(loadable):
     def showall(self, message, user, params):
 
         reply = []
-
         
         for c in session.query(Channel).all():
             reply.append("%s: %s (Max: %s)" % (c.name, c.usergroup.name, c.maxgroup.name))
