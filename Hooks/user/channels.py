@@ -23,7 +23,7 @@
 
 from Core.db import session
 from Core.maps import Channel
-from Core.loadable import loadable, route, require_user
+from Core.loadable import loadable, route
 
 class channels(loadable):
     """List existing channels. Optionally include galchans."""
@@ -31,7 +31,6 @@ class channels(loadable):
     access = 1 # Admin
     
     @route(r"(.*)", access = "channels")
-    @require_user
     def execute(self, message, user, params):
 
         reply = []

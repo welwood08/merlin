@@ -23,7 +23,7 @@
  
 from Core.db import session
 from Core.maps import Channel
-from Core.loadable import loadable, route, require_user
+from Core.loadable import loadable, route
 
 class showchan(loadable):
     """Show details of an existing channel."""
@@ -31,7 +31,6 @@ class showchan(loadable):
     access = 1 # Admin
     
     @route(r"([^\*\s]\S+)", access = "showchan")
-    @require_user
     def execute(self, message, user, params):
         
         chan = params.group(1)
@@ -47,7 +46,6 @@ class showchan(loadable):
 
 
     @route(r"\*", access = "showchan")
-    @require_user
     def showall(self, message, user, params):
 
         reply = []
