@@ -30,11 +30,14 @@ from threading import Thread
 from Core.exceptions_ import Reboot
 from Core.config import Config
 from Core.string import decode, encode, CRLF
+from Core.admintools import adminmsg
 
 class connection(object):
     # Socket/Connection handler
     output = PriorityQueue()
     quitting = False
+    queue_warned = 0
+    wait_warned = 0
     
     def __init__(self):
         # Socket to handle is provided
@@ -81,7 +84,6 @@ class connection(object):
         self.quitting = True
         print "%s Disconnecting IRC... (%s)" % (time.asctime(),encode(line),)
         try:
-            # self.output.join() # Timeout?
             self.write("QUIT :%s" % (line,))
         except Reboot:
             pass
@@ -94,7 +96,9 @@ class connection(object):
         self.output.put((priority, time.time(), line))
         if self.output.qsize() > 50: # Limit in Config?
             # Warn admins if the queue is too long
-            pass
+            if time.time() > self.queue_warned + 300:
+                self.queue_warned = time.time()
+                adminmsg("Message output queue length is too long: %s messages" % self.output.qsize())
 
     def writeout(self):
         # Write to socket/server
@@ -105,7 +109,9 @@ class connection(object):
                     time.sleep(0.5)
                 if time.time() > sent + 10: # Timeout in Config?
                     # Warn admins if the wait is too long
-                    pass
+                    if time.time() > self.wait_warned + 300:
+                        self.wait_warned = time.time()
+                        adminmsg("Message output message delay is too long: %.1f seconds" % (time.time() - sent))
                 self.sock.send(encode(line) + CRLF)
                 self.last = time.time()
                 print "%s >>> %s" % (time.asctime(),encode(line),)
