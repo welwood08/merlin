@@ -94,8 +94,8 @@ class connection(object):
     def write(self, line, priority=10):
         # Write to output queue
         self.output.put((priority, time.time(), line))
-        if self.output.qsize() > 50: # Limit in Config?
-            # Warn admins if the queue is too long
+        # Warn admins if the queue is too long
+        if self.output.qsize() > Config.getint("Connection", "maxqueue"):
             if time.time() > self.queue_warned + 300:
                 self.queue_warned = time.time()
                 adminmsg("Message output queue length is too long: %s messages" % self.output.qsize())
@@ -107,8 +107,8 @@ class connection(object):
             try:
                 while self.last + Config.getfloat("Connection", "antiflood") * float(max(priority-2, 3)/3) >= time.time():
                     time.sleep(0.5)
-                if time.time() > sent + 10: # Timeout in Config?
-                    # Warn admins if the wait is too long
+                # Warn admins if the wait is too long
+                if time.time() > sent + Config.getint("Connection", "maxdelay"):
                     if time.time() > self.wait_warned + 300:
                         self.wait_warned = time.time()
                         adminmsg("Message output message delay is too long: %.1f seconds" % (time.time() - sent))
