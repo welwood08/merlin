@@ -101,7 +101,7 @@ class connection(object):
         while not self.quitting:
             (priority, sent, line) = self.output.get(True, None)
             try:
-                while self.last + Config.getfloat("Connection", "antiflood") >= time.time():
+                while self.last + Config.getfloat("Connection", "antiflood") * float(max(priority-2, 3)/3) >= time.time():
                     time.sleep(0.5)
                 if time.time() > sent + 10: # Timeout in Config?
                     # Warn admins if the wait is too long
