@@ -74,7 +74,7 @@ class Action(Message):
         else:
             Connection.write(params[:-1])
     
-    def privmsg(self, text, target=None):
+    def privmsg(self, text, target=None, priority=0):
         # Privmsg someone. Target defaults to the person who triggered this line
         # Should we send colours?
         if (Config.has_option("Connection", "color") and not Config.has_option("NoColor", target) and not (target[0] in ['#','&'] and Config.has_option("NoColorChan", target[1:]))):
@@ -85,19 +85,19 @@ class Action(Message):
         # If we're opped in a channel in common with the user, we can reply with
         #  CPRIVMSG instead of PRIVMSG which doesn't count towards the flood limit.
         if target[0] not in "#&" and hasattr(self, "_channel") and CUT.opped(self.get_chan()) and CUT.nick_in_chan(target or self.get_nick(), self.get_chan()):
-            self.write("CPRIVMSG %s %s :%s" % (target or self.get_nick(), self.get_chan(), text), color)
+            self.write("CPRIVMSG %s %s :%s" % (target or self.get_nick(), self.get_chan(), text), color, priority)
         else:
-            self.write("PRIVMSG %s :%s" % (target or self.get_nick(), text), color)
+            self.write("PRIVMSG %s :%s" % (target or self.get_nick(), text), color, priority)
     
-    def notice(self, text, target=None):
+    def notice(self, text, target=None, priority=0):
         # If we're opped in a channel in common with the user, we can reply with
         #  CNOTICE instead of NOTICE which doesn't count towards the flood limit.
         if hasattr(self, "_channel") and CUT.opped(self.get_chan()) and CUT.nick_in_chan(target or self.get_nick(), self.get_chan()):
-            self.write("CNOTICE %s %s :%s" % (target or self.get_nick(), self.get_chan(), text))
+            self.write("CNOTICE %s %s :%s" % (target or self.get_nick(), self.get_chan(), text), priority=priority)
         else:
-            self.write("NOTICE %s :%s" % (target or self.get_nick(), text))
+            self.write("NOTICE %s :%s" % (target or self.get_nick(), text), priority=priority)
     
-    def reply(self, text):
+    def reply(self, text, priority=0):
         if self.get_command() != "PRIVMSG":
             return
         # Caps Lock is cruise control for awesome
@@ -107,20 +107,20 @@ class Action(Message):
         # Always reply to an @command with a PM
         reply = self.reply_type()
         if reply == PUBLIC_REPLY:
-            self.privmsg(text, self.get_chan())
+            self.privmsg(text, self.get_chan(), priority=priority)
         if reply == PRIVATE_REPLY:
-            self.privmsg(text, self.get_nick())
+            self.privmsg(text, self.get_nick(), priority=priority)
         if reply == NOTICE_REPLY:
-            self.notice(text)
+            self.notice(text, priority=priority)
     
-    def alert(self, text):
+    def alert(self, text, priority=0):
         if self.get_command() != "PRIVMSG":
             return
         # Notice the user, unless it was a PM
         if self.in_chan():
-            self.notice(text)
+            self.notice(text, priority=priority-1)
         else:
-            self.privmsg(text, self.get_nick())
+            self.privmsg(text, self.get_nick(), priority=priority-1)
     
     def topic(self, text, channel=None):
         # Set the topic in a channel
@@ -142,11 +142,11 @@ class Action(Message):
     def invite(self, target, channel=None):
         # Invite target to channel
         channel = channel or self.get_chan()
-        self.write(("INVITE %s %s" % (target, channel)))
+        self.write(("INVITE %s %s" % (target, channel)), priority=-1)
     
     def quit(self, message=None):
         # Quit the bot from the network
-        self.write(("QUIT :%s" % message) if message else "QUIT")
+        self.write(("QUIT :%s" % message) if message else "QUIT", priority=+1)
     
     def kick(self, target, channel=None, message=None):
         # Make the bot kick someone
