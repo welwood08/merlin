@@ -23,11 +23,13 @@
 
 # Admin tools
 
-from Core.chanusertracker import CUT
-from Core.config import Config
-from Core.connection import Connection
 
 def adminmsg(message, priority=2):
+    # Import these here or Core/connection.py will get upset.
+    from Core.chanusertracker import CUT
+    from Core.config import Config
+    from Core.connection import Connection
+
     for a in Config.options("Admins"):
         for nick in CUT.get_user_nicks(a.lower()):
             Connection.write("PRIVMSG %s :%s" % (nick, message), priority)
