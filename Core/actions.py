@@ -25,12 +25,35 @@ from Core.connection import Connection
 from Core.chanusertracker import CUT
 from Core.messages import Message, PUBLIC_REPLY, PRIVATE_REPLY, NOTICE_REPLY
 from Core.config import Config
+from Core.maps import User
 
 class Action(Message):
     # This object holds the parse, and will enable users to send messages to the server on a higher level
     
-    def write(self, text, color=False):
+    def write(self, text, color=False, priority=0):
         # Write something to the server, the message will be split up by newlines and at 450chars max
+
+        # Set Priority
+        l = len(text)
+        p = 5 + priority
+        if l < 100:
+            p -= 1
+        elif l > 150:
+            p += min(l,400) // 100 + l // 450
+        ##
+        n = self.get_pnick()
+        if n:
+            if n in Config.options("Admins"):
+                p -= 2
+            try:
+                u = User.load(n)
+                if u:
+                    if u.group_id == 1:
+                        p -= 1
+            except:
+                pass
+
+        # Split message and send
         params = text.split(":")[0] + ":"
         text = ":".join(text.split(":")[1:])
         if text:            
@@ -46,7 +69,7 @@ class Action(Message):
                             Connection.write((params + line)[:450])
                             line = line[450 - len(params):]
                             continue
-                    Connection.write(params + line[:i])
+                    Connection.write(params + line[:i], p)
                     line = line[i+1:]
         else:
             Connection.write(params[:-1])
