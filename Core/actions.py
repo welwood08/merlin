@@ -52,7 +52,7 @@ class Action(Message):
             try:
                 u = User.load(n)
                 if u:
-                    if u.group_id == 1:
+                    if u.is_admin():
                         p -= 1
             except:
                 pass
