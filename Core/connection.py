@@ -24,6 +24,8 @@
 import re
 import socket
 import time
+from Queue import PriorityQueue
+from threading import Thread
 
 from Core.exceptions_ import Reboot
 from Core.config import Config
@@ -31,12 +33,15 @@ from Core.string import decode, encode, CRLF
 
 class connection(object):
     # Socket/Connection handler
+    output = PriorityQueue()
     
     def __init__(self):
         # Socket to handle is provided
         self.ping = re.compile(r"PING\s*:\s*(\S+)", re.I)
         self.pong = re.compile(r"PONG\s*:", re.I)
         self.last = time.time()
+        self.thread = Thread(target=self.writeout)
+        self.thread.start()
     
     def connect(self, nick):
         # Configure socket
@@ -50,10 +55,10 @@ class connection(object):
         
         passwd = Config.get("Connection", "servpass")
         if passwd:
-            self.write("PASS %s" % (passwd,))
+            self.write("PASS %s" % (passwd,), 0)
         
-        self.write("NICK %s" % (nick,))
-        self.write("USER %s 0 * :%s bot. Admin: %s" % (nick, Config.get("Alliance", "name"), Config.items("Admins")[0][0],))
+        self.write("NICK %s" % (nick,), 0)
+        self.write("USER %s 0 * :%s bot. Admin: %s" % (nick, Config.get("Alliance", "name"), Config.items("Admins")[0][0],), 0)
         return self.sock
     
     def attach(self, sock=None, nick=None):
@@ -74,6 +79,7 @@ class connection(object):
         # Cleanly close sockets
         print "%s Disconnecting IRC... (%s)" % (time.asctime(),encode(line),)
         try:
+            # self.output.join() # Timeout?
             self.write("QUIT :%s" % (line,))
         except Reboot:
             pass
@@ -81,20 +87,29 @@ class connection(object):
             self.close()
         return ()
     
-    def write(self, line):
+    def write(self, line, priority=10):
+        # Write to output queue
+        self.output.put((priority, time.time(), line))
+        if self.output.qsize() > 50: # Limit in Config?
+            # Warn admins if the queue is too long
+            pass
+
+    def writeout(self):
         # Write to socket/server
-        try:
-            ponging = self.pong.match(line)
-            if ponging:
-                self.sock.send(line + CRLF)
-            else:
+        while True:
+            (priority, sent, line) = self.output.get(True, None)
+            try:
                 while self.last + Config.getfloat("Connection", "antiflood") >= time.time():
                     time.sleep(0.5)
+                if time.time() > sent + 10: # Timeout in Config?
+                    # Warn admins if the wait is too long
+                    pass
                 self.sock.send(encode(line) + CRLF)
                 self.last = time.time()
                 print "%s >>> %s" % (time.asctime(),encode(line),)
-        except socket.error as exc:
-            raise Reboot(exc)
+                self.output.task_done()
+            except socket.error as exc:
+                raise Reboot(exc)
     
     def read(self):
         # Read from socket
@@ -109,7 +124,7 @@ class connection(object):
                 line = line[:-1]
             pinging = self.ping.match(line)
             if pinging:
-                self.write("PONG :%s" % pinging.group(1))
+                self.write("PONG :%s" % pinging.group(1), 0)
                 #print "%s <<< PING? PONG!" % (time.asctime(),)
             else:
                 print "%s <<< %s" % (time.asctime(),encode(line),)
