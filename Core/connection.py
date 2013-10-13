@@ -34,6 +34,7 @@ from Core.string import decode, encode, CRLF
 class connection(object):
     # Socket/Connection handler
     output = PriorityQueue()
+    quitting = False
     
     def __init__(self):
         # Socket to handle is provided
@@ -77,6 +78,7 @@ class connection(object):
     
     def disconnect(self, line):
         # Cleanly close sockets
+        self.quitting = True
         print "%s Disconnecting IRC... (%s)" % (time.asctime(),encode(line),)
         try:
             # self.output.join() # Timeout?
@@ -96,7 +98,7 @@ class connection(object):
 
     def writeout(self):
         # Write to socket/server
-        while True:
+        while not self.quitting:
             (priority, sent, line) = self.output.get(True, None)
             try:
                 while self.last + Config.getfloat("Connection", "antiflood") >= time.time():
