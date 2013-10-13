@@ -41,7 +41,11 @@ class Action(Message):
         elif l > 150:
             p += min(l,400) // 100 + l // 450
         ##
-        n = self.get_pnick()
+        n = False
+        try:
+            n = self.get_pnick()
+        except:
+            pass
         if n:
             if n in Config.options("Admins"):
                 p -= 2
