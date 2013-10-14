@@ -76,7 +76,7 @@ class Action(Message):
                     Connection.write(params + line[:i], p)
                     line = line[i+1:]
         else:
-            Connection.write(params[:-1])
+            Connection.write(params[:-1], p)
     
     def privmsg(self, text, target=None, priority=0):
         # Privmsg someone. Target defaults to the person who triggered this line
