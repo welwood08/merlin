@@ -45,7 +45,7 @@ class Action(Message):
         try:
             n = self.get_pnick()
         except:
-            pass
+            p += 2
         if n:
             if n in Config.options("Admins"):
                 p -= 2
@@ -54,8 +54,12 @@ class Action(Message):
                 if u:
                     if u.is_admin():
                         p -= 1
+                    elif u.is_galmate():
+                        p += 1
+                else:
+                    p +=2
             except:
-                pass
+                p += 2
 
         # Split message and send
         params = text.split(":")[0] + ":"
