@@ -196,8 +196,8 @@ def closereqs(planet_tick):
     session.close()
 
 
-def parsescans():
-    Q = session.query(Scan).filter(Scan.planet_id == None)
+def parsescans(tick):
+    Q = session.query(Scan).filter(Scan.planet_id == None).filter(Scan.tick >= tick - 1)
     if Q.count() > 0:
         for s in Q.all():
             parse(s.scanner_id, "scan", s.pa_id).start()
@@ -1176,6 +1176,8 @@ if __name__ == "__main__":
         cp.read(config)
         bots += [cp]
         prefixes += [cp.get("DB", "prefix")]
+
+    oldtick = Updates.current_tick()
     
     if session.query(Scan).filter(Scan.tick < Updates.current_tick()).filter(Scan.planet_id == None).count() > 0:
         errorlog("Something broke the scan parser. There are unparsed scans.")
@@ -1188,7 +1190,7 @@ if __name__ == "__main__":
     
     penis()
     closereqs(planet_tick)
-    parsescans()
+    parsescans(oldtick)
     clean_cache()
     
     # Add a newline at the end
