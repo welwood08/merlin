@@ -1178,8 +1178,8 @@ if __name__ == "__main__":
         prefixes += [cp.get("DB", "prefix")]
 
     oldtick = Updates.current_tick()
-    
-    if session.query(Scan).filter(Scan.tick < Updates.current_tick()).filter(Scan.planet_id == None).count() > 0:
+
+    if session.query(Scan).filter(Scan.tick == oldtick-1).filter(Scan.planet_id == None).count() > 0:
         errorlog("Something broke the scan parser. There are unparsed scans.")
 
     if len(sys.argv) > 1:
