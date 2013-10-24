@@ -24,6 +24,7 @@ __all__ = [
            "scan",
            "scans",
            "request",
+           "parse",
            "parser",
            "toprequesters",
            "topscanners",
