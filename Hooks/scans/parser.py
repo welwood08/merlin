@@ -20,42 +20,30 @@
 # Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA 02110-1301 USA
  
 import re
+import socket
 from threading import Thread
 from time import asctime, time
 import urllib2
 from sqlalchemy.exc import IntegrityError
-from Core.exceptions_ import PNickParseError
 from Core.config import Config
 from Core.paconf import PA
-from Core.string import decode, scanlog
+from Core.string import decode, scanlog, CRLF
 from Core.db import session
-from Core.maps import Updates, Planet, PlanetHistory, User, Intel, Ship, Scan, Request
+from Core.maps import Updates, Planet, PlanetHistory, Intel, Ship, Scan, Request
 from Core.maps import PlanetScan, DevScan, UnitScan, FleetScan, CovOp
-from Core.loadable import system
-from Core.robocop import push
 
 scanre=re.compile("http://[^/]+/(?:showscan|waves).pl\?scan_id=([0-9a-zA-Z]+)")
 scangrpre=re.compile("http://[^/]+/(?:showscan|waves).pl\?scan_grp=([0-9a-zA-Z]+)")
 
-@system('PRIVMSG')
-def catcher(message):
-    try:
-        user = User.load(name=message.get_pnick())
-        uid = user.id if user else None
-    except PNickParseError:
-        uid = None
-    for m in scanre.finditer(message.get_msg()):
-        parse(uid, "scan", m.group(1)).start()
-        if Config.has_option("Channels", "share"):
-            sharechan = Config.get("Channels", "share")
-            if message.get_chan().lower() != sharechan.lower():
-                message.privmsg(m.group(0), Config.get("Channels", "share"), priority=+3)
-    for m in scangrpre.finditer(message.get_msg()):
-        parse(uid, "group", m.group(1)).start()
-        if Config.has_option("Channels", "share"):
-            sharechan = Config.get("Channels", "share")
-            if message.get_chan().lower() != sharechan.lower():
-                message.privmsg(m.group(0), Config.get("Channels", "share"), priority=+3)
+class push(object):
+    # Robocop message pusher
+    def __init__(self, line, **kwargs):
+        line = " ".join([line] + map(lambda i: "%s=%s"%i, kwargs.items()))
+        port = Config.getint("Misc", "robocop")
+        sock = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+        sock.settimeout(30)
+        sock.connect(("127.0.0.1", port,))
+        sock.send(line + CRLF)
 
 class parse(Thread):
     useragent = "Merlin (Python-urllib/%s); Alliance/%s; BotNick/%s; Admin/%s" % (urllib2.__version__, Config.get("Alliance", "name"),
