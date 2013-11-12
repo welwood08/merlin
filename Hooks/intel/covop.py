@@ -23,6 +23,7 @@
  
 from Core.maps import Planet, Updates
 from Core.loadable import loadable, route, require_planet
+from Core.paconf import PA
 
 class covop(loadable):
     """Calculates target alert, damage caused and liklihood of success of a covop based on stored scans."""
@@ -98,17 +99,7 @@ class covop(loadable):
                 elif prob > 100:
                     prob = 100
 
-                race = user.planet.race
-                if race == "Ter":
-                    growth = 6
-                elif race == "Cat":
-                    growth = 10
-                elif race == "Xan":
-                    growth = 4
-                elif race == "Zik":
-                    growth = 6
-                elif race == "Etd":
-                    growth = 6
+                growth = PA.getint(user.planet.race.lower(), "sgrowth")
                 from math import ceil
                 message.reply("New stealth: %s  Success rate: %s%%  Recovery time: %1.1f ticks" % (stealth, prob, ceil((5+int(agents/2))/growth)))
 # base_max_stealth * (1 + gov_bonus / 100) + cumulative_success_bonus
