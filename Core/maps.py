@@ -661,7 +661,7 @@ class Planet(Base):
         return int(self.size * self.caprate(attacker))
     
     def resources_per_agent(self, target):
-        return min(10000,(target.value * 2000)/self.value)
+        return min(PA.getint("numbers", "res_cap_per_agent"),(target.value * 2000)/self.value)
 Planet._idx_x_y_z = Index('planet_x_y_z', Planet.x, Planet.y, Planet.z)
 Galaxy.planets = relation(Planet, order_by=asc(Planet.z), backref=backref('galaxy', lazy='joined'), lazy='joined')
 Galaxy.planet_loader = dynamic_loader(Planet)
