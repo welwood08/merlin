@@ -56,7 +56,7 @@ class edituser(loadable):
         remchans = []
         changed = []
 
-        if type(access) == str:
+        if type(access) in (str, unicode):
             newchanQ = session.query(Channel).join(ChannelAdd).filter(ChannelAdd.group_id == g.id)
             
         for username in usernames.split():
@@ -65,7 +65,7 @@ class edituser(loadable):
                 message.alert("No such user '%s'" % (username,))
                 return
             
-            if type(access) is str and not member.active:
+            if type(access) in (str, unicode) and not member.active:
                 message.reply("You should first re-activate user %s" %(member.name,))
                 return
             
@@ -75,7 +75,7 @@ class edituser(loadable):
 
             changed.append(username)
 
-            if type(access) == str:
+            if type(access) in (str, unicode):
                 if member.active == True:
                     oldchanQ = session.query(Channel).join(ChannelAdd).filter(ChannelAdd.group_id == member.group_id)
                     addQ = newchanQ.except_(oldchanQ)
