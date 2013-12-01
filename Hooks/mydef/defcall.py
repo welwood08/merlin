@@ -47,7 +47,10 @@ class defcall(loadable):
         
         notice = "DEFCALL: %s wants %s to %s:%s:%s eta %s" % (user.name, params.group(7), params.group(1), params.group(3), 
                                                               params.group(5), params.group(6))
-        message.notice(notice, Config.get("Channels", "home"))
+        if Config.getboolean("Misc", "globaldef"):
+            push("broadcast", notice=notice)
+        else:
+            message.notice(notice, Config.get("Channels", "home"))
     
     @robohci
     def robocop(self, message, etype, uname="Unknown", tick=0, x=0, y=0, z=0, name="", eta=0, size=0, res=0, cons=0):
@@ -113,10 +116,13 @@ class defcall(loadable):
             return
         # Send email - pref?
         if notice:
-            if etype == "new" and Config.has_option("Channels", "def"):
-                message.notice(notice, Config.get("Channels", "def"))
+            if Config.getboolean("Misc", "globaldef"):
+                   push("broadcast", notice=notice)
             else:
-                message.notice(notice, Config.get("Channels", "home"))
+                if etype == "new" and Config.has_option("Channels", "def"):
+                    message.notice(notice, Config.get("Channels", "def"))
+                else:
+                    message.notice(notice, Config.get("Channels", "home"))
         
         if email and addr:
             self.send_email("Relayed PA Notifications from tick %s" % (tick), email, addr)
