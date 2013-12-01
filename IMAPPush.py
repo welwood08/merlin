@@ -119,7 +119,7 @@ class Idler(threading.Thread):
     """
     def robonotify(self, header, body):
         # Check for correct "From" address?
-        uname = re.findall("(.+)@.+", header['To'])[0].split()[1]
+        uname = re.findall("<?(.+)@.+", header['To'])[0]
         dsuff = Config.get("imap", "defsuffix")
         if dsuff:
             if uname[-len(dsuff):] == dsuff:
