@@ -8,7 +8,9 @@ Here Be Dragons
 ----------------------------
 This version of merlin breaks database and config compatibility with ellonweb's original branch, and pretty much anything not forked from here. Additionally, it breaks compatibility with itself occasionally (well, actually quite frequently...).
 
-For support, use github or (preferably) try #munin on netgamers IRC.
+If you run into trouble, it may be worth checking the [See Also](#see-also) section below, which contains some more detail and a step-by-step walkthrough.
+
+For further support, use github or (preferably) try #munin on netgamers IRC. 
 
 Installation Requirements
 ----------------------------
