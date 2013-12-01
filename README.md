@@ -197,6 +197,7 @@ Other useful sources:
 
 + Installation walkthrough: [walkthrough.md](walkthrough.md)
 + Command list: [commandlist.md](commandlist.md)
++ A more detailed description of merlin.cfg entries: [config-desc.md](config-desc.md)
 + Posix tips: [README.Posix](README.Posix)
 + Branch explanation on the wiki: <https://github.com/d7415/merlin/wiki/Branches>
 
