@@ -21,6 +21,8 @@
  
 # Module by Martin Stone
 
+from Core.db import session
+from Core.maps import Channel
 from Core.config import Config
 from Core.loadable import loadable, route, robohci
 
@@ -34,10 +36,10 @@ class broadcast(loadable):
             notice = "%s" % (params.group(1)[:-6])
         else:
             notice = "(%s) %s" % (user.name, params.group(1))
-        for chan in Config.items("Channels"):
-            message.notice(notice, chan[1])
+        for chan in session.query(Channel).filter(Channel.userlevel > (Config.get("Access",  "galmate") if "galmate" in Config.options("Access") else 0)).all():
+            message.notice(notice, chan.name)
     
     @robohci
     def robocop(self, message, notice):
-        for chan in Config.items("Channels"):
-            message.notice(notice, chan[1])
+        for chan in session.query(Channel).filter(Channel.userlevel > (Config.get("Access",  "galmate") if "galmate" in Config.options("Access") else 0)).all():
+            message.notice(notice, chan.name)
