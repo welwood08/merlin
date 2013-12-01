@@ -210,7 +210,9 @@ Some features require extra configuration. Details below.
 ### IMAP Support
 IMAP support allows the bot to parse notification emails from Planetarion. The bot can then announce incoming or recalled fleets, request scans for incoming fleets and forward the messages to the user's email address.
 
-To use this feature, the alliance will need a domain or subdomain to receive the emails. Users must then set their notification email address in-game to pnick-def@alliance.com. ("-def" is the default suffix for notification emails, which is configurable. If this is set, pnick@alliance.com will still forward emails but not trigger defcalls)
+This feature has been tested in two environments. The first is where the alliance has a domain or subdomain. The account specified in the [imap] section of merlin.cfg should be a wildcard address so that it can receive notifications for all users. Users must then set their notification email address in-game to pnick-def@alliance.com. The "-def" is a configurable suffix for notification email addresses. If this is set, the bot will forward any emails to pnick@alliance.com but will not check their contents or trigger defcalls. The suffix allows users to have their own inboxes without the bot listening, or to have a forwarding address through the bot.
+
+Alternatively, the feature can be used with a single address, so long as the provider will collect all mail for username+something@domain in the same inbox. GMail is known to behave in this way. In this case, it is recommended to set the defsuffix to blank in the [imap] section of merlin.cfg to avoid confusion. Set the singleaddr option to True and users should use username+pnick@domain as their notifications email address in-game.
 
 To listen for new emails:
 
