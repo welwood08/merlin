@@ -193,9 +193,9 @@ See Also
 ----------------------------
 Other useful sources:
 
-+ Installation walkthrough: walkthrough.md
-+ Command list: commandlist.md
-+ Posix tips: README.Posix
++ Installation walkthrough: [walkthrough.md](walkthrough.md)
++ Command list: [commandlist.md](commandlist.md)
++ Posix tips: [README.Posix](README.Posix)
 + Branch explanation on the wiki: <https://github.com/d7415/merlin/wiki/Branches>
 
 Extra Features and Requirements
