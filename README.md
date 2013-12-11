@@ -237,8 +237,13 @@ Planetarion allows alliance members to "List scan ids of last 1000 scans". If th
 
 
 ### WhatsApp Support
-WhatsApp support allows the use of WhatsApp with the !sms command.  
-It requires the yowsup library, by Tarek Galal.
+WhatsApp support allows the use of WhatsApp with the !sms command.
+
+##### Requirements
+You will need a phone number to receive the confirmation SMS and create a WhatsApp account. The bot will need its own account (and number) because two devices cannot be logged in at the same time.
+
+##### Dependencies
+This function requires the yowsup library, by Tarek Galal.
 The git repository will already point to the latest known-good version of the library. To install:  
 
     git submodule init
@@ -250,12 +255,13 @@ The second of these can also be used to update to a newer version when the upstr
     git submodule update
 
 ##### Config Items
-"login" is your full, international phone number, including the country code but without the leading + or 00.  
-For accounts set up from a phone, "password" is the IMEI reversed and MD5 hashed (for android) or the MAC address, uppercase, repeated twice and MD5 hashed. This can be achieved using
+First, the easy bit. "login" is your full, international phone number, including the country code but without the leading + or 00.
+
+"password" is more tricky. If you're very lucky and plan to use an old account, set up from a phone some time ago, "password" may be the IMEI reversed and MD5 hashed (for android) or the MAC address, uppercase, repeated twice and MD5 hashed (iOS). This can be achieved using
 
     python yowsup/src/yowsup-cli --generatepassword your-IMEI-or-MAC-address-here
 
-For accounts set up using yowsup, "password" is the password given by yowsup, base64 decoded. In python:
+For the vast majority of users, you will need to register using the yowsup cli and this [guide](https://github.com/tgalal/yowsup/wiki/yowsup-cli#registration). Once you have been given a password by this method, it must be base64 decoded before saving as "password" in merlin.cfg. In python:
 
     "your password".decode("base64")
 
