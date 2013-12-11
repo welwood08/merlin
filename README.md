@@ -255,13 +255,9 @@ The second of these can also be used to update to a newer version when the upstr
     git submodule update
 
 ##### Config Items
-First, the easy bit. "login" is your full, international phone number, including the country code but without the leading + or 00.
+"login" is your full, international phone number, including the country code but without the leading + or 00.
 
-"password" is more tricky. If you're very lucky and plan to use an old account, set up from a phone some time ago, "password" may be the IMEI reversed and MD5 hashed (for android) or the MAC address, uppercase, repeated twice and MD5 hashed (iOS). This can be achieved using
-
-    python yowsup/src/yowsup-cli --generatepassword your-IMEI-or-MAC-address-here
-
-For the vast majority of users, you will need to register using the yowsup cli and this [guide](https://github.com/tgalal/yowsup/wiki/yowsup-cli#registration). Once you have been given a password by this method, it must be base64 decoded before saving as "password" in merlin.cfg. In python:
+"password" is more tricky. Register the bot's number using the yowsup cli and this [guide](https://github.com/tgalal/yowsup/wiki/yowsup-cli#registration). Once you have been given a password it must be base64 decoded before saving as "password" in merlin.cfg. In python:
 
     "your password".decode("base64")
 
