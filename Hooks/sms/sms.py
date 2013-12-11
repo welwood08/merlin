@@ -87,6 +87,8 @@ class sms(loadable):
         if mode == "email":
             error = self.send_email(user, receiver, public_text, phone, text)
         elif mode == "whatsapp":
+            if receiver.phone[0] == "g":
+                phone = receiver.phone
             wa = WhatsappEchoClient(phone[1:], text, True)
             wa.login(Config.get("WhatsApp", "login"), Config.get("WhatsApp", "password").decode("string_escape"))
             if wa.gotReceipt:
