@@ -80,6 +80,9 @@ class sms(loadable):
             if (receiver.smsmode == "WhatsApp"):
                 if Config.get("WhatsApp", "login"):
                     mode = "whatsapp"
+            elif (receiver.smsmode == "Twilio"):
+                if Config.get("Twilio", "sid"):
+                    mode = "twilio"
             else:
                 mode = receiver.smsmode or mode if mode == "combined" else mode
                 mode = mode.lower()
