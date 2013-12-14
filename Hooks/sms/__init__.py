@@ -25,4 +25,5 @@ __all__ = [
            "smslog",
            "showmethemoney",
            "email",
+           "call",
            ]
