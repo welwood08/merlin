@@ -1205,7 +1205,7 @@ Group.commands = relation(Access, secondary=(grants), lazy='dynamic', backref="g
 
 class User(Base):
     __tablename__ = Config.get('DB', 'prefix') + 'users'
-    _sms_modes = {"C":"Clickatell", "G":"GoogleVoice", "R":"Retard", "E":"Email", "W":"WhatsApp",}
+    _sms_modes = {"C":"Clickatell", "G":"GoogleVoice", "R":"Retard", "E":"Email", "W":"WhatsApp", "T":"Twilio",}
     id = Column(Integer, primary_key=True)
     name = Column(String(255)) # pnick
     alias = Column(String(255))
