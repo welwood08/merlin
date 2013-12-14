@@ -261,6 +261,15 @@ The second of these can also be used to update to a newer version when the upstr
 
     "your password".decode("base64")
 
+### Twilio Support
+Merlin can now use [Twilio](https://www.twilio.com) for SMS and voice calling.
+
+Sign up on their website and add the details to merlin.cfg. You can send test messages/calls to your own phone for free with a trial account, but you will have to upgrade to send to others. SMS will be send using Twilio when the user's smsmode is set to Twilio.
+
+The !call command will initiate a call to a user and hang up after the number of seconds set in the timeout setting in the Twilio section of merlin.cfg. If the user answers and the warn setting is True, a message will be played identifying the bot and telling the user to stop wasting credit.
+
+Unfortunately Twilio does not have an API call to check account balance, so there is no !showmethemoney support at this time.
+
 ### FluxBB Integration
 Merlin can integrate with FluxBB, creating user accounts and updating passwords when the arthur password is updated in !pref.
 
