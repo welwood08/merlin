@@ -63,7 +63,7 @@ def get_dumps(last_tick, alt=False, useragent=None):
 
     # Build the request for planet data
     req = urllib2.Request(purl)
-    if last_tick > 0:
+    if last_tick > 0 and not alt:
         u = Updates.load()
         req.add_header('If-None-Match', u.etag)
         req.add_header('If-Modified-Since', u.modified)
