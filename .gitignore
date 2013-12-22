@@ -20,3 +20,7 @@ PG_setup.txt
 IMAPLog.txt
 imaplog.txt
 imappush.sh
+dumps/*
+yconfig
+scans.priv.*
+excalibur.py
