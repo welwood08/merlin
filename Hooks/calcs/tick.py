@@ -22,6 +22,7 @@
 from datetime import datetime, timedelta
 from Core.loadable import loadable, route
 from Core.maps import Updates
+from Core.paconf import PA
 
 class tick(loadable):
     access = 2 # Public
@@ -44,50 +45,20 @@ class tick(loadable):
         else:
             diff = int(params.group(1)) - tick
             now = datetime.utcnow()
+            tick_length = PA.getint("numbers", "tick_length")
+            tdiff = timedelta(seconds=tick_length*diff)-timedelta(minutes=now.minute%(tick_length/60))
             seconds = 0
-            retstr = ""
-            if diff > 0:
+            retstr  = "%sd " % abs(tdiff.days) if tdiff.days else ""
+            retstr += "%sh " % abs(tdiff.seconds/3600) if tdiff.seconds/3600 else ""
+            retstr += "%sm " % abs(tdiff.seconds%3600/60) if tdiff.seconds%3600/60 else ""
                 
-                if diff > 24:
-                    days = (diff-1)/24
-                    seconds += days*24*60*60
-                    retstr += "%sd " % (days,)
-                
-                if diff > 1:
-                    hours = (diff-1)%24
-                    seconds += hours*60*60
-                    retstr += "%sh " % (hours,)
-                
-                mins = 60 - now.minute
-                seconds += mins *60
-                retstr += "%sm" % (mins,)
-                
-                if diff == 1:
-                    retstr = "Next tick is %s (in %s" % (params.group(1), retstr,)
-                else:
-                    retstr = "Tick %s is expected to happen in %s ticks (in %s" % (params.group(1), diff, retstr,)
+            if diff == 1:
+                retstr = "Next tick is %s (in %s" % (params.group(1), retstr)
+            elif diff > 1:
+                retstr = "Tick %s is expected to happen in %s ticks (in %s" % (params.group(1), diff, retstr)
+            elif diff <= 0:
+                retstr = "Tick %s was expected to happen %s ticks ago but was not scraped (%s ago" % (params.group(1), -diff, retstr)
             
-            elif diff < 0:
-                
-                if diff < -23:
-                    days = (-diff)/24
-                    seconds -= days*24*60*60
-                    retstr += "%sd " % (days,)
-                    
-                if diff < -1:
-                    hours = (-diff)%24
-                    seconds -= hours*60*60
-                    retstr += "%sh " % (hours,)
-                    
-                mins = now.minute
-                seconds -= mins*60
-                retstr += "%sm" % (mins,)
-                
-                if diff == -1:
-                    retstr = "Last tick was %s (%s ago" % (params.group(1), retstr,)
-                else:
-                    retstr = "Tick %s was expected to happen %s ticks ago but was not scraped (%s ago" % (params.group(1), -diff, retstr,)
-            
-            time = now + timedelta(seconds=seconds)
+            time = now + tdiff
             retstr += " - %s)" % (time.strftime("%a %d/%m %H:%M"),)
             message.reply(retstr)
