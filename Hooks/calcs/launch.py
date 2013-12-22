@@ -22,6 +22,7 @@
 import datetime
 from Core.maps import Updates
 from Core.loadable import loadable, route
+from Core.paconf import PA
 
 class launch(loadable):
     """Calculate launch tick, launch time, prelaunch tick and prelaunch modifier for a given ship class or eta, and land tick."""
@@ -52,9 +53,10 @@ class launch(loadable):
         current_tick=Updates.current_tick()
 
         current_time = datetime.datetime.utcnow()
+        tick_length = PA.getint("numbers","tick_length")
         launch_tick = land_tick - eta
-        launch_time = current_time + datetime.timedelta(hours=(launch_tick-current_tick))
+        launch_time = current_time + datetime.timedelta(seconds=tick_length*(launch_tick-current_tick+1)) - datetime.timedelta(minutes=current_time.minute%(tick_length/60)+5)
         prelaunch_tick = land_tick - eta + 1
         prelaunch_mod = launch_tick - current_tick
 
-        message.reply("eta %d landing pt %d (currently %d) must launch at pt %d (%s), or with prelaunch tick %d (currently %+d)" % (eta, land_tick, current_tick, launch_tick, (launch_time.strftime("%m-%d %H:55")), prelaunch_tick, prelaunch_mod))
+        message.reply("eta %d landing pt %d (currently %d) must launch at pt %d (%s), or with prelaunch tick %d (currently %+d)" % (eta, land_tick, current_tick, launch_tick, (launch_time.strftime("%m-%d %H:%M")), prelaunch_tick, prelaunch_mod))
