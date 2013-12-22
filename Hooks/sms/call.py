@@ -24,7 +24,8 @@
 from Core.config import Config
 from Core.maps import User
 from Core.loadable import loadable, route, require_user
-from twilio.rest import TwilioRestClient
+if Config.get("Twilio", "sid"):
+    from twilio.rest import TwilioRestClient
 
 class call(loadable):
     """Calls the user's phone."""
@@ -33,7 +34,10 @@ class call(loadable):
     @route(r"(\S+)", access = "member")
     @require_user
     def execute(self, message, user, params):
-        
+        if not Config.get("Twilio", "sid"):
+            message.reply("Twilio support not configured. Tell the admin. If you are the admin, configure Twilio or disable !call to prevent this message.")
+            return
+
         rec = params.group(1)
         receiver=User.load(name=rec,exact=False,access="member") or User.load(name=rec)
         if not receiver:
