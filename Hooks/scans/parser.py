@@ -242,6 +242,7 @@ class parse(Thread):
             <tr><td[^>]*>Eonium\s+Refinery</td><td[^>]*>(\d*)</td></tr>\s*
             <tr><td[^>]*>Research\s+Laboratory</td><td[^>]*>(\d*)</td></tr>\s*
             <tr><td[^>]*>Finance\s+Centre</td><td[^>]*>(\d*)</td></tr>\s*
+            <tr><td[^>]*>Military\s+Centre</td><td[^>]*>(\d*)</td></tr>\s*
             <tr><td[^>]*>Security\s+Centre</td><td[^>]*>(\d*)</td></tr>
         """, page,re.VERBOSE)
 
@@ -255,7 +256,8 @@ class parse(Thread):
         devscan.eonium_refinery = m.group(8)
         devscan.research_lab = m.group(9)
         devscan.finance_centre = m.group(10)
-        devscan.security_centre = m.group(11)
+#        devscan.military_centre = m.group(11)
+        devscan.security_centre = m.group(12)
 
         m = re.search("""
             <tr><td[^>]*>Space\s+Travel</td><td[^>]*>(\d+)\s*<span[^<]*</span></td></tr>\s*
