@@ -1390,7 +1390,10 @@ class Channel(Base):
             return Group.load(id=2).has_access(access)
     
     def can_access(self, access):
-        return self.maxgroup.has_access(access)
+        if self.maxlevel:
+            return self.maxgroup.has_access(access)
+        else:
+            return Group.load(id=2).has_access(access)
     
     @staticmethod
     def load(name):
