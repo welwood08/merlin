@@ -35,7 +35,6 @@ from Core.admintools import adminmsg
 class connection(object):
     # Socket/Connection handler
     output = PriorityQueue()
-    quitting = False
     queue_warned = 0
     wait_warned = 0
     
@@ -81,10 +80,10 @@ class connection(object):
     
     def disconnect(self, line):
         # Cleanly close sockets
-        self.quitting = True
         print "%s Disconnecting IRC... (%s)" % (time.asctime(),encode(line),)
         try:
             self.write("QUIT :%s" % (line,))
+            self.thread.join()
         except Reboot:
             pass
         finally:
@@ -102,7 +101,7 @@ class connection(object):
 
     def writeout(self):
         # Write to socket/server
-        while not self.quitting:
+        while True:
             (priority, sent, line) = self.output.get(True, None)
             try:
                 while self.last + Config.getfloat("Connection", "antiflood") * (1 + (len(line) > 300) + (priority > 10)) >= time.time():
@@ -116,6 +115,8 @@ class connection(object):
                 self.last = time.time()
                 print "%s >>> %s" % (time.asctime(),encode(line),)
                 self.output.task_done()
+                if line[:4].upper() == "QUIT":
+                    break
             except socket.error as exc:
                 raise Reboot(exc)
     
