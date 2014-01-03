@@ -57,28 +57,27 @@ class covop(loadable):
             d_age = tick - dscan.tick
             dscan = dscan.devscan
 
+        # Get government info from pa.cfg and intel
         gov_bonus = 0
         gov = "Unknown"
-        if planet.intel.gov is not None:
-            if planet.intel.gov[0].lower() == "c":
-                gov = "Corporatism"
-                gov_bonus = -0.05
-            if planet.intel.gov[0].lower() == "d":
-                gov = "Democracy"
-                gov_bonus = -0.10
-            if planet.intel.gov[0].lower() == "n":
-                gov = "Nationalism"
-                gov_bonus = 0.25
-            if planet.intel.gov[0].lower() == "s":
-                gov = "Socialism"
-                gov_bonus = 0.00
-            if planet.intel.gov[0].lower() == "t":
-                gov = "Totalitarianism"
-                gov_bonus = 0.10
+        gov_alert_max = 0.00
+        gov_alert_min = 0.00
+        int_gov = planet.intel.gov
+        if int_gov is not None:
+            int_gov = int_gov[0].lower()
+        for gcode in PA.options("govs"):
+            gov_alert = PA.getfloat(gcode, "alert")
+            if int_gov and int_gov == gcode[0]:
+                gov = PA.get(gcode, "name")
+                gov_bonus = gov_alert
+            if gov_alert > gov_alert_max:
+                gov_alert_max = gov_alert
+            if gov_alert < gov_alert_min:
+                gov_alert_min = gov_alert
 
 
-        alert_min = int((50+5*min(pscan.guards/(planet.size+1),15))*(1+dscan.security_centre*2/dscan.total + (gov_bonus if gov != "Unknown" else -0.10) + 0.0))
-        alert_max = int((50+5*min(pscan.guards/(planet.size+1),15))*(1+dscan.security_centre*2/dscan.total + (gov_bonus if gov != "Unknown" else +0.25) + 0.5))
+        alert_min = int((50+5*min(pscan.guards/(planet.size+1),15))*(1+dscan.security_centre*2/dscan.total + (gov_bonus if gov != "Unknown" else gov_alert_min) + 0.0))
+        alert_max = int((50+5*min(pscan.guards/(planet.size+1),15))*(1+dscan.security_centre*2/dscan.total + (gov_bonus if gov != "Unknown" else gov_alert_max) + 0.5))
 
         message.reply("Planet: %s:%s:%s  Government: %s  Alert: %s-%s  (Scan Age P:%s D:%s)" % (planet.x, planet.y, planet.z, gov, alert_min, alert_max, p_age, d_age))
         if params.group(6):
