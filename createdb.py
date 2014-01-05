@@ -123,32 +123,6 @@ if (not round) or fromlegacy:
             pass
         session.commit()
 
-print "Setting up default channels"
-for chan, name in Config.items("Channels"):
-    try:
-        channel = Channel(name=name)
-        if chan == "public":
-            channel.userlevel = 2
-            channel.maxlevel = 2
-        else:
-            channel.userlevel = 3
-            channel.maxlevel = 1
-        session.add(channel)
-        session.commit()
-        if chan == "home":
-            session.add(ChannelAdd(channel_id=channel.id, group_id=1, level=100))
-            session.add(ChannelAdd(channel_id=channel.id, group_id=3))
-        elif chan == "scans":
-            session.add(ChannelAdd(channel_id=channel.id, group_id=4))
-        session.flush()
-    except IntegrityError:
-        print "Channel '%s' already exists" % (channel.name,)
-        session.rollback()
-    else:
-        print "Created '%s' with access (%s|%s)" % (channel.name, channel.userlevel, channel.maxlevel,)
-        session.commit()
-session.close()
-
 if round and not mysql:
     print "Migrating data:"
     try:
@@ -203,6 +177,32 @@ if round and not mysql:
         session.execute(text("DROP SCHEMA temp CASCADE;"))
         session.commit()
         session.close()
+
+print "Setting up default channels"
+for chan, name in Config.items("Channels"):
+    try:
+        channel = Channel(name=name)
+        if chan == "public":
+            channel.userlevel = 2
+            channel.maxlevel = 2
+        else:
+            channel.userlevel = 3
+            channel.maxlevel = 1
+        session.add(channel)
+        session.commit()
+        if chan == "home":
+            session.add(ChannelAdd(channel_id=channel.id, group_id=1, level=100))
+            session.add(ChannelAdd(channel_id=channel.id, group_id=3))
+        elif chan == "scans":
+            session.add(ChannelAdd(channel_id=channel.id, group_id=4))
+        session.flush()
+    except IntegrityError:
+        print "Channel '%s' already exists" % (channel.name,)
+        session.rollback()
+    else:
+        print "Created '%s' with access (%s|%s)" % (channel.name, channel.userlevel, channel.maxlevel,)
+        session.commit()
+session.close()
 
 print "Inserting ship stats"
 shipstats.main()
