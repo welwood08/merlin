@@ -112,10 +112,7 @@ class parse(Thread):
         m = re.search("<p class=\"right scan_time\">Scan time: ([^<]*)</p>", page)
         scantime = m.group(1)
         
-        try:
-            planet = PlanetHistory.load(x,y,z,tick).current
-        except AttributeError:
-            planet = None
+        planet = PlanetHistory.load_planet(x,y,z,tick,closest=Config.getboolean("Misc", "catchup"))
 
         try:
             Q = session.query(Scan).filter(Scan.pa_id == pa_id).filter(Scan.planet_id == None)
