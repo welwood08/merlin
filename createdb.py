@@ -145,14 +145,17 @@ if round and not mysql:
 print "Inserting ship stats"
 shipstats.main()
 
-if round:
+if not noschema:
     import os, shutil, errno, glob
     if os.path.exists("dumps"):
-        print "Archiving dump files"
-        try:
-            os.makedirs("dumps/archive/%s" % round)
-        except OSError as e:
-            if e.errno != errno.EEXIST:
-                raise
-        for tdir in glob.glob("dumps/[0-9]*"):
-            shutil.move(tdir,"dumps/archive/%s/" % round)
+        if round and round != "temp":
+            print "Archiving dump files"
+            try:
+                os.makedirs("dumps/archive/%s" % round)
+            except OSError as e:
+                if e.errno != errno.EEXIST:
+                    raise
+            for tdir in glob.glob("dumps/[0-9]*"):
+                shutil.move(tdir,"dumps/archive/%s/" % round)
+        else:
+            print "Not removing dump files. Please remove them manually."
