@@ -39,6 +39,7 @@ configs = ['merlin.cfg']
 savedumps = False
 useragent = "Merlin (Python-urllib/%s); Alliance/%s; BotNick/%s; Admin/%s" % (urllib2.__version__, Config.get("Alliance", "name"), 
                                                                               Config.get("Connection", "nick"), Config.items("Admins")[0][0])
+catchup_enabled = False
 
 # ########################################################################### #
 # ########################################################################### #
@@ -220,6 +221,7 @@ def clean_cache():
 def ticker(alt=False):
     global savedumps
     global useragent
+    global catchup_enabled
 
     t_start=time.time()
     t1=t_start
@@ -283,7 +285,7 @@ def ticker(alt=False):
             excaliburlog("Loaded dumps from webserver in %.3f seconds" % (t2,))
             t1=time.time()
     
-            if planet_tick > last_tick + 1:
+            if catchup_enabled and planet_tick > last_tick + 1:
                 if alt:
                     excaliburlog("Something is very, very wrong...")
                 else:
