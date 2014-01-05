@@ -34,12 +34,14 @@ from ConfigParser import ConfigParser as CP
 # ##############################     CONFIG     ############################# #
 # ########################################################################### #
 
+# Note that the useragent and catchup settings will be taken from the *local* merlin.cfg
+
 # Config files (absolute or relative paths) for all bots to be updated by this excalibur
 configs = ['merlin.cfg']
 savedumps = False
 useragent = "Merlin (Python-urllib/%s); Alliance/%s; BotNick/%s; Admin/%s" % (urllib2.__version__, Config.get("Alliance", "name"), 
                                                                               Config.get("Connection", "nick"), Config.items("Admins")[0][0])
-catchup_enabled = False
+catchup_enabled = Config.get("Misc", "catchup")
 
 # ########################################################################### #
 # ########################################################################### #
