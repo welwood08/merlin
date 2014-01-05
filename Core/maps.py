@@ -779,16 +779,28 @@ class PlanetHistory(Base):
     xp_lowest_rank_tick = Column(Integer)
 
     @staticmethod
-    def load(x,y,z,tick,active=True):
+    def load(x,y,z,tick,active=True,closest=False):
         if not x or not y or not z or not tick:
             return None
         Q = session.query(PlanetHistory)
-        Q = Q.filter_by(x=x, y=y, z=z, tick=tick)
+        Q = Q.filter_by(x=x, y=y, z=z)
+        if closest:
+            Q = Q.order_by(asc(func.abs(tick-PlanetHistory.tick)))
+        else:
+            Q = Q.filter_by(tick=tick)
         planet = Q.filter_by(active=True).first()
-        if planet is not None or active == True:
-            return planet
+        if planet is not None:
+            if planet.tick == tick:
+                return planet
+            if active:
+                return planet if closest else None
+        if active:
+            return None
         planet = Q.first()
-        return planet
+        if closest or planet.tick == tick:
+            return planet
+        else:
+            return None
     
 Planet.history_loader = relation(PlanetHistory, backref=backref('current', lazy='select'), lazy='dynamic')
 GalaxyHistory.planets = relation(PlanetHistory, order_by=asc(PlanetHistory.z), backref="galaxy")
