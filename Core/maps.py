@@ -801,6 +801,14 @@ class PlanetHistory(Base):
             return planet
         else:
             return None
+
+    @staticmethod
+    def load_planet(x,y,z,tick,active=True, closest=False):
+        ph = PlanetHistory.load(x, y, z, tick, active, closest)
+        if ph:
+            return ph.current
+        else:
+            return ph
     
 Planet.history_loader = relation(PlanetHistory, backref=backref('current', lazy='select'), lazy='dynamic')
 GalaxyHistory.planets = relation(PlanetHistory, order_by=asc(PlanetHistory.z), backref="galaxy")
