@@ -75,6 +75,8 @@ class Message(object):
             self._msg = " ".join(line.split()[3:])
             if self._msg and self._msg[0] == ":":
                 self._msg = self._msg[1:]
+            if not self._msg:
+                self._msgerror = True
         except ValueError:
             self._msgerror = True
     
