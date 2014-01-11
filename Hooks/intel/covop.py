@@ -26,7 +26,7 @@ from Core.loadable import loadable, route, require_planet
 from Core.paconf import PA
 
 class covop(loadable):
-    """Calculates target alert, damage caused and liklihood of success of a covop based on stored scans."""
+    """Calculates target alert, damage caused and likelihood of success of a covop based on stored scans."""
     usage = " <x:y:z> [agents] [stealth]"
     
     @route(loadable.planet_coord+r"(?:\s+(\d+))?(?:\s+(\d+))?")
