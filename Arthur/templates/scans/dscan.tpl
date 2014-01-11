@@ -38,8 +38,14 @@
         <td width="15%"> {{ dscan.finance_centre|and_percent(dscan.total) }} </td>
     </tr>
     <tr class="even">
+        <td class="datahigh" width="35%"> Military Centre </td>
+        <td width="15%"> {{ dscan.military_centre|and_percent(dscan.total) }} </td>
         <td class="datahigh" width="35%"> Security Centre </td>
         <td width="15%"> {{ dscan.security_centre|and_percent(dscan.total) }} </td>
+    </tr>
+    <tr class="odd">
+        <td class="datahigh" width="35%"> Structure Defence </td>
+        <td width="15%"> {{ dscan.structure_defence|and_percent(dscan.total) }} </td>
         <td class="datahigh" width="35%">  </td>
         <td width="15%">  </td>
     </tr>
