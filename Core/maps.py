@@ -1896,8 +1896,8 @@ class DevScan(Base):
         total = self.light_factory+self.medium_factory+self.heavy_factory
         total+= self.wave_amplifier+self.wave_distorter
         total+= self.metal_refinery+self.crystal_refinery+self.eonium_refinery
-        total+= self.research_lab+self.finance_centre+military_centre
-        total+= self.security_centre+structure_defence
+        total+= self.research_lab+self.finance_centre+self.military_centre
+        total+= self.security_centre+self.structure_defence
         return total
         
     def __str__(self):
