@@ -207,7 +207,7 @@ session.close()
 print "Inserting ship stats"
 shipstats.main()
 
-if not noschema:
+if round and not noschema:
     import os, shutil, errno, glob
     if os.path.exists("dumps"):
         if round and round != "temp":
