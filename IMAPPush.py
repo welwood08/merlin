@@ -120,7 +120,7 @@ class Idler(threading.Thread):
     def robonotify(self, header, body):
         # Check for correct "From" address?
         if Config.getboolean("imap", "singleaddr"):
-            uname_re = "%s\+(.+)@.+" % Config.get("imap", "uname").split("@")[0]
+            uname_re = "%s\+(.+)@.+" % Config.get("imap", "user").split("@")[0]
         else:
             uname_re = "<?(.+)@.+"
         uname = re.findall(uname_re, header['To'])[0]
