@@ -378,7 +378,7 @@ class parse(Thread):
             fleetscan.landing_tick = int(arrivaltick)
             fleetscan.fleet_size = numships
 
-            owner=PlanetHistory.load(originx,originy,originz,newstick).current
+            owner = PlanetHistory.load_planet(originx,originy,originz,newstick,closest=Config.getboolean("Misc", "catchup"))
             if owner is None:
                 continue
             fleetscan.owner = owner
@@ -413,7 +413,7 @@ class parse(Thread):
             fleetscan.launch_tick = newstick
             fleetscan.landing_tick = arrivaltick
 
-            target=PlanetHistory.load(originx,originy,originz,newstick).current
+            target = PlanetHistory.load_planet(originx,originy,originz,newstick,closest=Config.getboolean("Misc", "catchup"))
             if target is None:
                 continue
             fleetscan.owner = scan.planet
@@ -448,7 +448,7 @@ class parse(Thread):
             fleetscan.launch_tick = newstick
             fleetscan.landing_tick = arrivaltick
 
-            target=PlanetHistory.load(originx,originy,originz,newstick).current
+            target = PlanetHistory.load_planet(originx,originy,originz,newstick,closest=Config.getboolean("Misc", "catchup"))
             if target is None:
                 continue
             fleetscan.owner = scan.planet
@@ -485,7 +485,7 @@ class parse(Thread):
             originy = m.group(4)
             originz = m.group(5)
 
-            covopper=PlanetHistory.load(originx,originy,originz,newstick).current
+            covopper = PlanetHistory.load_planet(originx,originy,originz,newstick,closest=Config.getboolean("Misc", "catchup"))
             if covopper is None:
                 continue
             fleetscan.covopper = covopper
