@@ -72,7 +72,10 @@ class Message(object):
         
         # Message
         try:
-            self._msg = " ".join(line.split()[3:])
+            if len(line.split(":")[1].split()) < 3:
+                self._msg = line[line.index(":",1)+1:]
+            else:
+                self._msg = " ".join(line.split()[3:])
             if self._msg and self._msg[0] == ":":
                 self._msg = self._msg[1:]
             if not self._msg:
