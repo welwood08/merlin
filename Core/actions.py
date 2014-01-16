@@ -62,8 +62,16 @@ class Action(Message):
                 p += 2
 
         # Split message and send
-        params = text.split(":")[0] + ":"
-        text = ":".join(text.split(":")[1:])
+        colon = text.find(":")
+        if colon != -1:
+            while text[colon-1] != " " and colon != -1:
+                colon = text.find(":",colon+1)
+            if colon != -1:
+                params = text[:colon+1]
+                text = text[colon+1:]
+        if colon == -1:
+            params = text
+            text = None
         if text:            
             if color:
                 params += "\x03"+Config.get("Connection", "color")
@@ -80,7 +88,7 @@ class Action(Message):
                     Connection.write(params + line[:i], p)
                     line = line[i+1:]
         else:
-            Connection.write(params[:-1], p)
+            Connection.write(params, p)
     
     def privmsg(self, text, target=None, priority=0):
         # Privmsg someone. Target defaults to the person who triggered this line
