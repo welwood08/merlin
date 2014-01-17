@@ -100,7 +100,7 @@ class Action(Message):
             color = False
         # If we're opped in a channel in common with the user, we can reply with
         #  CPRIVMSG instead of PRIVMSG which doesn't count towards the flood limit.
-        if target[0] not in "#&" and hasattr(self, "_channel") and CUT.opped(self.get_chan()) and CUT.nick_in_chan(target or self.get_nick(), self.get_chan()):
+        if (not target or target[0] not in "#&") and hasattr(self, "_channel") and CUT.opped(self.get_chan()) and CUT.nick_in_chan(target or self.get_nick(), self.get_chan()):
             self.write("CPRIVMSG %s %s :%s" % (target or self.get_nick(), self.get_chan(), text), color, priority)
         else:
             self.write("PRIVMSG %s :%s" % (target or self.get_nick(), text), color, priority)
