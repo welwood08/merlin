@@ -83,12 +83,12 @@ gallevel = Config.get("Access", "galmate")
 for chan, name in Config.items("Channels"):
     try:
         channel = Channel(name=name)
-        if chan != "public":
-            channel.userlevel = userlevel
-            channel.maxlevel = maxlevel
-        else:
+        if chan in ["public", "share"]:
             channel.userlevel = gallevel
             channel.maxlevel = gallevel
+        else:
+            channel.userlevel = userlevel
+            channel.maxlevel = maxlevel
         session.add(channel)
         session.flush()
     except IntegrityError:
