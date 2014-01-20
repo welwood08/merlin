@@ -41,5 +41,7 @@ class broadcast(loadable):
     
     @robohci
     def robocop(self, message, notice):
+        if notice[:3] == "!#!":
+            notice = " ".join(notice[3:].split("!#!"))
         for chan in session.query(Channel).filter(Channel.userlevel > (Config.get("Access",  "galmate") if "galmate" in Config.options("Access") else 0)).all():
             message.notice(notice, chan.name)
