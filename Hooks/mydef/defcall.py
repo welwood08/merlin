@@ -48,7 +48,7 @@ class defcall(loadable):
         notice = "DEFCALL: %s wants %s to %s:%s:%s eta %s" % (user.name, params.group(7), params.group(1), params.group(3), 
                                                               params.group(5), params.group(6))
         if Config.getboolean("Misc", "globaldef"):
-            push("broadcast", notice=notice)
+            push("broadcast", notice="!#!"+notice.replace(" ","!#!"))
         else:
             message.notice(notice, Config.get("Channels", "home"))
     
@@ -117,7 +117,7 @@ class defcall(loadable):
         # Send email - pref?
         if notice:
             if Config.getboolean("Misc", "globaldef"):
-                   push("broadcast", notice=notice)
+                   push("broadcast", notice="!#!"+notice.replace(" ","!#!"))
             else:
                 if etype == "new" and Config.has_option("Channels", "def"):
                     message.notice(notice, Config.get("Channels", "def"))
