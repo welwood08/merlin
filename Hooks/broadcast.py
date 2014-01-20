@@ -23,7 +23,6 @@
 
 from Core.db import session
 from Core.maps import Channel
-from Core.config import Config
 from Core.loadable import loadable, route, robohci
 
 class broadcast(loadable):
