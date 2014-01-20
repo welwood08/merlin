@@ -133,16 +133,13 @@ class Idler(threading.Thread):
                 self.forwardMail(uname, header, body)
                 return
 
-        # Get rid of line breaks
-        body = body.replace("\n","")
-
         # Check for the main notificatino types
         tick = re.findall("events in tick (\d+)", body)[0]
-        newfleets = re.findall("We have detected an open jumpgate from (.+), located at (\d{1,2}):(\d{1,2}):(\d{1,2}). " +\
-                               "The fleet will approach our system in tick (\d+) and appears to have (\d+) visible ships.", body)
-        recalls = re.findall("The (.+) fleet from (\d{1,2}):(\d{1,2}):(\d{1,2}) has been recalled.", body)
-        cons = len(re.findall("Our construction team reports that .+ has been finished", body))
-        res = len(re.findall("Our scientists report that .+ has been finished", body))
+        newfleets = re.findall("We have detected an open jumpgate from (.+), located at (\d{1,2}):(\d{1,2}):(\d{1,2}). ".replace(" ","\s+") +\
+                               "The fleet will approach our system in tick (\d+) and appears to have (\d+) visible ships.".replace(" ","\s+"), body)
+        recalls = re.findall("The (.+) fleet from (\d{1,2}):(\d{1,2}):(\d{1,2}) has been recalled.".replace(" ","\s+"), body)
+        cons = len(re.findall("Our construction team reports that .+ has been finished".replace(" ","\s+"), body))
+        res = len(re.findall("Our scientists report that .+ has been finished".replace(" ","\s+"), body))
 
         # Wrap it up in a bow
         for line in newfleets:
