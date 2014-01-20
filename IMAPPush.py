@@ -133,6 +133,10 @@ class Idler(threading.Thread):
                 self.forwardMail(uname, header, body)
                 return
 
+        # Get rid of line breaks
+        body = body.replace("\n","")
+
+        # Check for the main notificatino types
         tick = re.findall("events in tick (\d+)", body)[0]
         newfleets = re.findall("We have detected an open jumpgate from (.+), located at (\d{1,2}):(\d{1,2}):(\d{1,2}). " +\
                                "The fleet will approach our system in tick (\d+) and appears to have (\d+) visible ships.", body)
