@@ -182,7 +182,7 @@ print "Setting up default channels"
 for chan, name in Config.items("Channels"):
     try:
         channel = Channel(name=name)
-        if chan == "public":
+        if chan in ["public", "share"]:
             channel.userlevel = 2
             channel.maxlevel = 2
         else:
