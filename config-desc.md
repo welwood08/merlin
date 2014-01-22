@@ -88,7 +88,7 @@ These channels will be created when createdb.py is run and some have some specia
 + **home**: This is the default channel for most things.`!letmein` will only let users into this channel. It is also the fallback if the `scans` or `def` channels are not set.
 + **scans**: This channel will receive all scan requests.By default, users in this channel can cancel or update the number of distorters on any request.
 + **def**: By default, any defcalls parsed from email notifications will appear here first.
-+ **share**: The bot will send the URL of any scans it sees to this channel, for sharing. This feature is primarily for the public #Scans bot, but can be activated on any merlin. If you want to share scans with the #Scans bot, speak to mPulse or Pit.
++ **share**: The bot will expect to receive shared scans via this channel. This helps to prevent infinite sharing loops.
 
 ## [Misc]
 ### acl       : False
@@ -175,6 +175,8 @@ Scan requests will not be filled if they are older than this many ticks. This ca
 *1: Allow the request, but make the user repeat it first.*  
 *2: Just request it, even if one exists.*  
 This enables "clever" behaviour where the bot will ignore, ask for confirmation or allow multiple requests of the same type on the same planet in the same tick. The behaviour for JGP requests is handled separately because these are more likely to change during a tick.
+### shareto   : 
+The bot will send the URL of any scans it sees to this nick or channel, for sharing. This feature is primarily designed to allow scan pooling with the public #Scans bot. If you want to join the scan pool with the #Scans bot, speak to mPulse or Pit.
 ### tellmsg   : False
 *!tell uses NOTICE by default. Set to True to use PRIVMSG instead.*  
 Specify how to pass `!tell` messages to users.
