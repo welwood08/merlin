@@ -41,10 +41,12 @@ def catcher(message):
         if Config.has_option("Channels", "share"):
             sharechan = Config.get("Channels", "share")
             if message.get_chan().lower() != sharechan.lower():
-                message.privmsg(m.group(0), Config.get("Channels", "share"), priority=+3)
+                if Config.get("Scans", "shareto"):
+                    message.privmsg(m.group(0), Config.get("Scans","shareto"), priority=+3)
     for m in scangrpre.finditer(message.get_msg()):
         parse(uid, "group", m.group(1)).start()
         if Config.has_option("Channels", "share"):
             sharechan = Config.get("Channels", "share")
             if message.get_chan().lower() != sharechan.lower():
-                message.privmsg(m.group(0), Config.get("Channels", "share"), priority=+3)
+                if Config.get("Scans", "shareto"):
+                    message.privmsg(m.group(0), Config.get("Scans","shareto"), priority=+3)
