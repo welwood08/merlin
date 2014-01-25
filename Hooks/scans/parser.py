@@ -488,8 +488,8 @@ class parse(Thread):
             covopper = PlanetHistory.load_planet(originx,originy,originz,newstick,closest=Config.getboolean("Misc", "catchup"))
             if covopper is None:
                 continue
-            fleetscan.covopper = covopper
-            fleetscan.target = scan.planet
+            covop.covopper = covopper
+            covop.target = scan.planet
 
             try:
                 scan.covops.append(covop)
