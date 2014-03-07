@@ -28,6 +28,7 @@ from sqlalchemy import *
 from sqlalchemy.ext.associationproxy import association_proxy
 from sqlalchemy.orm import validates, relation, backref, dynamic_loader, aliased
 from sqlalchemy.sql.functions import coalesce, count, current_timestamp, random
+from sqlalchemy.types import BIGINT
 
 from Core.exceptions_ import LoadableError
 from Core.config import Config
@@ -871,10 +872,10 @@ class Alliance(Base):
     alias = Column(String(255))
     size = Column(Integer)
     members = Column(Integer)
-    score = Column(Integer)
+    score = Column(BIGINT)
     points = Column(Integer)
-    score_total = Column(Integer)
-    value_total = Column(Integer)
+    score_total = Column(BIGINT)
+    value_total = Column(BIGINT)
     ratio = Column(Float)
     size_rank = Column(Integer)
     members_rank = Column(Integer)
@@ -1025,10 +1026,10 @@ class AllianceHistory(Base):
     alias = Column(String(255))
     size = Column(Integer)
     members = Column(Integer)
-    score = Column(Integer)
+    score = Column(BIGINT)
     points = Column(Integer)
-    score_total = Column(Integer)
-    value_total = Column(Integer)
+    score_total = Column(BIGINT)
+    value_total = Column(BIGINT)
     ratio = Column(Float)
     size_rank = Column(Integer)
     members_rank = Column(Integer)
@@ -1149,11 +1150,11 @@ alliance_temp = Table('alliance_temp', Base.metadata,
     Column('name', String(255), primary_key=True),
     Column('size', Integer),
     Column('members', Integer),
-    Column('score', Integer),
+    Column('score', BIGINT),
     Column('points', Integer),
     Column('score_rank', Integer),
-    Column('score_total', Integer),
-    Column('value_total', Integer),
+    Column('score_total', BIGINT),
+    Column('value_total', BIGINT),
     Column('size_avg', Integer),
     Column('score_avg', Integer),
     Column('points_avg', Integer))
