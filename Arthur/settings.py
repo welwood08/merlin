@@ -37,6 +37,6 @@ ALLOWED_HOSTS = (
     hostre.match(Config.get("URL", "arthur")).group(1),
 )
 # Get all alturls
-for url in Config.items("alturls"):
-    ALLOWED_HOSTS += ( hostre.match(url[1]).group(1), )
+for url in Config.items("arthururls"):
+    ALLOWED_HOSTS += ( url[1] )
 
