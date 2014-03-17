@@ -38,5 +38,5 @@ ALLOWED_HOSTS = (
 )
 # Get all alturls
 for url in Config.items("arthururls"):
-    ALLOWED_HOSTS += ( url[1] )
+    ALLOWED_HOSTS += ( url[1], )
 
