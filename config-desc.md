@@ -280,8 +280,20 @@ Galaxy Scan page.
 PA Battle Calc.
 
 ## [alturls]
-### ip        : http://146.185.135.215
+
+    ip : http://146.185.135.215
+    # game : http://game.planetarion.com
+    # r56 : http://r56.planetarion.com
+    # tof : http://twistoffate.planetarion.com
+    # ranul : http://pa.ranultech.co.uk
+    # ranulgame : http://game.ranultech.co.uk
+    # p45 : http://p45.planetarion.com
+
 IP for accessing Planetarion if you're having DNS issues.
+
+##[arthururls]
+*Section for any URLs arthur may run from, to keep Django happy. No "http", no "/", no port numbers.*
+###local : 127.0.0.1
 
 ## [clickatell]
 
