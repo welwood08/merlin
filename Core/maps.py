@@ -1807,6 +1807,7 @@ class PlanetScan(Base):
     factory_usage_medium = Column(String(255))
     factory_usage_heavy = Column(String(255))
     prod_res = Column(Integer)
+    sold_res = Column(Integer)
     agents = Column(Integer)
     guards = Column(Integer)
     
@@ -1817,7 +1818,7 @@ class PlanetScan(Base):
     def __str__(self):
         reply = " Roids: (m:%s, c:%s, e:%s) |" % (self.roid_metal,self.roid_crystal,self.roid_eonium,)
         reply+= " Resources: (m:%s, c:%s, e:%s) |" % (self.res_metal,self.res_crystal,self.res_eonium,)
-        reply+= " Hidden: %s | Agents: %s | Guards: %s" % (self.prod_res,self.agents,self.guards,)
+        reply+= " Prod: %s | Selling: %s | Agents: %s | Guards: %s" % (self.prod_res,self.sold_res,self.agents,self.guards,)
         return reply
 Scan.planetscan = relation(PlanetScan, uselist=False, backref="scan")
 

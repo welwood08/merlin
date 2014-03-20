@@ -219,9 +219,10 @@ class parse(Thread):
         planetscan.factory_usage_heavy=m.group(3)
 
         #atm the only span tag is the one around the hidden res.
-        m=re.search(r"""<span[^>]*>(\d+)</span>""",page,re.VERBOSE)
+        m=re.findall(r"""<span[^>]*>(\d+)</span>""",page,re.VERBOSE)
 
-        planetscan.prod_res=m.group(1)
+        planetscan.prod_res=m[0]
+        planetscan.sold_res=m[1]
 
         session.commit()
 
