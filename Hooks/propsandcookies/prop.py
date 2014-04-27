@@ -22,6 +22,7 @@
 import datetime
 from sqlalchemy.sql import asc, desc, literal, union
 from sqlalchemy.sql.functions import current_timestamp, sum
+from sqlalchemy import func
 from Core.config import Config
 from Core.db import session
 from Core.maps import Alliance, User, Invite, Kick, Vote, Suggestion
@@ -169,7 +170,7 @@ class prop(loadable):
             message.reply("Filthy orphans should be castrated.")
             return
         
-        prop = Invite(proposer=user, person=person, comment_text=params.group(2))
+        prop = Invite(id=self.new_prop_id(), proposer=user, person=person, comment_text=params.group(2))
         session.add(prop)
         session.commit()
         
@@ -196,7 +197,7 @@ class prop(loadable):
             message.reply("Unfortunately I like %s more than you. So none of that."%(u.name,))
             return
         
-        prop = Kick(proposer=user, kicked=u, comment_text=params.group(2))
+        prop = Kick(id=self.new_prop_id(), proposer=user, kicked=u, comment_text=params.group(2))
         session.add(prop)
         session.commit()
         
@@ -312,7 +313,7 @@ class prop(loadable):
     @channel("home")
     @require_user
     def suggest(self,message,user,params):
-        prop = Suggestion(proposer=user, comment_text=params.group(1))
+        prop = Suggestion(id=self.new_prop_id(), proposer=user, comment_text=params.group(1))
         session.add(prop)
         session.commit()
         
@@ -424,3 +425,6 @@ class prop(loadable):
         Q = session.query(props.c.id, props.c.person, props.c.vote_result, props.c.type)
         Q = Q.filter(props.c.person.ilike("%"+search+"%")).order_by(desc(props.c.id))
         return Q.all()
+
+    def new_prop_id(self):
+        return max(session.query(func.max(Invite.id)).one()[0], session.query(func.max(Kick.id)).one()[0], session.query(func.max(Suggestion.id)).one()[0]) + 1
