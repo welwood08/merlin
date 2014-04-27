@@ -46,22 +46,13 @@ class Message(object):
     
     def parse(self, line):
         # Parse the irc line
+        r = parse_raw_irc(line)
         self.line = line
-        self._nick = line.split("!")[0][1:]
-        self._hostmask = line.split()[0][1:]
-        self._command = line.split()[1]
-        self._channel = ""
-        
-        # Channel
-        try:
-            chan = ":"+line.split(":")[1] # The ":" is added after the split etc, just to make the .find()s return the right result
-            hash = max(chan.find("#"),0) or len(line)
-            amp = max(chan.find("&"),0) or len(line)
-            if not hash == amp: # There's no # or &, ie both lines returned len(line)
-                self._channel = line[min(hash,amp):].split()[0]
-            else: # This should almost certainly give the bot's nick
-                self._channel = line.split()[2]
-        except IndexError:
+        self._nick = r['source']['name']
+        self._hostmask = r['source']['full']
+        self._command = r['msg']
+        self._channel = r['params'][0]
+        if not self._channel:
             self._chanerror = True
         
         # Encoding
@@ -71,17 +62,9 @@ class Message(object):
         self._channel = encode(self._channel)
         
         # Message
-        try:
-            if len(line.split(":")[1].split()) < 3:
-                self._msg = line[line.index(":",1)+1:]
-            else:
-                self._msg = " ".join(line.split()[3:])
-            if self._msg and self._msg[0] == ":":
-                self._msg = self._msg[1:]
-            if (not self._msg or self._msg.strip() == "") and self._command != "PRIVMSG":
-                # CUT needed this, but merlin gets *very* upset on an empty PRIVMSG.
-                self._msgerror = True
-        except ValueError:
+        self._msg = r['params'][-1]
+        if (not self._msg or self._msg.strip() == "") and self._command != "PRIVMSG":
+            # CUT needed this, but merlin gets *very* upset on an empty PRIVMSG.
             self._msgerror = True
     
     def __str__(self):
@@ -151,3 +134,48 @@ class Message(object):
         
         if p in PUBLIC_PREFIX+PRIVATE_PREFIX and not self.in_chan():
             return PRIVATE_REPLY
+
+# Parser from jobe1986 (http://pastebin.mdbnet.net/180)
+def parse_raw_irc(line):
+    ret = {'source': {'full': "", 'name': "", 'ident': "", 'host': ""}, 'msg': "", 'params': []}
+
+    stat = 0
+
+    words = line.split(' ')
+
+    for word in words:
+        if ((stat < 3) and (len(word) == 0)):
+            continue
+
+        if (stat == 0):
+            stat += 1
+            if (word[0] == ":"):
+                 ret['source']['full'] = word[1:]
+            else:
+                ret['msg'] = word
+                stat += 1
+        elif (stat == 1):
+            ret['msg'] = word
+            stat += 1
+        elif (stat == 2):
+            if (word[0] == ":"):
+                ret['params'].append(word[1:])
+                stat += 1
+            else:
+                ret['params'].append(word)
+        else:
+            ret['params'][-1] = ret['params'][-1] + " " + word
+    #end for
+
+    if (len(ret['source']['full']) > 0):
+        src = ret['source']['full']
+        if (src.find("@") >= 0):
+            ret['source']['host'] = src[src.find("@")+1:]
+            src = src[:src.find("@")]
+        if (src.find("!") >= 0):
+            ret['source']['ident'] = src[src.find("!")+1:]
+            src = src[:src.find("!")]
+        ret['source']['name'] = src
+    #end if
+
+    return ret
