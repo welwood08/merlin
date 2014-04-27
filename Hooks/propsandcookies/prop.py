@@ -151,7 +151,7 @@ class prop(loadable):
         if person.lower() == Config.get("Connection","nick").lower():
             message.reply("I am already here, shitface.")
             return
-        u = User.load(name=person, group_id=3)
+        u = User.load(name=person, access=1)
         if u is not None:
             message.reply("Stupid %s, that wanker %s is already a member."%(user.name,person))
             return
@@ -185,7 +185,7 @@ class prop(loadable):
         if person.lower() == Config.get("Connection","nick").lower():
             message.reply("I'll peck your eyes out, cunt.")
             return
-        u = User.load(name=person, group_id=3)
+        u = User.load(name=person, access=1)
         if u is None:
             message.reply("Stupid %s, you can't kick %s, they're not a member."%(user.name,person))
             return
