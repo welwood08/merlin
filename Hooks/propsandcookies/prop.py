@@ -425,4 +425,4 @@ class prop(loadable):
         return Q.all()
 
     def new_prop_id(self):
-        return max(session.query(func.max(Invite.id)).one()[0], session.query(func.max(Kick.id)).one()[0], session.query(func.max(Suggestion.id)).one()[0]) + 1
+        return (max(session.query(func.max(Invite.id)).one()[0], session.query(func.max(Kick.id)).one()[0], session.query(func.max(Suggestion.id)).one()[0]) or 0) + 1
