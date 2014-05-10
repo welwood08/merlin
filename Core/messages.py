@@ -51,7 +51,7 @@ class Message(object):
         self._nick = r['source']['name']
         self._hostmask = r['source']['full']
         self._command = r['msg']
-        self._channel = r['params'][0]
+        self._channel = r['params'][2] if r['msg'] == "353" else r['params'][0]
         if not self._channel:
             self._chanerror = True
         
