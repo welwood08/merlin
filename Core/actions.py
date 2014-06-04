@@ -34,13 +34,14 @@ class Action(Message):
         # Write something to the server, the message will be split up by newlines and at 450chars max
 
         # Set Priority
-        l = len(text)
         p = 5 + priority
-        if l < 100:
-            p -= 1
-        elif l > 150:
-            p += min(l,400) // 100 + l // 450
-        ##
+        if Config.getint("Connection", "antiflood") > 0:
+            l = len(text)
+            if l < 100:
+                p -= 1
+            elif l > 150:
+                p += min(l,400) // 100 + l // 450
+
         n = False
         try:
             n = self.get_pnick()
