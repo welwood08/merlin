@@ -18,31 +18,17 @@
 # You should have received a copy of the GNU General Public License
 # along with this program; if not, write to the Free Software
 # Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA 02110-1301 USA
+
+# Module by Martin Stone
  
-# List of package modules
-__all__ = ["system",
-           "chanusertracker",
-           "auth",
-           "commandlog",
-           "help",
-           "user",
-           "propsandcookies",
-           "sms",
-           "fuckthatnameusethis",
-           "lookup",
-           "details",
-           "intel",
-           "growth",
-           "newb",
-           "target",
-           "mydef",
-           "victim",
-           "calcs",
-           "scans",
-           "ships",
-           "quotes",
-           "links",
-           "galstatus",
-           "broadcast",
-           "ctcp",
-           ]
+from Core.loadable import system
+
+@system('PRIVMSG', robocop=True)
+def ping(message):
+    """Respond to CTCP PINGs (from admins)"""
+    m = message.get_msg()
+    if m[:5] == '\001PING':
+        from Core.config import Config
+        if message.get_pnick() in Config.options("Admins"):
+            import time
+            message.write("NOTICE %s :\001PING %s\001" % (message.get_nick(), " ".join(repr(time.time()).split("."))))
