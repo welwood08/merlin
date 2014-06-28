@@ -24,10 +24,19 @@
 from Core.loadable import system
 
 @system('PRIVMSG', robocop=True)
-def ping(message):
-    """Respond to CTCP PINGs (from admins)"""
+def ctcp(message):
+    """Respond to CTCP queries (from admins)"""
     m = message.get_msg()
-    if m[:5] == '\001PING':
+    if m[0] == '\001':
         from Core.config import Config
         if message.get_pnick() in Config.options("Admins"):
-            message.write("NOTICE %s :\001PING %s\001" % (message.get_nick(), m[6:]))
+            if m[1:5] == 'PING':
+                message.write("NOTICE %s :\001PING %s\001" % (message.get_nick(), m[6:]))
+            elif m[1:8] == 'VERSION':
+                import subprocess
+                try:
+                    version = subprocess.check_output(["git", "describe", "HEAD"]).strip()
+                    version += "/" + "/".join(subprocess.check_output(["git", "describe", "origin/acl", "origin/master"]).split())
+                except:
+                    pass
+                message.write("NOTICE %s :\001PING %s\001" % (message.get_nick(), "Merlin (%s)" % version))
