@@ -168,6 +168,12 @@ Once you're done, it should look like this
     #        autoindex on;
     #    }
 
+    #    Uncomment this section to point arthur.your-domain.com/forum/ at a FluxBB installation at /var/www/fluxbb/
+    #    location /forum/ {
+    #        alias /var/www/fluxbb/;
+    #        index index.php;
+    #    }
+
         location /favicon.ico {
             alias /home/merlin/Arthur/static/favicon.ico;
             expires 30d;
