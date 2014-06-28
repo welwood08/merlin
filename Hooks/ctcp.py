@@ -30,5 +30,4 @@ def ping(message):
     if m[:5] == '\001PING':
         from Core.config import Config
         if message.get_pnick() in Config.options("Admins"):
-            import time
-            message.write("NOTICE %s :\001PING %s\001" % (message.get_nick(), " ".join(repr(time.time()).split("."))))
+            message.write("NOTICE %s :\001PING %s\001" % (message.get_nick(), m[6:]))
