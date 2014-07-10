@@ -1966,7 +1966,8 @@ class DevScan(Base):
         reply+= "Structures: LFac: %s, MFac: %s, HFac: %s, Amp: %s," % (self.light_factory,self.medium_factory,self.heavy_factory,self.wave_amplifier,)
         reply+= " Dist: %s, MRef: %s, CRef: %s, ERef: %s," % (self.wave_distorter,self.metal_refinery,self.crystal_refinery,self.eonium_refinery,)
         reply+= " ResLab: %s (%s%%), FC: %s, Mil: %s," % (self.research_lab,int(float(self.research_lab)/self.total*100),self.finance_centre,self.military_centre,)
-        reply+= " Sec: %s (%s%%), SDef: %s" % (self.security_centre,int(float(self.security_centre)/self.total*100),self.structure_defence,)
+        reply+= " Sec: %s (%s%%)," % (self.security_centre,int(float(self.security_centre)/self.total*100),)
+        reply+= " SDef: %s (%s%%)" % (self.structure_defence,int(float(self.structure_defence)/self.total*100),)
         return reply
 Scan.devscan = relation(DevScan, uselist=False, backref="scan")
 
