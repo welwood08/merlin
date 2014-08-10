@@ -142,7 +142,6 @@ if round and not mysql:
         session.execute(text("SELECT setval('%susers_id_seq',(SELECT max(id) FROM %susers));" % (prefix, prefix)))
         session.execute(text("SELECT setval('%sgroups_id_seq',(SELECT max(id) FROM %sgroups));" % (prefix, prefix)))
         session.execute(text("SELECT setval('%saccess_id_seq',(SELECT max(id) FROM %saccess));" % (prefix, prefix)))
-        session.execute(text("SELECT setval('%sgrants_id_seq',(SELECT max(id) FROM %sgrants));" % (prefix, prefix)))
         session.execute(text("INSERT INTO %sphonefriends (user_id, friend_id) SELECT user_id, friend_id FROM %s.%sphonefriends;" % (prefix, round, old_prefix)))
         print "  - slogans/quotes"
         session.execute(text("INSERT INTO %sslogans (text) SELECT text FROM %s.%sslogans;" % (prefix, round, old_prefix)))
