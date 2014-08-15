@@ -39,4 +39,4 @@ def ctcp(message):
                     version += "/" + "/".join(subprocess.check_output(["git", "describe", "origin/acl", "origin/master"]).split())
                 except:
                     pass
-                message.write("NOTICE %s :\001PING %s\001" % (message.get_nick(), "Merlin (%s)" % version))
+                message.write("NOTICE %s :\001VERSION %s\001" % (message.get_nick(), "Merlin (%s)" % version))
