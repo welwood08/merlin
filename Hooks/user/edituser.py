@@ -89,8 +89,8 @@ class edituser(loadable):
             if not member.active:
                 CUT.untrack_user(member.name)
         session.commit()
-        message.privmsg("adduser %s %s 24" %(home, ",".join(addnicks),), Config.get("Services", "nick"))
         if addnicks:
+            message.privmsg("adduser %s %s 24" %(home, ",".join(addnicks),), Config.get("Services", "nick"))
             message.reply("%s ha%s been added to %s"%(", ".join(addnicks), "ve" if len(addnicks) > 1 else "s", home,))
         if remnicks:
             message.reply("%s ha%s been removed from %s"%(", ".join(remnicks), "ve" if len(remnicks) > 1 else "s", home,))
