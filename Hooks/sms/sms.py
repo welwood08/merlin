@@ -98,6 +98,7 @@ class sms(loadable):
             wa.login(Config.get("WhatsApp", "login"), Config.get("WhatsApp", "password").decode("string_escape"))
             if wa.gotReceipt:
                 error = None
+                self.log_message(user, receiver, phone, public_text, "whatsapp")
             else:
                 error = "No receipt received from the WhatsApp server."
         elif mode == "twilio":
@@ -105,6 +106,7 @@ class sms(loadable):
             tw = client.sms.messages.create(body=text, to=phone, from_=Config.get("Twilio", "number"))
             if tw.sid:
                 error = None
+                self.log_message(user, receiver, phone, public_text, "twilio")
             else:
                 error = "Failed to get message ID from Twilio server."
         else:
