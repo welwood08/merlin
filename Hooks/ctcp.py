@@ -22,6 +22,7 @@
 # Module by Martin Stone
  
 from Core.loadable import system
+from Core.exceptions_ import PNickParseError
 
 @system('PRIVMSG', robocop=True)
 def ctcp(message):
@@ -29,14 +30,17 @@ def ctcp(message):
     m = message.get_msg()
     if m[0] == '\001':
         from Core.config import Config
-        if message.get_pnick() in Config.options("Admins"):
-            if m[1:5] == 'PING':
-                message.write("NOTICE %s :\001PING %s\001" % (message.get_nick(), m[6:]))
-            elif m[1:8] == 'VERSION':
-                import subprocess
-                try:
-                    version = subprocess.check_output(["git", "describe", "HEAD"]).strip()
-                    version += "/" + "/".join(subprocess.check_output(["git", "describe", "origin/acl", "origin/master"]).split())
-                except:
-                    pass
-                message.write("NOTICE %s :\001VERSION %s\001" % (message.get_nick(), "Merlin (%s)" % version))
+        try:
+            if message.get_pnick() in Config.options("Admins"):
+                if m[1:5] == 'PING':
+                    message.write("NOTICE %s :\001PING %s\001" % (message.get_nick(), m[6:]))
+                elif m[1:8] == 'VERSION':
+                    import subprocess
+                    try:
+                        version = subprocess.check_output(["git", "describe", "HEAD"]).strip()
+                        version += "/" + "/".join(subprocess.check_output(["git", "describe", "origin/acl", "origin/master"]).split())
+                    except:
+                        pass
+                    message.write("NOTICE %s :\001VERSION %s\001" % (message.get_nick(), "Merlin (%s)" % version))
+        except PNickParseError:
+            pass
