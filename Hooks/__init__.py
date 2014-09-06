@@ -45,4 +45,5 @@ __all__ = ["system",
            "galstatus",
            "broadcast",
            "ctcp",
+           "rollback",
            ]
