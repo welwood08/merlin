@@ -124,6 +124,10 @@ tr.attack {
 	background-color: #895959;
 }
 
+tr.return {
+	background-color: #898989;
+}
+
 tr.unknown {
 	background-color: #898959;
 }
