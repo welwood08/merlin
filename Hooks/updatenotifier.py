@@ -52,7 +52,7 @@ def updatenotifier(message):
                         levels = Config.get("Updates", "notify-level").split()
                         if params[2] in levels or ("all" in levels and params[2] != "forks"):
                             nu = Config.get("Updates", "notify-users").split()
-                            message.privmsg("UPDATE (%s): New %s in %s: %s" % (message.get_pnick(), params[2], "/".join(params[:1]), params[3]), 
+                            message.privmsg("UPDATE (%s): %s in %s: %s" % (message.get_pnick(), params[2], "/".join(params[:1]), params[3]), 
                                             ",".join(nu) if nu else Config.options("Admins")[0], priority=+5)
         except (ChanParseError, PNickParseError):
             pass
