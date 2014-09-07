@@ -147,6 +147,9 @@ This will send an email to the address below for each line of a selected file lo
 *Email address for maillogs. separate multiple addresses with a space.*  
 *Make sure that the smtp settings below are correct. If using the localhost mailer, it may be possible to use usernames in place of full email addresses.*  
 If `maillogs` is enabled above, the emails will be sent to this address.
+### catchup   : True
+*Whether to allow "catch-up" from the altdumps botfiles archive specified below.*
+This will avoid missed ticks by collecting them from an archive on another server.
 ### autoreg   : False
 If True, users are automatically added as galmates.
 ### usercache : join
@@ -192,6 +195,29 @@ Attacks are considered active and shown on the website this many ticks before th
 ### tellmsg   : False
 *!tell uses NOTICE by default. Set to True to use PRIVMSG instead.*  
 Specify how to pass `!tell` messages to users.
+
+## [Updates]
+### notify-users:
+*Users to be notified of new updates. Space-separated pnicks. Should be a subset of [Admins].*
+*Empty will use the first user in the [Admins] section. Remove "updatenotifier" from Hooks/\__init__.py to disable.*
+### notify-repo: d7415
+*Filter updates by repo author name. Space separated.*
+### notify-allow: Pit
+*Allow updates from these pnicks. Space separated.*
+### notify-channel: #merlin-updates
+*Join this channel to receive updates. If you are forking merlin and would like voice, contact Pit.*
+### notify-branch: acl-stable
+*Filter notifications by branch, e.g. acl, acl-stable, master, legacy-stable. Also allows these keywords: all, stable. Space separated list.*
+*Non-stable branches may require DB structure updates and should only be applied by advanced users, but there is no harm in being notified of them.*
+### notify-level: bugfix major forks
+*Filter notifications by level. Space separated list. Options are:*
+
++ *major:   Patches required for the bot to function correctly, or at all.*
++ *bugfix:  Patches fixing bugs in the code.*
++ *minor:   Minor changes, e.g. formatting, typos, documentation changes.*
++ *feature: New features. *
++ *all:     Any of the above levels*
++ *forks:   New merlin forks when they are first added to the update channel*
 
 ## [DB]
 
@@ -282,18 +308,36 @@ IP for accessing Planetarion if you're having DNS issues.
 
 ## [clickatell]
 
-    user      : username
-    pass      : password
+    user      : 
+    pass      : 
     api       : api_key
 
 Clickatell configuration.
 
 ## [googlevoice]
-    user      : username
-    pass      : password
+    user      : 
+    pass      : 
     api       : api_key
 
 Google Voice configuration.
+
+## [Twilio]
+    sid       :
+    auth_token:
+    number    :
+    timeout   : 10
+    warn      : True
+    # timeout is in seconds to wait for an answer.
+    # If warn is True, anyone answering will be told that it's the bot and to stop wasting credit.
+
+Twilio configuratoin
+
+## [WhatsApp]
+
+    login     : 
+    password  : 
+
+WhatsApp configuration. See [README.md](https://github.com/d7415/merlin#whatsapp-support).
 
 ## [smtp]
 ### user      : 
@@ -327,13 +371,6 @@ This is used to differentiate PA notifications from other email.
 ### singleaddr: False
 *Allows using a normal gmail account or similar, using address+pnick@gmail.com. In this mode, a blank defsuffix is recommended.*  
 This changes the parser to look for username+pnick@domain rather than pnick-suffix@domain. More details in [README.md](https://github.com/d7415/merlin#imap-support).
-
-## [WhatsApp]
-
-    login     : 
-    password  : 
-
-WhatsApp configuration. See [README.md](https://github.com/d7415/merlin#whatsapp-support).
 
 ## [FluxBB]
 ### enabled   : False
