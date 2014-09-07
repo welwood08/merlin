@@ -204,7 +204,7 @@ Specify how to pass `!tell` messages to users.
 + *major:   Patches required for the bot to function correctly, or at all.*
 + *bugfix:  Patches fixing bugs in the code.*
 + *minor:   Minor changes, e.g. formatting, typos, documentation changes.*
-+ *feature: New features. *
++ *feature: New features.*
 + *all:     Any of the above levels*
 + *forks:   New merlin forks when they are first added to the update channel*
 
