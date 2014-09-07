@@ -77,6 +77,7 @@ def loggedin(message):
         nick = Config.get("Connection", "nick")
         if Merlin.nick != nick:
             message.nick(nick)
+        message.join(Config.get("Updates", "notify-channel"))
         return # This is now deprecated in favour of
                #  setting autoinvite when adding the chan
         for channel in session.query(Channel):
