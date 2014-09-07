@@ -65,6 +65,7 @@ Note that anyone added here will have the following privileges:
 + can invite the bot to any channel it knows about
 + can use the `!adduser` command and some others before being added to the bot themselves
 + has access to some extra commands unavailable to "normal" admins
++ will receive responses to CTCP PING and VERSION queries
 
 ## [Alliance]
 ### name      : Alliance
