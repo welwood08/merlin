@@ -37,8 +37,9 @@
             <td class="right"> {{ planet.score|intcomma }} </td>
             <td class="center">
                 {% for scan in scans %}
-                    <a href="#{{ scan.pa_id }}"
-                    onclick="return linkshift(event, '{{ scan.link|url }}');">{{ scan.scantype }}</a>
+                    {% set scanage = update.id - scan.tick %}
+                    <a href="#{{ scan.pa_id }}" onclick="return linkshift(event, '{{ scan.link|url }}');" class="scan_age_{% 
+                        if scanage > 12 %}ancient{% elif scanage > 5 %}older{% elif scanage > 0 %}old{% else %}new{% endif %}">{{ scan.scantype }}</a>
                 {% endfor %}
             </td>
                 {% for lt, target in bookings %}
