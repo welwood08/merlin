@@ -55,6 +55,7 @@ a.gray:hover {
 	color: #cccccc;
 }
 
+
 input {
 	font-family: Lucida Sans Unicode, Lucida Grande, sans-serif;
 	font-size: x-small;
@@ -310,3 +311,9 @@ tr.nolongerexists {
 	border-style: solid;
 	border-width: 7px 7px 7px 0px;
 } 
+
+/* Scans (from PA CSS) */
+.scan_age_new { color: #00FF00; }
+.scan_age_old { color: #FFFF00; }
+.scan_age_older { color: #FFA500; }
+.scan_age_ancient { color: #FF0000; }
