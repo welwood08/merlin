@@ -145,7 +145,7 @@ Configuration for various smsmodes is later in the file. For the most part, this
 *"cached", "enabled", or "disabled"*  
 This controls graphing in Arthur.
 ### defage    : 24
-*mydef can be this oldbefore the bot starts pestering people.*  
+*mydef can be this old before the bot starts pestering people. Set to 0 to disable.*  
 If a user's mydef is older than this number of ticks, every time they join a channel with the bot in it will send them a notice telling them to update it.
 ### globaldef : False
 *defcalls are sent to *all* channels, not just home or def.*  
