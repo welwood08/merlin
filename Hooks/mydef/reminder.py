@@ -31,13 +31,15 @@ from Core.maps import User, Updates
 def join(message):
     # Someone is joining a channel
     if message.get_nick() != Merlin.nick:
-        # Someone is joining a channel we're in
-        try:
-            u = User.load(name=message.get_pnick())
-            if u is None:
+        # That someone is not the bot
+        if Config.getint("Misc", "defage") > 0:
+            # mydef reminders are enabled
+            try:
+                u = User.load(name=message.get_pnick())
+                if u is None:
+                    return
+                defage = Updates.current_tick() - (u.fleetupdated or 0)
+                if defage > Config.getint("Misc", "defage"):
+                    message.notice("Your mydef is %d ticks old. Update it now!" % (defage), message.get_nick())
+            except PNickParseError:
                 return
-            defage = Updates.current_tick() - (u.fleetupdated or 0)
-            if defage > Config.getint("Misc", "defage"):
-                message.notice("Your mydef is %d ticks old. Update it now!" % (defage), message.get_nick())
-        except PNickParseError:
-            return

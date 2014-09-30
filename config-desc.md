@@ -172,7 +172,7 @@ If True, `!remuser` will ban users from channels when removing them from the ser
 *Bot will remove itself from P's access list for a channel when !remchan is used.*  
 If True, the bot will remove its own channel access when `!remchan` is used.
 ### defage    : 24
-*mydef can be this oldbefore the bot starts pestering people.*  
+*mydef can be this old before the bot starts pestering people. Set to 0 to disable.*  
 If a user's mydef is older than this number of ticks, every time they join a channel with the bot in it will send them a notice telling them to update it.
 ### globaldef : False
 *defcalls are sent to *all* channels, not just home or def.*  
