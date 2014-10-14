@@ -90,10 +90,11 @@ class covop(loadable):
                      agents/20, self.xpcalc(agents,7), min(max_res, pscan.res_metal/10), min(max_res, pscan.res_crystal/10), min(max_res, pscan.res_eonium/10),
                      self.xpcalc(agents,8), agents/5, self.xpcalc(agents,9)))
 
+            # If stealth is supplied, calculate the probability of success.
             if params.group(7):
                 stealth = int(params.group(7))
                 stealth = stealth - 5 - int(agents/2)
-                t=19-alert_min
+                t=8-alert_min
                 prob = 100*(t+stealth)/(t+alert_max)
                 if prob < 0:
                     prob = 0
@@ -110,7 +111,7 @@ class covop(loadable):
 
 # new_stealth = (old stealth - 5 - int(No_of_agents*0.5) )
 # Note: "int()" means "take the integer part of", e.g. int(5.x) = 5
-# (1-20)* + new_stealth - target_alertness must be higher than 1 for the operation to succeed.
+# (1-9)* + new_stealth - target_alertness must be higher than 1 for the operation to succeed.
 # *chosen randomly
 
     def xpcalc(self, agents, num):
