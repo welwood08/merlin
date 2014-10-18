@@ -29,7 +29,7 @@ from Core.loadable import loadable, route, require_user
 
 class forcepref(loadable):
     """Set a user's planet, password for the webby, URL preference and phone number and settings; order doesn't matter"""
-    usage = " <user> [planet=x.y.z] [password=pass] [url=ip] [phone=999] [pubphone=T|F] [smsmode=clickatell|google|both]"
+    usage = " <user> [planet=x.y.z] [password=pass] [url=ip] [phone=999] [pubphone=T|F] [smsmode=clickatell|google|both|twilio|whatsapp|email] [email=user@example.com]"
     planet_coordre = re.compile(loadable.planet_coord)
     
     @route(r"(\S+)", access="admin")
