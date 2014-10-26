@@ -80,14 +80,14 @@ class Action(Message):
                 while line:
                     i = len(line)
                     while i > (450 - len(params)):
-                        i = line.rfind(" ", 0, i)
+                        i = max(line.rfind(" ", 0, i), line.rfind(",", 0, i))
                         if i == -1:
                             while len(params + line) > 450:
                                 Connection.write((params + line)[:450])
                                 line = line[450 - len(params):]
                             i = len(line)
                             continue
-                    Connection.write(params + line[:i], p)
+                    Connection.write(params + line[:i+1], p)
                     line = line[i+1:]
         else:
             Connection.write(params, p)
