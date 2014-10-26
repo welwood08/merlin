@@ -77,14 +77,15 @@ class Action(Message):
             if color:
                 params += "\x03"+Config.get("Connection", "color")
             for line in text.split("\n"):
-                line
                 while line:
                     i = len(line)
-                    while len(line[:i]) > (450 - len(params)):
+                    while i > (450 - len(params)):
                         i = line.rfind(" ", 0, i)
                         if i == -1:
-                            Connection.write((params + line)[:450])
-                            line = line[450 - len(params):]
+                            while len(params + line) > 450:
+                                Connection.write((params + line)[:450])
+                                line = line[450 - len(params):]
+                            i = len(line)
                             continue
                     Connection.write(params + line[:i], p)
                     line = line[i+1:]
