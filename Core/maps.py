@@ -1732,7 +1732,7 @@ class Request(Base):
     @property
     def type(self):
         return PA.get(self.scantype,"name")
-Request.user = relation(User, backref=backref("requests", cascade="delete"))
+Request.user = relation(User, backref="requests")
 Request.target = relation(Planet)
 Request.scan = relation(Scan)
 
