@@ -1442,7 +1442,7 @@ class Target(Base):
     user_id = Column(Integer, ForeignKey(User.id, ondelete='cascade'), index=True)
     planet_id = Column(Integer, ForeignKey(Planet.id, ondelete='cascade'), index=True)
     tick = Column(Integer)
-User.bookings = relation(Target, backref=backref('user', lazy='select'), lazy='dynamic', cascade='delete')
+User.bookings = relation(Target, backref=backref('user', lazy='select'), lazy='dynamic', cascade='all, delete-orphan')
 Planet.bookings = relation(Target, backref=backref('planet'), lazy='dynamic', order_by=(asc(Target.tick)))
 Galaxy.bookings = relation(Target, Planet.__table__, lazy='dynamic')
 #Alliance.bookings = dynamic_loader(Target, Intel.__table__)
@@ -1732,7 +1732,7 @@ class Request(Base):
     @property
     def type(self):
         return PA.get(self.scantype,"name")
-Request.user = relation(User, backref="requests")
+Request.user = relation(User, backref=backref("requests", cascade="all, delete-orphan"))
 Request.target = relation(Planet)
 Request.scan = relation(Scan)
 
