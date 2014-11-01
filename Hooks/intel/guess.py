@@ -30,10 +30,10 @@ from Core.loadable import loadable, route
 
 class guess(loadable):
     """Use stored fleet data to suggest possible alliances for unknown planets."""
-    usage = " [x.y.z]"
+    usage = " [x.y.z] [limit]"
     access = "member"
 
-    @route(r"")
+    @route(r"(\d+)?")
     def list_planets(self, message, user, params):
         oIntel = aliased(Intel)
         tIntel = aliased(Intel)
@@ -73,11 +73,14 @@ class guess(loadable):
 
         # Reply to the user
         message.reply("Coords     Suggestion      Fleets")
-        for r in results:
+        limit = int(params.group(1) or 5)
+        for r in results[:limit]:
             message.reply("%-9s  %-14s  %s" % ("%s:%s:%s" % (r[0], r[1], r[2]), r[3], r[4]))
+        if len(results) > limit:
+            message.reply("%s results not shown (%s total)" % (len(results)-limit, len(results)))
 
     
-    @route(loadable.coord)
+    @route(loadable.coord+r"(?:\s+(\d+))?")
     def list_fleets(self, message, user, params):
         # Check the planet exists
         planet = Planet.load(*params.group(1,3,5))
@@ -102,5 +105,8 @@ class guess(loadable):
 
         # Reply to the user
         message.reply("Tick  Dir   Planet     Alliance")
-        for r in results:
+        limit = int(params.group(6) or 5)
+        for r in results[:limit]:
             message.reply("%4s  %s  %-9s  %s" % (r[0], r[1], "%s:%s:%s" % (r[2], r[3], r[4]), r[5]))
+        if len(results) > limit:
+            message.reply("%s results not shown (%s total)" % (len(results)-limit, len(results)))
