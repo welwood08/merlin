@@ -103,6 +103,11 @@ class guess(loadable):
         # Combine the results into one sorted list
         results = sorted(OQ.all()+TQ.all(), reverse=True)
 
+        # Quit now if there are no results
+        if len(results) == 0:
+            message.reply("No suggestions found")
+            return
+
         # Reply to the user
         message.reply("Tick  Dir   Planet     Alliance")
         limit = int(params.group(6) or 5)
