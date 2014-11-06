@@ -196,6 +196,9 @@ Attacks are considered active and shown on the website this many ticks before th
 ### tellmsg   : False
 *!tell uses NOTICE by default. Set to True to use PRIVMSG instead.*  
 Specify how to pass `!tell` messages to users.
+### findsmall : True
+*Find new small (one-planet) alliances each tick.*
+If True, excalibur will look for new one-planet alliances each tick, find the relevant planet and add the intel automatically.
 
 ## [Updates]
 ### notify-users:
