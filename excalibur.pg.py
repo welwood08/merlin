@@ -186,6 +186,7 @@ def penis():
     excaliburlog("Total penis time: %.3f seconds" % (t1,))
     session.close()
 
+
 def closereqs(planet_tick):
     # Close old scan requests
     t_start = time.time()
@@ -204,6 +205,7 @@ def parsescans(tick):
     if Q.count() > 0:
         for s in Q.all():
             parse(s.scanner_id, "scan", s.pa_id).start()
+
 
 def clean_cache():
     # Clean tick dependant graph cache
@@ -1170,6 +1172,7 @@ def ticker(alt=False):
     t1=time.time()-t_start
     excaliburlog("Total time taken: %.3f seconds" % (t1,))
     return planet_tick
+
 
 if __name__ == "__main__":
     bots = []
