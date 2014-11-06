@@ -21,11 +21,12 @@
  
 import datetime, re, sys, time, traceback, urllib2, shutil, os, errno
 from sqlalchemy.sql import text, bindparam
+from sqlalchemy import and_
 from Core.config import Config
 from Core.paconf import PA
 from Core.string import decode, excaliburlog, errorlog
 from Core.db import true, false, session
-from Core.maps import Updates, galpenis, apenis, Scan
+from Core.maps import Updates, galpenis, apenis, Scan, Planet, Alliance
 from Core.maps import galaxy_temp, planet_temp, alliance_temp, planet_new_id_search, planet_old_id_search
 from Hooks.scans.parser import parse
 from ConfigParser import ConfigParser as CP
@@ -1174,6 +1175,32 @@ def ticker(alt=False):
     return planet_tick
 
 
+def find1man():
+    # Find one-man alliances and store intel
+    # Can't use ORM fully here because intel is not shared
+    # This will find any new 1-man alliances
+    t_start = time.time()
+    results = session.query(Alliance, Planet).select_from(Alliance).filter(Alliance.age == 1, Alliance.members == 1).join(Planet, and_(Planet.score == Alliance.score_total, Planet.value == Alliance.value_total, Planet.size == Alliance.size)).all()
+    for a, p in results:
+        count = 0
+        for ta, tp in results:
+            if ta.id == a.id:
+                count += 1
+        if count > 1:
+            excaliburlog("Uncertainty for one-man alliance %s" % (a.name))
+            continue
+        else:
+            for i in range(len(bots)):
+                if bots[i].getboolean("Misc", "findsmall"):
+                    if session.execute(text("SELECT planet_id FROM %sintel WHERE planet_id=%s;" % (prefixes[i], p.id))).rowcount == 0:
+                        session.execute(text("INSERT INTO %sintel (planet_id, alliance_id) VALUES (%s, %s);" % (prefixes[i], p.id, a.id)))
+                    else:
+                        session.execute(text("UPDATE %sintel set alliance_id=%s WHERE planet_id=%s;" % (prefixes[i], a.id, p.id)))
+    session.commit()
+    excaliburlog("Added intel for one-man alliances in %.3f seconds" % (time.time() - t_start))
+    session.close()
+
+
 if __name__ == "__main__":
     bots = []
     prefixes = []
@@ -1199,6 +1226,7 @@ if __name__ == "__main__":
     closereqs(planet_tick)
     parsescans(oldtick)
     clean_cache()
+    find1man()
     
     # Add a newline at the end
     excaliburlog("\n")
