@@ -64,6 +64,7 @@
 <tr><td> racism </td><td> racism &lt;alliance&gt; | &lt;x:y&gt; </td><td> Shows averages for each race matching a given alliance in intel or for a galaxy. </td></tr>
 <tr><td> covop </td><td> covop &lt;x:y:z&gt; [agents] [stealth] </td><td> Calculates target alert, damage caused and liklihood of success of a covop based on stored scans. </td></tr>
 <tr><td> spamin </td><td> spamin &lt;alliance&gt; [x.y.z]+ </td><td> Update intel on many planets at once. Accepts !spam format. </td></tr>
+<tr><td> guess </td><td> guess [x.y.z] [limit] </td><td> Use stored fleet data to suggest posible alliances for unknown planets. </td></tr>
 <tr><td> epenis </td><td> epenis [user] </td><td> Penis </td></tr>
 <tr><td> galpenis </td><td> galpenis &lt;x:y&gt; </td><td> Cock </td></tr>
 <tr><td> apenis </td><td> apenis [alliance] </td><td> Schlong </td></tr>
