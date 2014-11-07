@@ -1167,12 +1167,12 @@ def ticker(alt=False):
     return planet_tick
 
 
-def find1man():
+def find1man(max_age):
     # Find one-man alliances and store intel
     # Can't use ORM fully here because intel is not shared
     # This will find any new 1-man alliances
     t_start = time.time()
-    results = session.query(Alliance, Planet).select_from(Alliance).filter(Alliance.age == 1, Alliance.members == 1).join(Planet, and_(Planet.score == Alliance.score_total, Planet.value == Alliance.value_total, Planet.size == Alliance.size)).all()
+    results = session.query(Alliance, Planet).select_from(Alliance).filter(Alliance.age <= max_age, Alliance.members == 1).join(Planet, and_(Planet.score == Alliance.score_total, Planet.value == Alliance.value_total, Planet.size == Alliance.size)).all()
     for a, p in results:
         count = 0
         for ta, tp in results:
@@ -1218,7 +1218,7 @@ if __name__ == "__main__":
     closereqs(planet_tick)
     parsescans(oldtick)
     clean_cache()
-    find1man()
+    find1man(planet_tick-oldtick)
     
     # Add a newline at the end
     excaliburlog("\n")
