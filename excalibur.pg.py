@@ -310,14 +310,6 @@ def ticker(alt=False):
             session.execute(planet_temp.delete())
             session.execute(alliance_temp.delete())
     
-            # If the new tick is below the shuffle tick, empty out all the data
-            #  and don't store anything from the dumps other than the tick itself
-            if planet_tick <= PA.getint("numbers", "shuffle"):
-                excaliburlog("Pre-shuffle dumps detected, emptying out the data")
-                planets = None
-                galaxies = None
-                alliances = None
-    
             # Insert the data to the temporary tables
             # Planets
             session.execute(planet_temp.insert(), [{
@@ -661,7 +653,7 @@ def ticker(alt=False):
             excaliburlog("Copy planet ids to temp in %.3f seconds" % (t2,))
             t1=time.time()
     
-            while last_tick > PA.getint("numbers", "shuffle"): #looks are deceiving, this only runs once
+            while True: #looks are deceiving, this only runs once
                 # This code is designed to match planets whose ruler/planet names
                 #  change, by matching them with new planets using certain criteria
     
