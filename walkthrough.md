@@ -103,7 +103,7 @@ Add your details to git
 
 Commit your changes. Add a comment. "Config for bot_name" is a good starting point.
 
-    git commit -sa
+    git commit -a
 
 Set up the database tables
 
@@ -122,7 +122,7 @@ Add www-data to merlin's group
 
 Grant write permissions to the group where required
 
-    chmod g+w arthurlog Arthur/graphs
+    chmod g+w arthurlog.txt Arthur/graphs
 
 Make the matplotlib directory, and make sure it is owned by the nginx user.
 
