@@ -57,6 +57,11 @@ class guess(loadable):
         # Combine the results into one sorted list
         results = sorted(TQ.all()+OQ.all())
 
+        # Quit now if there are no results
+        if len(results) == 0:
+            message.reply("No suggestions found")
+            return
+
         i = 0
         while i < (len(results)-1):
           # Check for planet/alliance combinations that appeared in both lists
