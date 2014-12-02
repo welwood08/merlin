@@ -103,7 +103,7 @@ class covop(loadable):
 
                 growth = PA.getint(user.planet.race.lower(), "sgrowth")
                 from math import ceil
-                message.reply("New stealth: %s  Success rate: %s%%  Recovery time: %1.1f ticks" % (stealth, prob, ceil((5+int(agents/2))/growth)))
+                message.reply("New stealth: %s  Success rate: %s%%  Recovery time: %d ticks" % (stealth, prob, ceil((5.0+int(agents/2))/growth)))
 # base_max_stealth * (1 + gov_bonus / 100) + cumulative_success_bonus
 # base_recovery*bonus_from_government (rounded down)
 
