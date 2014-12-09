@@ -643,7 +643,7 @@ class Planet(Base):
         return retstr
     
     def bravery(self, target):
-        bravery = max(0,( min(2,float(target.value)/self.value)-0.1 ) * (min(2,float(target.score)/self.score)-0.2))*10
+        bravery = max(0.2,min(2.2,float(target.score)/self.score)-0.2) * max(0.2,min(1.8,float(target.value)/self.value)-0.1)/((6+max(4,float(self.score)/self.value))/10)
         return bravery
     
     def calc_xp(self, target, cap=None):
