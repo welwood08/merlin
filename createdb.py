@@ -157,9 +157,10 @@ if round and not mysql:
     except DBAPIError, e:
         print "An error occurred during migration: %s" %(str(e),)
         session.rollback()
-        print "Reverting to previous schema"
-        """session.execute(text("DROP SCHEMA public CASCADE;"))
-        session.execute(text("ALTER SCHEMA %s RENAME TO public;" % (round,)))"""
+        if not noschema:
+            print "Reverting to previous schema"
+            session.execute(text("DROP SCHEMA public CASCADE;"))
+            session.execute(text("ALTER SCHEMA %s RENAME TO public;" % (round,)))
         session.commit()
         sys.exit()
     else:
