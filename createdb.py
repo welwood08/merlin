@@ -130,9 +130,21 @@ if round and not mysql:
     finally:
         session.close()
     if Config.has_section("FluxBB") and Config.getboolean("FluxBB", "enabled"):
+        # Get the names of all FluxBB tables.
         tables = session.execute(text("SELECT table_name FROM information_schema.tables WHERE table_schema='%s' AND table_name LIKE '%s%%';" % (round, Config.get("FluxBB", "prefix"))))
         for t in tables:
-            session.execute(text("CREATE TABLE %s AS SELECT * FROM %s.%s;" % (t[0], round, t[0])))
+            session.execute(text("CREATE TABLE %s (LIKE %s.%s INCLUDING DEFAULTS INCLUDING CONSTRAINTS INCLUDING INDEXES);" % (t[0], round, t[0])))
+            session.execute(text("INSERT INTO %s (SELECT * FROM %s.%s);" % (t[0], round, t[0])))
+        # Get the names of all FluxBB sequnces.
+        sequences = session.execute(text("SELECT sequence_name FROM information_schema.sequences WHERE sequence_schema='%s' AND sequence_name LIKE '%s%%';" % (round, Config.get("FluxBB", "prefix"))))
+        for seq in sequences:
+            # The group table is different, so deal with that separately.
+            if seq[0][-15:] == "groups_g_id_seq":
+                session.execute(text("CREATE SEQUENCE %s; SELECT SETVAL('%s', max(g_id)) FROM %s;" % (seq[0], seq[0], seq[0][:-9])))
+                session.execute(text("ALTER TABLE %s ALTER COLUMN g_id SET DEFAULT nextval('%s'::regclass);" % (seq[0][:-9], seq[0])))
+            else:
+                session.execute(text("CREATE SEQUENCE %s; SELECT SETVAL('%s', max(id)) FROM %s;" % (seq[0], seq[0], seq[0][:-7])))
+                session.execute(text("ALTER TABLE %s ALTER COLUMN id SET DEFAULT nextval('%s'::regclass);" % (seq[0][:-7], seq[0])))
         session.commit()
         session.close()
 
