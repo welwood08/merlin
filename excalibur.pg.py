@@ -42,7 +42,7 @@ configs = ['merlin.cfg']
 savedumps = False
 useragent = "Merlin (Python-urllib/%s); Alliance/%s; BotNick/%s; Admin/%s" % (urllib2.__version__, Config.get("Alliance", "name"), 
                                                                               Config.get("Connection", "nick"), Config.items("Admins")[0][0])
-catchup_enabled = Config.get("Misc", "catchup")
+catchup_enabled = Config.getboolean("Misc", "catchup")
 
 # ########################################################################### #
 # ########################################################################### #
