@@ -143,9 +143,9 @@ class Idler(threading.Thread):
 
         # Wrap it up in a bow
         for line in newfleets:
-            push("defcall", etype="new", uname=uname, tick=tick, name=line[0], x=line[1], y=line[2], z=line[3], eta=line[4], size=line[5])
+            push("defcall", etype="new", uname=uname, tick=tick, name=("!#!" + line[0].replace(" ", "!#!")), x=line[1], y=line[2], z=line[3], eta=line[4], size=line[5])
         for line in recalls:
-            push("defcall", etype="rec", uname=uname, tick=tick, name=line[0], x=line[1], y=line[2], z=line[3])
+            push("defcall", etype="rec", uname=uname, tick=tick, name=("!#!" + line[0].replace(" ", "!#!")), x=line[1], y=line[2], z=line[3])
         if res + cons > 0:
             push("defcall", etype="fin", uname=uname, tick=tick, res=res, cons=cons)
 

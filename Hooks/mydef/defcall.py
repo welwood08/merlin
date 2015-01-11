@@ -57,6 +57,9 @@ class defcall(loadable):
         notice = ""
         email = ""
 
+        if name[:3] == "!#!":
+            name = " ".join(name[3:].split("!#!"))
+
         user = User.load(uname)
         if user is None:
             errorlog("Defcall: Invalid user in email. Idiot.")
