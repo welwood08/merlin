@@ -121,9 +121,13 @@ class Idler(threading.Thread):
         # Check for correct "From" address?
         if Config.getboolean("imap", "singleaddr"):
             uname_re = "%s\+(.+)@.+" % Config.get("imap", "user").split("@")[0].lower()
+            try:
+                uname = re.findall(uname_re, header['To'].lower())[0]
+            except IndexError:
+                uname = "Unknown"
         else:
             uname_re = "<?(.+)@.+"
-        uname = re.findall(uname_re, header['To'].lower())[0]
+            uname = re.findall(uname_re, header['To'].lower())[0]
 
         dsuff = Config.get("imap", "defsuffix")
         if dsuff:
@@ -165,7 +169,7 @@ class Idler(threading.Thread):
             addr = user.email
         else:
             addr = Config.get("imap", "bounce")
-            body = "Bad username: %s\n\n" % (uname) + body
+            body = "Bad username: %s (%s)\n\n" % (uname, header['To']) + body
         if addr:
             self.send_email(header['Subject'], body, addr)
 
