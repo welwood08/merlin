@@ -118,7 +118,6 @@ class Idler(threading.Thread):
     Relay email contents to merlin via robocop.
     """
     def robonotify(self, header, body):
-        # Check for correct "From" address?
         if Config.getboolean("imap", "singleaddr"):
             uname_re = "%s\+(.+)@.+" % Config.get("imap", "user").split("@")[0].lower()
             try:
@@ -137,8 +136,19 @@ class Idler(threading.Thread):
                 self.forwardMail(uname, header, body)
                 return
 
+        # Check the email "From" header says it's from Planetarion.
+        if not "@planetarion.com" in header['From'].lower():
+            self.forwardMail(uname, header, body)
+            return
+
+        # Get the tick number (if this is a notification email).
+        try:
+            tick = re.findall("events in tick (\d+)", body)[0]
+        except IndexError:
+            self.forwardMail(uname, header, body)
+            return
+
         # Check for the main notificatino types
-        tick = re.findall("events in tick (\d+)", body)[0]
         newfleets = re.findall("We have detected an open jumpgate from (.+), located at (\d{1,2}):(\d{1,2}):(\d{1,2}). ".replace(" ","\s+") +\
                                "The fleet will approach our system in tick (\d+) and appears to have (\d+) visible ships.".replace(" ","\s+"), body)
         recalls = re.findall("The (.+) fleet from (\d{1,2}):(\d{1,2}):(\d{1,2}) has been recalled.".replace(" ","\s+"), body)
