@@ -2132,7 +2132,7 @@ class Command(Base):
     command_prefix = Column(String(255))
     command = Column(String(255))
     subcommand = Column(String(255))
-    command_parameters = Column(String(255))
+    command_parameters = Column(String(500))
     nick = Column(String(255))
     username = Column(String(255))
     hostname = Column(String(255))
