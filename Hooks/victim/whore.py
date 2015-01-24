@@ -89,8 +89,9 @@ class whore(loadable):
         maxcap = cast(func.floor(cast(Planet.size,Float).op("*")(caprate)),Integer)
         bravery = func.greatest(0.2,func.least(2.2, cast(Planet.score,Float).op("/")(float(attacker.score)))-0.2) \
                    * func.greatest(0.2,func.least(1.8, cast(Planet.value,Float).op("/")(float(attacker.value)))-0.1) \
-                   / ((6+func.greatest(4.0, cast(Planet.score,Float).op("/")(float(attacker.value)))).op("/")(10.0))
-        xp_gain = cast(func.floor(maxcap.op("*")(bravery)),Integer)
+                   / ((6+max(4.0, float(attacker.score)/float(attacker.value)))/10.0)
+
+        xp_gain = cast(func.floor(maxcap.op("*")(bravery.op("*")(10.0))),Integer)
         
         Q = session.query(Planet, Intel, xp_gain.label("xp_gain"))
         if alliance.id:
