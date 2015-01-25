@@ -1620,6 +1620,9 @@ class Scan(Base):
             bcalc += "%s_1_%d=%d&" % (("att", "def",)[target], unitscan.ship_id - 1, unitscan.amount,)
         bcalc += "%s_planet_value_1=%d&" % (("att", "def",)[target], self.planet.value,)
         bcalc += "%s_planet_score_1=%d&" % (("att", "def",)[target], self.planet.score,)
+        bcalc += "%s_coords_x_1=%d&" % (("att", "def",)[target], self.planet.x,)
+        bcalc += "%s_coords_y_1=%d&" % (("att", "def",)[target], self.planet.y,)
+        bcalc += "%s_coords_z_1=%d&" % (("att", "def",)[target], self.planet.z,)
         
         if target:
             pscan = self.planet.scan("P")
