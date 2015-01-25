@@ -1,7 +1,7 @@
 {% from 'macros.tpl' import planetlink, galaxyscanslink, alliancelink with context %}
 {% extends "base.tpl" %}
-{% set cols = 8 + waves|count %}
-{% if user|intel %}{% set cols = cols + 2 %}{% endif %}
+{% set cols = 9 + waves|count %}
+{% if user|intel %}{% set cols = cols + 1 %}{% endif %}
 {% block content %}
 {% if message %}
     <p>{{ message }}</p>
@@ -17,14 +17,14 @@
             <th>Value</th>
             <th>Score</th>
             <th>Scans</th>
+            <th>Amps / Dists / Tech</th>
             {%- for lt in waves %}
             <th>ETA {{lt-tick}} ({{lt}})</th>
             {% endfor -%}
             <th><a href="" onclick="toggleGrowth();return false;">Size</a></th>
             <th><a href="" onclick="toggleGrowth();return false;">Value</a></th>
             {% if user|intel %}
-            <th>Alliance</th>
-            <th>Nick</th>
+            <th>Intel</th>
             {% endif %}
         </tr>
         
@@ -42,6 +42,14 @@
                         if scanage > 12 %}ancient{% elif scanage > 5 %}older{% elif scanage > 0 %}old{% else %}new{% endif %}">{{ scan.scantype }}</a>
                 {% endfor %}
             </td>
+            {% if planet.intel %}
+                {% set scan = planet.scan("D") %}
+                {% with dscan = scan.devscan %}
+                <td class="center">{{planet.intel.amps}} / {{ planet.intel.dists}} / {{dscan.waves_str()[:1] if dscan else "?"}}</td>
+                {% endwith %}
+            {% else %}
+                <td class="center">? / ? / ?</td>
+            {% endif %}
                 {% for lt, target in bookings %}
             <td class="center">
                     {%- if target and target.user == user %}
@@ -62,8 +70,11 @@
             <td align="right">{{ planet|growth("size") }}</td>
             <td align="right">{{ planet|growth("value") }}</td>
             {% if user|intel %}
-            <td class="center">{%if planet.intel and planet.alliance %}<a {{alliancelink(planet.alliance.name)}}>{{ planet.alliance.name }}</a>{% endif %}</td>
-            <td class="center">{%if planet.intel.nick %}{{ planet.intel.nick }}{% endif %}</td>
+                {% if planet.intel %}
+                <td class="center">{%if planet.alliance %}A:<a {{alliancelink(planet.alliance.name)}}>{{ planet.alliance.name }}</a>{% endif %}{%if planet.intel.nick %} N:{{ planet.intel.nick }}{% endif %}</td>
+                {% else %}
+                <td class="center"></td>
+                {% endif %}
             {% endif %}
         </tr>
         {% endfor %}
