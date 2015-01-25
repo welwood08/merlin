@@ -50,14 +50,14 @@
         <td class="center datahigh">
         {% if owner.scan("A") %}
              {% set scanage = update.id - owner.scan("A").tick %}
-                 <a href="#{{ owner.scan("A").link|url }}" class="scan_age_{% if scanage > 12 %}ancient{% elif scanage > 5 %}older{% elif scanage > 0 %}old{% else %}new{% endif %}">{{ owner.scan("A").scantype }}</a>
+                 <a href="{{ owner.scan("A").link|url }}" class="scan_age_{% if scanage > 12 %}ancient{% elif scanage > 5 %}older{% elif scanage > 0 %}old{% else %}new{% endif %}">{{ owner.scan("A").scantype }}</a>
         {% elif owner.scan("U") %}
              {% set scanage = update.id - owner.scan("U").tick %}
-                 <a href="#{{ owner.scan("U").link|url }}" class="scan_age_{% if scanage > 12 %}ancient{% elif scanage > 5 %}older{% elif scanage > 0 %}old{% else %}new{% endif %}">{{ owner.scan("U").scantype }}</a>
+                 <a href="{{ owner.scan("U").link|url }}" class="scan_age_{% if scanage > 12 %}ancient{% elif scanage > 5 %}older{% elif scanage > 0 %}old{% else %}new{% endif %}">{{ owner.scan("U").scantype }}</a>
         {% endif %}
         {% if owner.scan("N") %}
              {% set scanage = update.id - owner.scan("N").tick %}
-                 <a href="#{{ owner.scan("N").link|url }}" class="scan_age_{% if scanage > 12 %}ancient{% elif scanage > 5 %}older{% elif scanage > 0 %}old{% else %}new{% endif %}">{{ owner.scan("N").scantype }}</a>
+                 <a href="{{ owner.scan("N").link|url }}" class="scan_age_{% if scanage > 12 %}ancient{% elif scanage > 5 %}older{% elif scanage > 0 %}old{% else %}new{% endif %}">{{ owner.scan("N").scantype }}</a>
         {% endif %}
         </td>
     </tr>
