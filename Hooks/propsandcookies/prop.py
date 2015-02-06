@@ -244,7 +244,7 @@ class prop(loadable):
                 member.active = True
                 member.group_id = 3
                 member.sponsor = prop.proposer.name
-            elif not member.is_member():
+            elif member.group_id == 2:
                 member.group_id = 3
                 member.sponsor = prop.proposer.name
             for chan in member.group.autochannels:

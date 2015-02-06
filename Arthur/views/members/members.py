@@ -36,7 +36,7 @@ class members(loadable):
         
         order =  {"name"  : (asc(User.name),),
                   "sponsor" : (asc(User.sponsor),),
-                  "access" : (asc(User.group.name),desc(User.carebears),asc(User.name),),
+                  "access" : (asc(User.group_id),desc(User.carebears),asc(User.name),),
                   "carebears" : (desc(User.carebears),),
                   "planet" : (asc(Planet.x),asc(Planet.y),asc(Planet.z),),
                   "defage" : (asc(User.fleetupdated),),
@@ -47,7 +47,7 @@ class members(loadable):
         order = order.get(sort)
         
         members = []
-        Q = session.query(User.name, User.alias, User.sponsor, User.group.name, User.carebears, Planet, User.fleetupdated,
+        Q = session.query(User.name, User.alias, User.sponsor, User.group_id, User.carebears, Planet, User.fleetupdated,
                           User.phone, User.pubphone, or_(User.id == user.id, User.id.in_(session.query(PhoneFriend.user_id).filter_by(friend=user))))
         Q = Q.filter(User.group_id != 2)
         Q = Q.filter(User.active == True)
@@ -109,9 +109,9 @@ class channels(loadable):
             Q = Q.order_by(o)
 
         if nogroups:
-            members.append(("All", Q.all(),))
+            channels.append(("All", Q.all(),))
         else:
             for g in session.query(Group).filter(Group.id != 2).order_by(asc(Group.name)).all():
-                members.append((g.name, Q.filter(Channel.userlevel == g.id).all(),))
+                channels.append((g.name, Q.filter(Channel.userlevel == g.id).all(),))
 
         return render("channels.tpl", request, accesslist=channels)

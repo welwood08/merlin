@@ -48,7 +48,7 @@ urlpatterns = patterns('Arthur.views.home',
 class login(loadable):
     def execute(self, request, user):
         from Arthur.views.dashboard import dashboard
-        if user.is_member():
+        if user.group_id != 2:
             return dashboard.execute(request, user, dashuser=user)
         else:
             return home.execute(request, user)

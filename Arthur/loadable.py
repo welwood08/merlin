@@ -168,7 +168,7 @@ class loadable(_base):
         if planet is not None:
             if self.is_user(user):
                 user.planet = planet
-                if user.is_member():
+                if user.group_id != 2:
                     alliance = Alliance.load(Config.get("Alliance","name"))
                     if planet.intel is None:
                         planet.intel = Intel(nick=user.name, alliance=alliance)
