@@ -22,6 +22,10 @@
 import os
 os.environ['DJANGO_SETTINGS_MODULE'] = 'Arthur.settings'
 
+import django
+if django.VERSION[0] == 1 and django.VERSION[1] >= 7:
+    django.setup()
+ 
 import Arthur
 
 import django.core.management.commands.runserver
