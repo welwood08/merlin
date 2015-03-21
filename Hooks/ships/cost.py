@@ -40,7 +40,8 @@ class cost(loadable):
             return
         
         num = self.short2num(num)
-        reply="Buying %s %s will cost %s metal, %s crystal and %s eonium."%(num,ship.name,
+        reply="Buying %s %s (%s) will cost %s metal, %s crystal and %s eonium."%(num,ship.name,
+                self.num2short(ship.total_cost*num/PA.getint("numbers", "ship_value")),
                 self.num2short(ship.metal*num),
                 self.num2short(ship.crystal*num),
                 self.num2short(ship.eonium*num))
@@ -56,5 +57,5 @@ class cost(loadable):
                         self.num2short(floor(ship.crystal*(1+bonus))*num),
                         self.num2short(floor(ship.eonium*(1+bonus))*num))
         
-        reply+=" It will add %s value"%(self.num2short(ship.total_cost*num/PA.getint("numbers", "ship_value")),)
+        reply+=" It will add %s value"%(self.num2short(ship.total_cost*num*(1.0/PA.getint("numbers", "ship_value") - 1.0/PA.getint("numbers", "res_value"))),)
         message.reply(reply)
