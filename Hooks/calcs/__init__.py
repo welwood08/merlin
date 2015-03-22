@@ -31,4 +31,5 @@ __all__ = [
            "xp",
            "seagal",
            "tick",
+           "bonus",
            ]
