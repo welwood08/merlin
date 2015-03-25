@@ -115,7 +115,7 @@ class connection(object):
                 while self.last + Config.getfloat("Connection", "antiflood") * (1 + (len(line) > 300) + (priority > 10)) >= time.time():
                     time.sleep(0.5)
                 # Warn admins if the wait is too long
-                if time.time() > sent + Config.getint("Connection", "maxdelay"):
+                if priority < 10 and time.time() > sent + Config.getint("Connection", "maxdelay"):
                     if time.time() > self.wait_warned + 300:
                         self.wait_warned = time.time()
                         adminmsg("Message output message delay is too long: %.1f seconds" % (time.time() - sent))
