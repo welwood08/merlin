@@ -75,6 +75,9 @@ class parse(Thread):
         session.remove()
     
     def group(self, uid, gid):
+        # Skip duplicate groups, only from the "share" channel. This allowed partially processed groups to be repeated if required.
+        if not self.share and session.query(Scan).filter(Scan.group_id == gid).count() > 0:
+            return
         scanlog("Group scan: %s" %(gid,))
         req = urllib2.Request(Config.get("URL","viewgroup")%(gid,)+"&inc=1")
         req.add_header("User-Agent", self.useragent)
@@ -90,6 +93,7 @@ class parse(Thread):
             push("sharescan", pa_id=gid, group=True)
     
     def scan(self, uid, pa_id, gid=None):
+        # Skip duplicate scans (unless something went wrong last time)
         if session.query(Scan).filter(Scan.pa_id == pa_id).filter(Scan.planet_id != None).count() > 0:
             return
         req = urllib2.Request(Config.get("URL","viewscan")%(pa_id,)+"&inc=1")
