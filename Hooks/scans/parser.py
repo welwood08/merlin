@@ -48,10 +48,11 @@ class push(object):
 class parse(Thread):
     useragent = "Merlin (Python-urllib/%s); Alliance/%s; BotNick/%s; Admin/%s" % (urllib2.__version__, Config.get("Alliance", "name"),
                                                                               Config.get("Connection", "nick"), Config.items("Admins")[0][0])
-    def __init__(self, uid, type, id):
+    def __init__(self, uid, type, id, share=True):
         self.uid = uid
         self.type = type
         self.id = id
+        self.share = share
         Thread.__init__(self)
     
     def run(self):
@@ -85,6 +86,8 @@ class parse(Thread):
                     self.execute(scan, uid, m.group(1), gid)
                 except Exception, e:
                     scanlog("Exception in scan: %s"%(str(e),), traceback=True)
+        if self.share:
+            push("sharescan", pa_id=gid, group=True)
     
     def scan(self, uid, pa_id, gid=None):
         if session.query(Scan).filter(Scan.pa_id == pa_id).filter(Scan.planet_id != None).count() > 0:
@@ -93,6 +96,8 @@ class parse(Thread):
         req.add_header("User-Agent", self.useragent)
         page = urllib2.urlopen(req).read()
         self.execute(page, uid, pa_id, gid)
+        if self.share:
+            push("sharescan", pa_id=pa_id)
     
     def execute(self, page, uid, pa_id, gid=None):
         scanlog("Scan: %s (group: %s)" %(pa_id,gid,))
