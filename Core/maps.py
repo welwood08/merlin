@@ -35,6 +35,11 @@ from Core.paconf import PA
 from Core.string import encode
 from Core.db import Base, session
 
+if Config.getboolean("Misc", "bcrypt"):
+    import bcrypt
+else:
+    import hashlib
+
 # ########################################################################### #
 # #############################    DUMP TABLES    ########################### #
 # ########################################################################### #
@@ -1298,11 +1303,9 @@ class User(Base):
     
     @validates('passwd')
     def valid_passwd(self, key, passwd):
-        try:
-            import bcrypt
+        if Config.getboolean("Misc", "bcrypt"):
             return bcrypt.hashpw(passwd, bcrypt.gensalt())
-        except ImportError:
-            import hashlib
+        else:
             return hashlib.sha1(passwd).hexdigest()
     @validates('email')
     def valid_email(self, key, email):
@@ -1311,11 +1314,9 @@ class User(Base):
     
     def checkpass(self, passwd):
         passwd = encode(passwd)
-        try:
-            import bcrypt
+        if Config.getboolean("Misc", "bcrypt"):
             return bcrypt.checkpw(passwd, self.passwd)
-        except ImportError:
-            import hashlib
+        else:
             return hashlib.sha1(passwd).hexdigest() == self.passwd
 
     @staticmethod
