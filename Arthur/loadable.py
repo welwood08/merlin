@@ -22,6 +22,7 @@
 from datetime import datetime, timedelta
 from random import randrange
 import re
+import hashlib
 
 from Core.exceptions_ import LoadableError, UserError
 from Core.config import Config
@@ -200,7 +201,7 @@ class loadable(_base):
         return response
     
     def generate_key(self, user):
-        return User.hasher(user.name+user.passwd+str(datetime.now())+str(randrange(1,1000000000)))
+        return hashlib.sha1(user.name+user.passwd+str(datetime.now())+str(randrange(1,1000000000))).hexdigest()
 
 def load(hook):
     return hook()

@@ -187,6 +187,9 @@ Specify how to pass `!tell` messages to users.
 ### findsmall : True
 *Find new small (one-planet) alliances each tick.*
 If True, excalibur will look for new one-planet alliances each tick, find the relevant planet and add the intel automatically.
+### bcrypt    : False
+*Use bcrypt instead of SHA1 for passwords. This will break FluxBB integration and requires the Python bcrypt library.*
+If True, use bcrypt for passwords instead of SHA1. This is a much more suitable algorithm for storing passwords, but is incompatible with FluxBB integration and requires the python bcrypt library which is not usually installed by default.
 
 ## [Updates]
 ### notify-users:
