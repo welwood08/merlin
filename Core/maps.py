@@ -20,7 +20,6 @@
 # Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA 02110-1301 USA
  
 from datetime import datetime
-import hashlib
 from math import ceil
 import re
 import sys
@@ -35,6 +34,11 @@ from Core.config import Config
 from Core.paconf import PA
 from Core.string import encode
 from Core.db import Base, session
+
+if Config.getboolean("Misc", "bcrypt"):
+    import bcrypt
+else:
+    import hashlib
 
 # ########################################################################### #
 # #############################    DUMP TABLES    ########################### #
@@ -1299,19 +1303,22 @@ class User(Base):
     
     @validates('passwd')
     def valid_passwd(self, key, passwd):
-        return User.hasher(passwd)
+        if Config.getboolean("Misc", "bcrypt"):
+            return bcrypt.hashpw(passwd, bcrypt.gensalt())
+        else:
+            return hashlib.sha1(passwd).hexdigest()
     @validates('email')
     def valid_email(self, key, email):
         assert email is None or self.emailre.match(email)
         return email
     
-    @staticmethod
-    def hasher(passwd):
-        # *Every* user password operation should go through this function
-        # This can be easily adapted to use SHA1 instead, or add salts
+    def checkpass(self, passwd):
         passwd = encode(passwd)
-        return hashlib.sha1(passwd).hexdigest()
-    
+        if Config.getboolean("Misc", "bcrypt"):
+            return bcrypt.checkpw(passwd, self.passwd)
+        else:
+            return hashlib.sha1(passwd).hexdigest() == self.passwd
+
     @staticmethod
     def load(name=None, id=None, passwd=None, exact=True, active=True, access=0):
         assert id or name
@@ -1335,7 +1342,7 @@ class User(Base):
                 if user is not None or exact is True:
                     break
         if (user and passwd) is not None:
-            user = user if user.passwd == User.hasher(passwd) else None
+            user = user if user.checkpass(passwd) else None
         return user
     
     def has_ancestor(self, possible_ancestor):
