@@ -24,9 +24,9 @@ Enable colours in bash
     vi ~/.bashrc
 
 ##Step Three: Install packages
-    apt-get install vim-nox bash-completion screen git postgresql python-sqlalchemy python-psycopg2 python-django python-jinja2 python-numpy python-matplotlib nginx logrotate
+    apt-get install vim-nox bash-completion screen git postgresql python-sqlalchemy python-psycopg2 python-django python-jinja2 python-numpy python-matplotlib python-bcrypt nginx logrotate
 
-`vim-nox` and  `bash-completion` just make life nicer. `screen` is used to keep the bot running after you logout. `git` is used to fetch and update the bot. `postgresql`, `python-sqlalchemy`, `python-psycopg2`, `python-django` and `python-jinja2` are basic merlin/arthur dependencies. `python-numpy` and `python-matplotlib` have lots of dependencies, but are needed for graphing in arthur. `nginx` is an alternative to apache, and is my preference. `logrotate` should be automatically installed as a dependency of postgresql, but installing manually won't hurt. It will be used to keep merlin's log files to a manageable size.
+`vim-nox` and  `bash-completion` just make life nicer. `screen` is used to keep the bot running after you logout. `git` is used to fetch and update the bot. `postgresql`, `python-sqlalchemy`, `python-psycopg2`, `python-django` and `python-jinja2` are basic merlin/arthur dependencies. `python-numpy` and `python-matplotlib` have lots of dependencies, but are needed for graphing in arthur. `python-bcrypt` provides bcrypt support, which is recommended unless you are using FluxBB integration. `nginx` is an alternative to apache, and is my preference. `logrotate` should be automatically installed as a dependency of postgresql, but installing manually won't hurt. It will be used to keep merlin's log files to a manageable size.
 
 ##Step Four: Add a new user for merlin
 We'll create "merlin" as a normal user. You can rename this if you wish, but you may have to change other things further down the line. You can run more than one bot with the same username (in fact, it's easier).  
