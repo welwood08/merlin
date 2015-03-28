@@ -22,11 +22,12 @@
 import datetime, re, sys, time, traceback, urllib2, shutil, os, errno
 from sqlalchemy.sql import text, bindparam
 from sqlalchemy import and_
+from sqlalchemy.sql.functions import max as max_
 from Core.config import Config
 from Core.paconf import PA
 from Core.string import decode, excaliburlog, errorlog
 from Core.db import true, false, session
-from Core.maps import Updates, galpenis, apenis, Scan, Planet, Alliance
+from Core.maps import Updates, galpenis, apenis, Scan, Planet, Alliance, PlanetHistory, Galaxy, Feed, War
 from Core.maps import galaxy_temp, planet_temp, alliance_temp, planet_new_id_search, planet_old_id_search
 from Hooks.scans.parser import parse
 from ConfigParser import ConfigParser as CP
@@ -60,10 +61,12 @@ def get_dumps(last_tick, alt=False, useragent=None):
        purl = Config.get("URL", "alt_plan") % (last_tick+1)
        gurl = Config.get("URL", "alt_gal") % (last_tick+1)
        aurl = Config.get("URL", "alt_ally") % (last_tick+1)
+       furl = Config.get("URL", "alt_feed") % (last_tick+1)
     else:
        purl = Config.get("URL", "planets")
        gurl = Config.get("URL", "galaxies")
        aurl = Config.get("URL", "alliances")
+       furl = Config.get("URL", "userfeed")
 
     # Build the request for planet data
     req = urllib2.Request(purl)
@@ -95,15 +98,18 @@ def get_dumps(last_tick, alt=False, useragent=None):
         req = urllib2.Request(aurl)
         req.add_header('User-Agent', useragent)
         alliances = opener.open(req)
+        req = urllib2.Request(furl)
+        req.add_header('User-Agent', useragent)
+        userfeed = opener.open(req)
     except Exception, e:
         excaliburlog("Failed gathering dump files.\n%s" % (str(e),))
         time.sleep(300)
-        return (False, False, False)
+        return (False, False, False, False)
     else:
-        return (planets, galaxies, alliances)
+        return (planets, galaxies, alliances, userfeed)
 
 
-def checktick(planets, galaxies, alliances):
+def checktick(planets, galaxies, alliances, userfeed):
     # Skip first three lines of the dump, tick info is on fourth line
     planets.readline();planets.readline();planets.readline();
     # Parse the fourth line and check we have a number
@@ -142,13 +148,102 @@ def checktick(planets, galaxies, alliances):
     excaliburlog("Alliance dump for tick %s" % (alliance_tick,))
     alliances.readline();alliances.readline();alliances.readline();
 
+    # As above
+    userfeed.readline();userfeed.readline();userfeed.readline();
+    tick=userfeed.readline()
+    m=re.search(r"tick:\s+(\d+)",tick,re.I)
+    if not m:
+        excaliburlog("Invalid tick: '%s'" % (tick,))
+        time.sleep(120)
+        return False
+    userfeed_tick=int(m.group(1))
+    excaliburlog("UserFeed dump for tick %s" % (userfeed_tick,))
+    userfeed.readline();userfeed.readline();userfeed.readline();
+
     # Check the ticks of the dumps are all the same and that it's
     #  greater than the previous tick, i.e. a new tick
-    if not (planet_tick == galaxy_tick  == alliance_tick):
-        excaliburlog("Varying ticks found, sleeping\nPlanet: %s, Galaxy: %s, Alliance: %s" % (planet_tick,galaxy_tick,alliance_tick))
+    if not (planet_tick == galaxy_tick  == alliance_tick == userfeed_tick):
+        excaliburlog("Varying ticks found, sleeping\nPlanet: %s, Galaxy: %s, Alliance: %s, UserFeed: %s" % (planet_tick,galaxy_tick,alliance_tick,userfeed_tick))
         time.sleep(30)
         return False
     return planet_tick
+
+
+def parse_userfeed(userfeed):
+    global catchup_enabled
+    last_tick = session.query(max_(Feed.tick)).scalar() or 0
+    for line in userfeed:
+        [tick, category, text] = decode(line).strip().split("\t")
+        if tick <= last_tick:
+            continue
+        tick = int(tick)
+        category = category[1:-1]
+        text = text[1:-1]
+        f = Feed(tick=tick, category=category, text=text)
+### Idea: 3 levels of news. None, Some (members, alliance), More (add member gals, creports), All (everything - spammy)
+
+        if category == "Planet Ranking":
+            # "TAKIYA GENJI of SUZURAN (3:2:7) is now rank 278 (formerly rank 107)"
+            m = re.match(r"(.*) \((\d+):(\d+):(\d+)\)", text)
+            f.planet_id = PlanetHistory.load(m.group(2), m.group(3), m.group(4), tick).id
+        elif category == "Galaxy Ranking":
+            # "4:7 ("Error we only have 12 planets") has taken over rank 1 (formerly rank 2)"
+            m = re.match(r"^\s*(\d+):(\d+)", text)
+            f.galaxy_id = Galaxy.load(m.group(1), m.group(2)).id
+        elif category == "Alliance Ranking":
+            # "p3nguins has taken over rank 1 (formerly rank 2)"
+            m = re.match(r"(.*) has taken", text)
+            f.alliance1_id = Alliance.load(m.group(1)).id
+        elif category == "Alliance Merging":
+            # "The alliances "HEROES" and "TRAITORS" have merged to form "TRAITORS"."
+            m = re.match(r"The alliances \"(.*)\" and \"(.*)\" have merged to form \"(.*)\"", text)
+            f.alliance1_id = Alliance.load(m.group(1)).id
+            f.alliance2_id = Alliance.load(m.group(2)).id
+            f.alliance3_id = Alliance.load(m.group(3)).id
+###         Merge Intel
+        elif category == "Relation Change":
+            # "Ultores has declared war on Conspiracy !"
+            # "Ultores has decided to end its NAP with NewDawn."
+            # "Faceless and Ultores have confirmed they have formed a non-aggression pact."
+            # "ODDR's war with RainbowS has expired."
+            m = re.match(r"(.*) has declared war on (.*) ?!", text)
+            if m:
+                dec_war = True
+            else:
+                m = re.match(r"(.*) and (.*) have confirmed .*", text) or re.match(r"(.*) has decided to end its .* with (.*).", text)  or \
+                    re.match(r"(.*)'s war with (.*) has expired.", text)
+
+            if m:
+                a1 = Alliance.load(m.group(1))
+                if a1:
+                    f.alliance1_id = a1.id
+                a2 = Alliance.load(m.group(2))
+                if a2:
+                    f.alliance2_id = a2.id
+                if dec_war and a1 and a2:
+                    # War XP
+                    w = War(start_tick=tick, end_tick=tick+72, alliance1_id=f.alliance1_id or None, alliance2_id=f.alliance2_id or None)
+                    session.add(w)
+            else:
+                excaliburlog("Unrecognised Relation Change: '%s'" % (text,))
+        elif category == "Anarchy":
+            # "laxer1013 of SchoolsOut (3:3:11) has exited anarchy."
+            # "Nandos Skank of Chicken on the Phone (6:7:4) has entered anarchy until tick 192."
+            m = re.match(r"(.*) \((\d+):(\d+):(\d+)\) has (entered|exited) anarchy(?: until tick (\d+).)?", text)
+            p = PlanetHistory.load(m.group(2), m.group(3), m.group(4), tick)
+            if not p or "%s of %s" % (p.rulername, p.planetname) != m.group(1):
+                p = PlanetHistory.load(m.group(2), m.group(3), m.group(4), tick+1)
+            if p and "%s of %s" % (p.rulername, p.planetname) == m.group(1):
+                f.planet_id = p.id
+            # Store intel - probably set the gov, put expiry and previous gov in comment. Append to comment?
+        elif category == "Combat Report":
+            # " Combat Report: [news]yy9w6bhijoo7h2b[/news]"
+            # Could get planet ID from the report?
+            pass
+        else:
+            excaliburlog("Unknown User Feed Item Type: '%s'" % (category,))
+        session.add(f)
+    session.commit()
 
 
 def penis():
@@ -246,7 +341,7 @@ def ticker(alt=False):
                 session.close()
                 sys.exit()
     
-            (planets, galaxies, alliances) = get_dumps(last_tick, alt, useragent)
+            (planets, galaxies, alliances, userfeed) = get_dumps(last_tick, alt, useragent)
             if not planets:
                 continue
 
@@ -264,20 +359,24 @@ def ticker(alt=False):
                 pf = open("dumps/%s/planet_listing.txt" % (last_tick+1,), "w+")
                 gf = open("dumps/%s/galaxy_listing.txt" % (last_tick+1,), "w+")
                 af = open("dumps/%s/alliance_listing.txt" % (last_tick+1,), "w+")
+                uf = open("dumps/%s/user_feed.txt" % (last_tick+1,), "w+")
                 # Copy dump contents
                 shutil.copyfileobj(planets, pf)
                 shutil.copyfileobj(galaxies, gf)
                 shutil.copyfileobj(alliances, af)
+                shutil.copyfileobj(userfeed, uf)
                 # Return to the start of the file
                 pf.seek(0)
                 gf.seek(0)
                 af.seek(0)
+                uf.seek(0)
                 # Swap pointers
                 planets = pf
                 galaxies = gf
                 alliances = af
+                userfeed = uf
     
-            planet_tick = checktick(planets, galaxies, alliances)
+            planet_tick = checktick(planets, galaxies, alliances, userfeed)
             if not planet_tick:
                 continue
     
@@ -1161,6 +1260,11 @@ def ticker(alt=False):
             continue
 
     session.close()
+
+    if not alt:
+        parse_userfeed(userfeed)
+    t2=time.time()-t1
+    excaliburlog("Parsed User Feed in %.3f seconds" % (t2,))
 
     t1=time.time()-t_start
     excaliburlog("Total time taken: %.3f seconds" % (t1,))
