@@ -1124,6 +1124,63 @@ class AllianceHistory(Base):
     points_avg_lowest_rank_tick = Column(Integer)
 Alliance.history_loader = relation(AllianceHistory, backref=backref('current', lazy='select'), lazy='dynamic')
 
+class Feed(Base):
+    __tablename__ = 'feed'
+    id = Column(Integer, primary_key=True)
+    tick = Column(Integer, ForeignKey(Updates.id, ondelete='cascade'))
+    category = Column(String(255), index=True)
+    alliance1_id = Column(Integer, ForeignKey(Alliance.id, ondelete='set null'), default=None, index=True)
+    alliance2_id = Column(Integer, ForeignKey(Alliance.id, ondelete='set null'), default=None, index=True)
+    alliance3_id = Column(Integer, ForeignKey(Alliance.id, ondelete='set null'), default=None, index=True)
+    planet_id = Column(Integer, ForeignKey(Planet.id, ondelete='set null'), default=None, index=True)
+    galaxy_id = Column(Integer, ForeignKey(Galaxy.id, ondelete='set null'), default=None, index=True)
+    text = Column(String(255))
+    def __str__(self):
+        if self.category == "Combat Report":
+            try:
+                news_id = re.match(r".*\[news\](.*)\[/news\]", self.text).group(1)
+            except:
+                return self.text
+            else:
+                return Config.get("URL", "viewnews") % news_id
+        else:
+            self.text
+
+    @staticmethod
+    def filter(tick=None, category=None, type=None, id=None, limit=10):
+        Q = session.query(Feed)
+        if tick:
+            Q = Q.filter_by(tick=tick)
+        if category:
+            Q = Q.filter_by(category=category)
+        if id and type and type in "pga":
+            if type == "p":
+                Q = Q.filter_by(planet_id=id)
+            if type == "g":
+                Q = Q.filter_by(galaxy_id=id)
+            if type == "a":
+                Q = Q.filter(or_(Feed.alliance1_id==id, Feed.alliance2_id==id, Feed.alliance3_id==id))
+        Q.order_by(desc(Feed.tick))
+        Q.limit(limit)
+        if tick:
+            return [str(f) for f in Q.all()]
+        else:
+            return ["%4s %s" % (f.tick, str(f)) for f in Q.all()]
+
+class War(Base):
+    __tablename__ = 'war'
+    start_tick = Column(Integer, primary_key=True)
+    end_tick = Column(Integer)
+    alliance1_id = Column(Integer, ForeignKey(Alliance.id, ondelete='set null'), default=None, index=True, primary_key=True)
+    alliance2_id = Column(Integer, ForeignKey(Alliance.id, ondelete='set null'), default=None, index=True, primary_key=True)
+    @staticmethod
+    def active(alliance1, alliance2, tick):
+        if alliance1.id == alliance2.id:
+            return False
+        return session.query(War).filter(or_(War.alliance1_id == alliance1.id, War.alliance1_id == alliance2.id)
+                                ).filter(or_(War.alliance2_id == alliance1.id, War.alliance2_id == alliance2.id)
+                                ).filter(War.end_tick > tick).filter(War.start_tick < tick).count()
+
 # ########################################################################### #
 # ##########################    EXCALIBUR TABLES    ######################### #
 # ########################################################################### #
