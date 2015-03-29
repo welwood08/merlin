@@ -26,7 +26,8 @@ from Core.config import Config
 
 class sharescan(loadable):
     """Shares scan URLs"""
-    usage=" is not available at this time."
+    usage = " is not available at this time."
+    access = "member"
 
     @robohci
     def robocop(self, message, pa_id, group=False):
