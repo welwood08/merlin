@@ -170,7 +170,7 @@ def checktick(planets, galaxies, alliances, userfeed):
 
 
 def parse_userfeed(userfeed):
-    global catchup_enabled
+    global prefixes
     last_tick = session.query(max_(Feed.tick)).scalar() or 0
     for line in userfeed:
         [tick, category, text] = decode(line).strip().split("\t")
@@ -200,7 +200,8 @@ def parse_userfeed(userfeed):
             f.alliance1_id = Alliance.load(m.group(1)).id
             f.alliance2_id = Alliance.load(m.group(2)).id
             f.alliance3_id = Alliance.load(m.group(3)).id
-###         Merge Intel
+            for prefix in prefixes:
+                session.execute(text("UPDATE %sintel SET alliance_id = %s WHERE alliance_id = %s or alliance_id = %s;" % (prefix, f.alliance3_id, f.alliance2_id, f.alliance1_id)))
         elif category == "Relation Change":
             # "Ultores has declared war on Conspiracy !"
             # "Ultores has decided to end its NAP with NewDawn."
@@ -285,6 +286,7 @@ def penis():
 
 def closereqs(planet_tick):
     # Close old scan requests
+    global bots, prefixes
     t_start = time.time()
     for i in range(len(bots)):
         if bots[i].getboolean("Misc", "acl"):
