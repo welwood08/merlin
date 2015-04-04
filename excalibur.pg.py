@@ -383,6 +383,9 @@ def ticker(alt=False):
                 continue
     
             if not planet_tick > last_tick:
+                if planet_tick < last_tick - 5:
+                    excaliburlog("Looks like a new round. Giving up.")
+                    return False
                 excaliburlog("Stale ticks found, sleeping")
                 time.sleep(60)
                 continue
@@ -1319,12 +1322,12 @@ if __name__ == "__main__":
     excaliburlog("Dumping from %s" %(Config.get("URL", "dumps"),))
     
     planet_tick = ticker()
-    
-    penis()
-    closereqs(planet_tick)
-    parsescans(oldtick)
-    clean_cache()
-    find1man(planet_tick-oldtick)
+    if planet_tick:
+        penis()
+        closereqs(planet_tick)
+        parsescans(oldtick)
+        clean_cache()
+        find1man(planet_tick-oldtick)
     
     # Add a newline at the end
     excaliburlog("\n")
