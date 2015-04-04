@@ -21,15 +21,20 @@
 
 # Module by Martin Stone
 
-# Admin tools
+from Core.loadable import loadable, robohci, route
+from Core.admintools import admin_msg
 
+class adminmsg(loadable):
+    """Sends a message to all online admins (from merlin.cfg)"""
+    usage=" <message>"
+    access=1
 
-def admin_msg(message, priority=2):
-    # Import these here or Core/connection.py will get upset.
-    from Core.chanusertracker import CUT
-    from Core.config import Config
-    from Core.connection import Connection
+    @robohci
+    def robocop(self, message, text):
+        if text[:3] == "!#!":
+            text = text[3:].replace("!#!", " ")
+        admin_msg(text)
 
-    for a in Config.options("Admins"):
-        for nick in CUT.get_user_nicks(a.lower()):
-            Connection.write("PRIVMSG %s :%s" % (nick, message), priority)
+    @route(r"(.+)")
+    def execute(self, message, user, params):
+        admin_msg("%s (%s)" % (params.group(1), user.name))
