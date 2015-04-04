@@ -30,7 +30,7 @@ from threading import Thread
 from Core.exceptions_ import Reboot
 from Core.config import Config
 from Core.string import decode, encode, CRLF
-from Core.admintools import adminmsg
+from Core.admintools import admin_msg
 
 class connection(object):
     # Socket/Connection handler
@@ -99,7 +99,7 @@ class connection(object):
         if self.output.qsize() > Config.getint("Connection", "maxqueue"):
             if time.time() > self.queue_warned + 300:
                 self.queue_warned = time.time()
-                adminmsg("Message output queue length is too long: %s messages" % self.output.qsize())
+                admin_msg("Message output queue length is too long: %s messages" % self.output.qsize())
 
     def writeout(self):
         # Write to socket/server
@@ -118,7 +118,7 @@ class connection(object):
                 if priority < 10 and time.time() > sent + Config.getint("Connection", "maxdelay"):
                     if time.time() > self.wait_warned + 300:
                         self.wait_warned = time.time()
-                        adminmsg("Message output message delay is too long: %.1f seconds" % (time.time() - sent))
+                        admin_msg("Message output message delay is too long: %.1f seconds" % (time.time() - sent))
                 self.sock.send(encode(line) + CRLF)
                 self.last = time.time()
                 print "%s >>> %s" % (time.asctime(),encode(line),)

@@ -47,4 +47,5 @@ __all__ = ["system",
            "ctcp",
            "rollback",
            "updatenotifier",
+           "adminmsg",
            ]
