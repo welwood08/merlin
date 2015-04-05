@@ -1,7 +1,7 @@
 Merlin
 ========
 Merlin is the Copyright &copy; 2012 of Robin K. Hansen, Elliot Rosemarine, Andreas Jacobsen.  
-This version was modified and added to by Martin Stone 2012-2013.  
+This version was modified and added to by Martin Stone 2012-2015.  
 Please read the included LICENSE.
 
 Here Be Dragons
@@ -24,7 +24,7 @@ Requirements (tested on):
 
 Additional Arthur requirements: 
 
-+ Apache 2.2 + mod_wsgi (also tested with nginx)
++ nginx (Apache 2.2 + mod_wsgi should be fine)
 + Django 1.4+
 + Jinja2 2.6
 
@@ -48,13 +48,13 @@ Create and chmod 666 these files:
 
 >Note that these sort of permissions are potentially insecure and can cause a stale graphing cache. For more information, refer to README.Posix.
 
-Installation Instructions
+Quick Installation Instructions
 ----------------------------
 Use Git to download the code and create a branch to track your changes:
 
 	git clone git://github.com/d7415/merlin.git
 	cd merlin
-	git checkout -b <your_branch_name>
+	git checkout -b <your_branch_name> acl-stable
 	
 After making changes to the code/config, you should store your changes:
 
@@ -63,9 +63,9 @@ After making changes to the code/config, you should store your changes:
 	
 To update the code to the latest available source:
 
-	git checkout master
+	git checkout acl-stable
 	git pull
-	git rebase master <your_branch_name>
+	git rebase acl-stable <your_branch_name>
 	
 This will re-apply your changes on top of the latest source. If you made some incompatible changes you might need to modify your change!
 
