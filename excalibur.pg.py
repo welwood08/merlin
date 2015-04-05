@@ -19,13 +19,13 @@
 # along with this program; if not, write to the Free Software
 # Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA 02110-1301 USA
  
-import datetime, re, sys, time, traceback, urllib2, shutil, os, errno
+import datetime, re, sys, time, traceback, urllib2, shutil, os, errno, socket
 from sqlalchemy.sql import text, bindparam
 from sqlalchemy import and_
 from sqlalchemy.sql.functions import max as max_
 from Core.config import Config
 from Core.paconf import PA
-from Core.string import decode, excaliburlog, errorlog
+from Core.string import decode, excaliburlog, errorlog, CRLF
 from Core.db import true, false, session
 from Core.maps import Updates, galpenis, apenis, Scan, Planet, Alliance, PlanetHistory, Galaxy, Feed, War
 from Core.maps import galaxy_temp, planet_temp, alliance_temp, planet_new_id_search, planet_old_id_search
@@ -55,6 +55,15 @@ class DefaultErrorHandler(urllib2.HTTPDefaultErrorHandler):
         result.status = code
         return result 
 
+def push_message(bot, command, text):
+# Robocop message pusher
+    line = "%s text=%s" % (command, "!#!" + text.replace(" ", "!#!"))
+    port = bot.getint("Misc", "robocop")
+    sock = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+    sock.settimeout(30)
+    sock.connect(("127.0.0.1", port,))
+    sock.send(line + CRLF)
+    sock.close()
 
 def get_dumps(last_tick, alt=False, useragent=None):
     if alt:
@@ -386,6 +395,8 @@ def ticker(alt=False):
             if not planet_tick > last_tick:
                 if planet_tick < last_tick - 5:
                     excaliburlog("Looks like a new round. Giving up.")
+                    for bot in bots:
+                        push_message(bot, "adminmsg", "The current tick appears to be %s, but I've seen tick %s. Has a new round started?" % (planet_tick, last_tick))
                     return False
                 excaliburlog("Stale ticks found, sleeping")
                 time.sleep(60)
