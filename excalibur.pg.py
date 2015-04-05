@@ -174,9 +174,9 @@ def parse_userfeed(userfeed):
     last_tick = session.query(max_(Feed.tick)).scalar() or 0
     for line in userfeed:
         [tick, category, text] = decode(line).strip().split("\t")
+        tick = int(tick)
         if tick <= last_tick:
             continue
-        tick = int(tick)
         category = category[1:-1]
         text = text[1:-1]
         f = Feed(tick=tick, category=category, text=text)
@@ -213,6 +213,7 @@ def parse_userfeed(userfeed):
             else:
                 m = re.match(r"(.*) and (.*) have confirmed .*", text) or re.match(r"(.*) has decided to end its .* with (.*).", text)  or \
                     re.match(r"(.*)'s war with (.*) has expired.", text)
+                dec_war = False
 
             if m:
                 a1 = Alliance.load(m.group(1))
