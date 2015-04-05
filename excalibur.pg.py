@@ -309,10 +309,10 @@ def closereqs(planet_tick):
 
 
 def parsescans(tick):
-    Q = session.query(Scan).filter(Scan.planet_id == None).filter(Scan.tick >= tick - 1)
-    if Q.count() > 0:
-        for s in Q.all():
-            parse(s.scanner_id, "scan", s.pa_id).start()
+    for i in range(len(bots)):
+        Q = session.execute(text("SELECT scanner_id, pa_id FROM %sscan WHERE planet_id IS NULL AND tick >= %s - 1;" % (prefixes[i], tick)))
+        for s in Q:
+            parse(s[0], "scan", s[1]).start()
 
 
 def clean_cache():
