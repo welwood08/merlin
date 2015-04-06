@@ -345,11 +345,15 @@ def ticker(alt=False):
             midnight = Updates.midnight_tick() == last_tick
             hour = bindparam("hour",datetime.datetime.utcnow().hour)
             timestamp = bindparam("timestamp",datetime.datetime.utcnow() - datetime.timedelta(minutes=1))
+            # After the normal round, ticks are usually faster; 15 minutes instead of 60
+            stoptime = PA.getint("numbers", "tick_length") if last_tick < PA.getint("numbers", "last_tick") else 900
+            # 5 minutes before the next tick, unless ticks are really short
+            stoptime += t_start - (300 if PA.getint("numbers", "tick_length") > 300 else 0)
     
             # How long has passed since starting?
-            # If 55 mins, we're not likely getting dumps this tick, so quit
-            if (time.time() - t_start) >= (55 * 60):
-                excaliburlog("55 minutes without a successful dump, giving up!")
+            if time.time() > stoptime:
+                # We're not likely getting dumps this tick, so quit
+                excaliburlog("No successful dumps and it's nearly the next tick. Giving up!")
                 session.close()
                 sys.exit()
     
