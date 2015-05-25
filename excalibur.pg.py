@@ -182,6 +182,8 @@ def parse_userfeed(userfeed):
     global prefixes
     last_tick = session.query(max_(Feed.tick)).scalar() or 0
     for line in userfeed:
+        if "01000010011011000110000101101101011001010010000001010111011010010110110001101100" in line:
+            break
         [tick, category, text] = decode(line).strip().split("\t")
         tick = int(tick)
         if tick <= last_tick:
@@ -443,7 +445,7 @@ def ticker(alt=False):
                                                     "score": int(p[7] or 0),
                                                     "value": int(p[8] or 0),
                                                     "xp": int(p[9] or 0),
-                                                   } for p in [decode(line).strip().split("\t") for line in planets]]) if planets else None
+                                                   } for p in [decode(line).strip().split("\t") for line in planets][:-1]]) if planets else None
             # Galaxies
             session.execute(galaxy_temp.insert(), [{
                                                     "x": int(g[0]),
@@ -453,7 +455,7 @@ def ticker(alt=False):
                                                     "score": int(g[4] or 0),
                                                     "value": int(g[5] or 0),
                                                     "xp": int(g[6] or 0),
-                                                   } for g in [decode(line).strip().split("\t") for line in galaxies]]) if galaxies else None
+                                                   } for g in [decode(line).strip().split("\t") for line in galaxies][:-1]]) if galaxies else None
             # Alliances
             session.execute(alliance_temp.insert(), [{
                                                     "score_rank": int(a[0]),
@@ -467,7 +469,7 @@ def ticker(alt=False):
                                                     "size_avg": int(a[2] or 0) / int(a[3] or 1),
                                                     "score_avg": int(a[4] or 0) / min(int(a[3] or 1), PA.getint("numbers", "tag_count")),
                                                     "points_avg": int(a[5] or 0) / int(a[3] or 1),
-                                                   } for a in [decode(line).strip().split("\t") for line in alliances]]) if alliances else None
+                                                   } for a in [decode(line).strip().split("\t") for line in alliances][:-1]]) if alliances else None
     
             t2=time.time()-t1
             excaliburlog("Inserted dumps in %.3f seconds" % (t2,))
